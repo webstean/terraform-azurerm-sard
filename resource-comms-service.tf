@@ -12,7 +12,7 @@ module "comms_keyvault" {
 
   name                            = local.comms_name_hostname
   resource_group_name             = module.environment_resource_group.resource.name
-  location                        = azurerm_resource_group.environment.location
+  location                        = module.environment_resource_group.resource.location
   tenant_id                       = data.azurerm_client_config.current.tenant_id
   sku_name                        = "standard"
   purge_protection_enabled        = true
@@ -63,7 +63,7 @@ module "comms_keyvault" {
   lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
     kind = "CanNotDelete"
   } : null
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [
     azurerm_role_assignment.kvault_admin,
     azurerm_user_assigned_identity.environment
@@ -80,9 +80,9 @@ resource "azurerm_communication_service" "this" {
 
   name                = local.comms_name_location
   resource_group_name = module.environment_resource_group.resource.name
-  data_location       = local.regions[azurerm_resource_group.environment.location].data_location
+  data_location       = local.regions[module.environment_resource_group.resource.location].data_location
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   timeouts {
     create = "60m"
     delete = "60m"
@@ -135,8 +135,8 @@ resource "azurerm_role_assignment" "comms_service_owner2" {
 resource "azurerm_email_communication_service" "this" {
   name                = "${local.comms_name_location}-email"
   resource_group_name = module.environment_resource_group.resource.name
-  data_location       = local.regions[azurerm_resource_group.environment.location].data_location
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  data_location       = local.regions[module.environment_resource_group.resource.location].data_location
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_email_communication_service_domain" "this" {
@@ -144,7 +144,7 @@ resource "azurerm_email_communication_service_domain" "this" {
   email_service_id                 = azurerm_email_communication_service.this.id
   domain_management                = "AzureManaged"
   user_engagement_tracking_enabled = true
-  tags                             = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                             = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_communication_service_email_domain_association" "comms" {
@@ -252,7 +252,7 @@ locals {
 resource "azurerm_notification_hub_namespace" "this" {
   name                = "${local.comms_name_location}-namespace"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   namespace_type      = "NotificationHub"
   sku_name            = local.notification_hub_sku
 }
@@ -260,7 +260,7 @@ resource "azurerm_notification_hub_namespace" "this" {
 resource "azurerm_notification_hub" "this" {
   name                = "${local.comms_name_location}-hub"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   namespace_name      = azurerm_notification_hub_namespace.this.name
   /*
   ## VAPID

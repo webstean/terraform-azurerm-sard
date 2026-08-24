@@ -12,7 +12,7 @@ locals {
 resource "azurerm_virtual_wan" "this" {
   name                = local.vwan_name
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
 
   disable_vpn_encryption            = false
   allow_branch_to_branch_traffic    = false
@@ -20,24 +20,24 @@ resource "azurerm_virtual_wan" "this" {
   ## With Basic, the hubs are free!
   type = local.vwan_sku
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 ## $$ (unles vWAN is basic SKU) We need 1x vWAN Hub in each region (take a long time to deploy - 30+ minutes)
 resource "azurerm_virtual_hub" "this" {
   name                = local.vwan_name
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
 
   virtual_wan_id = azurerm_virtual_wan.this.id
 
   ## address space
-  address_prefix = "10.99.${local.regions[azurerm_resource_group.environment.location].location_number}.0/24"
+  address_prefix = "10.99.${local.regions[module.environment_resource_group.resource.location].location_number}.0/24"
   sku            = local.vwan_hub_sku ## Possible values are Basic and Standard. 
 
   hub_routing_preference = "ASPath" ## Possible values are ExpressRoute, ASPath and VpnGateway.
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_vpn_gateway" "main" {
@@ -47,12 +47,12 @@ resource "azurerm_vpn_gateway" "main" {
 
   name                                  = "vpn-gateway-${var.environment}-${title(each.value.short_name)}"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   virtual_hub_id                        = azurerm_virtual_hub.this.id
   bgp_route_translation_for_nat_enabled = false
   routing_preference                    = "Microsoft Network"
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_virtual_hub_connection" "vnet" {

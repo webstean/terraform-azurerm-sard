@@ -38,11 +38,11 @@ EOT
 resource "azurerm_public_ip" "nginx" {
   name                = "pip-${local.nginx_name_location}"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   allocation_method   = "Static"
   sku                 = "Standard"
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_subnet" "nginx" {
@@ -70,7 +70,7 @@ resource "azurerm_nginx_deployment" "this" {
   name                = local.nginx_name_hostname
   sku                 = "standardv3_Monthly"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
 
   automatic_upgrade_channel = "stable"
   auto_scale_profile {
@@ -98,7 +98,7 @@ resource "azurerm_nginx_deployment" "this" {
   }
   ##email = azuread_group.cloud_support.mail
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   #  depends_on = [
   #    azurerm_subnet_network_security_group_association.nginx
   #  ]
@@ -165,9 +165,9 @@ resource "azurerm_monitor_diagnostic_setting" "nginx_logs" {
 */
 
 resource "azurerm_network_security_group" "nginx" {
-  name                = "nsg-nginx-${lower(azurerm_resource_group.environment.location)}"
+  name                = "nsg-nginx-${lower(module.environment_resource_group.resource.location)}"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
 
   security_rule {
     name                       = "AllowHttps-from-Internet"
@@ -288,7 +288,7 @@ resource "azurerm_network_security_group" "nginx" {
     description                = "Deny ALL Outbound as part of Zero Trust Networking"
   }
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   lifecycle {
     ignore_changes = [tags.created]
   }

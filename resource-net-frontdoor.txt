@@ -22,7 +22,7 @@ resource "azurerm_cdn_frontdoor_profile" "this" {
   sku_name            = var.frontdoor_sku == "Standard" ? "Standard_AzureFrontDoor" : "Premium_AzureFrontDoor"
 
   response_timeout_seconds = 30
-  tags                     = azurerm_resource_group.environment.tags
+  tags                     = module.environment_resource_group.resource.tags
   lifecycle {
     ignore_changes = [tags.created]
   }

@@ -25,7 +25,7 @@ resource "azurerm_dns_zone" "environment" {
   name                = "${var.prefix}.${var.custom_dns_zone_name}"
   resource_group_name = module.environment_resource_group.resource.name
   # soa record is automatically created by Azure DNS and is essentially cosmetic, as its about zone transfers, that Azure DNS does not support.
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_dns_ns_record" "delegation" {
@@ -36,7 +36,7 @@ resource "azurerm_dns_ns_record" "delegation" {
   resource_group_name = data.azurerm_dns_zone.specified.resource_group_name
   ttl                 = 10
   records             = azurerm_dns_zone.environment.name_servers
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 locals {
@@ -67,7 +67,7 @@ resource "azurerm_dns_caa_record" "cas" {
       value = record.value.value
     }
   }
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_dns_a_record" "testv4" {
@@ -76,7 +76,7 @@ resource "azurerm_dns_a_record" "testv4" {
   zone_name           = azurerm_dns_zone.environment.name
   records             = ["8.8.8.8", "8.8.4.4", "1.1.1.1", "1.0.0.1"]
   ttl                 = 300
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 resource "azurerm_dns_cname_record" "t4" {
   name                = "t4"
@@ -84,7 +84,7 @@ resource "azurerm_dns_cname_record" "t4" {
   resource_group_name = module.environment_resource_group.resource.name
   record              = azurerm_dns_a_record.testv4.fqdn
   ttl                 = 30
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 resource "azurerm_dns_cname_record" "test" {
   name                = "t"
@@ -92,7 +92,7 @@ resource "azurerm_dns_cname_record" "test" {
   resource_group_name = module.environment_resource_group.resource.name
   record              = azurerm_dns_a_record.testv4.fqdn
   ttl                 = 30
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_dns_aaaa_record" "testv6" {
@@ -101,7 +101,7 @@ resource "azurerm_dns_aaaa_record" "testv6" {
   zone_name           = azurerm_dns_zone.environment.name
   records             = ["2001:4860:4860::8888", "2001:4860:4860::8844", "2606:4700:4700::1111", "2606:4700:4700::1001"]
   ttl                 = 300
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 resource "azurerm_dns_cname_record" "t6" {
   name                = "t6"
@@ -109,7 +109,7 @@ resource "azurerm_dns_cname_record" "t6" {
   resource_group_name = module.environment_resource_group.resource.name
   record              = azurerm_dns_aaaa_record.testv6.fqdn
   ttl                 = 30
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_dns_cname_record" "web" {
@@ -118,7 +118,7 @@ resource "azurerm_dns_cname_record" "web" {
   resource_group_name = module.environment_resource_group.resource.name
   record              = azurerm_static_web_app.this.default_host_name
   ttl                 = 30
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_static_web_app_custom_domain" "this" {
@@ -146,7 +146,7 @@ resource "azurerm_dns_a_record" "apex_alias" { ## ${var.prefix}.${var.custom_dns
 
   target_resource_id = azurerm_static_web_app.this.id
   # or target_resource_id pointing at a public IP, Traffic Manager profile, etc.
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 resource "azurerm_static_web_app_custom_domain" "apex" {
   static_web_app_id = azurerm_static_web_app.this.id
@@ -171,7 +171,7 @@ resource "azurerm_dns_txt_record" "swa_dnsauth" {
   record {
     value = azurerm_static_web_app_custom_domain.apex.validation_token
   }
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [
     azurerm_dns_a_record.apex_alias,
   ]
@@ -185,7 +185,7 @@ resource "azurerm_dns_txt_record" "swa_dnsauth_verify" {
   record {
     value = try(azurerm_static_web_app_custom_domain.apex.validation_token, "already-used")
   }
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [
     azurerm_static_web_app_custom_domain.apex,
     azurerm_dns_a_record.apex_alias,
@@ -196,7 +196,7 @@ resource "azurerm_dns_zone" "aca" {
   name                = "${local.ingress_custom_aca}.${var.prefix}.${var.custom_dns_zone_name}"
   resource_group_name = module.environment_resource_group.resource.name
   # soa record is automatically created by Azure DNS and is essentially cosmetic, as its about zone transfers, that Azure DNS does not support.
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 resource "azurerm_dns_ns_record" "aca" {
   name                = local.ingress_custom_aca
@@ -204,7 +204,7 @@ resource "azurerm_dns_ns_record" "aca" {
   zone_name           = azurerm_dns_zone.environment.name
   ttl                 = 10
   records             = azurerm_dns_zone.aca.name_servers
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 resource "azurerm_dns_a_record" "aca" { ## establish domain ownership
   name                = "*"
@@ -214,7 +214,7 @@ resource "azurerm_dns_a_record" "aca" { ## establish domain ownership
     azurerm_container_app_environment.this.static_ip_address,
   ]
   ttl  = 300
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 resource "azurerm_dns_a_record" "acatest" {
   name                = "t"
@@ -222,7 +222,7 @@ resource "azurerm_dns_a_record" "acatest" {
   zone_name           = azurerm_dns_zone.aca.name
   records             = ["8.8.8.8", "8.8.4.4", "1.1.1.1", "1.0.0.1"]
   ttl                 = 300
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 resource "azurerm_dns_txt_record" "aca" { ## establish domain ownership
 
@@ -233,7 +233,7 @@ resource "azurerm_dns_txt_record" "aca" { ## establish domain ownership
     value = azurerm_container_app_environment.this.custom_domain_verification_id
   }
   ttl  = 300
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 resource "azurerm_dns_caa_record" "aca_cas" {
   name                = "@"
@@ -249,7 +249,7 @@ resource "azurerm_dns_caa_record" "aca_cas" {
       value = record.value.value
     }
   }
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_dns_cname_record" "pubsub" { ## custom domain, needs premium SKU
@@ -260,7 +260,7 @@ resource "azurerm_dns_cname_record" "pubsub" { ## custom domain, needs premium S
   resource_group_name = module.environment_resource_group.resource.name
   record              = azurerm_web_pubsub.this.hostname
   ttl                 = 300
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_dns_cname_record" "storage1" {
@@ -271,7 +271,7 @@ resource "azurerm_dns_cname_record" "storage1" {
   resource_group_name = module.environment_resource_group.resource.name
   ttl                 = 300
   record              = azurerm_storage_account.this.primary_blob_host
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 resource "azurerm_dns_cname_record" "storage2" {
   for_each = var.inbound_access == "FrontDoor" ? local.ingress_aliases_storage_diag : toset([])
@@ -281,7 +281,7 @@ resource "azurerm_dns_cname_record" "storage2" {
   resource_group_name = module.environment_resource_group.resource.name
   ttl                 = 300
   record              = azurerm_storage_account.diag.primary_blob_host
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_dns_cname_record" "ingress_frontdoor" {
@@ -292,7 +292,7 @@ resource "azurerm_dns_cname_record" "ingress_frontdoor" {
   resource_group_name = module.environment_resource_group.resource.name
   record              = azurerm_cdn_frontdoor_endpoint.this[0].host_name
   ttl                 = 300
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 /*
@@ -310,7 +310,7 @@ resource "azurerm_dns_srv_record" "ingress_frontdoor_tls1" {
     target   = azurerm_cdn_frontdoor_origin.this[0].host_name
     port     = (tobool(var.data_pii) || tobool(var.data_phi)) ? 443 : 8443
   }
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 resource "azurerm_dns_srv_record" "ingress_frontdoor_tls2" {
   for_each = var.inbound_access == "FrontDoor" ? local.ingress_aliases_aca : toset([])
@@ -326,7 +326,7 @@ resource "azurerm_dns_srv_record" "ingress_frontdoor_tls2" {
     target   = each.value
     port     = (tobool(var.data_pii) || tobool(var.data_phi)) ? 443 : 8443
   }
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 */
 
@@ -338,7 +338,7 @@ resource "azurerm_dns_a_record" "ingress_app_gateway" {
   zone_name           = azurerm_dns_zone.environment.name
   records             = [azurerm_public_ip.app_gateway[0].ip_address]
   ttl                 = 300
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_dns_mx_record" "mail" {
@@ -351,7 +351,7 @@ resource "azurerm_dns_mx_record" "mail" {
     exchange   = "${replace(azurerm_dns_zone.environment.name, ".", "-")}.mail.protection.outlook.com."
   }
   ttl  = 300
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 /*
@@ -363,7 +363,7 @@ resource "azurerm_dns_cname_record" "m365_dkim1" {
   resource_group_name = module.environment_resource_group.resource.name
   record              = "selector1-${replace(each.key, ".", "-")}._domainkey.${var.m365_tenant_onmicrosoft_domain}"
   ttl                 = 3600
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 */
 
@@ -375,7 +375,7 @@ resource "azurerm_dns_cname_record" "autodiscover" {
   zone_name           = azurerm_dns_zone.environment.name
   record              = "autodiscover.outlook.com"
   ttl                 = 300
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_dns_cname_record" "m365-enterpriseregistration" {
@@ -386,7 +386,7 @@ resource "azurerm_dns_cname_record" "m365-enterpriseregistration" {
   resource_group_name = module.environment_resource_group.resource.name
   record              = "enterpriseregistration.windows.net"
   ttl                 = 3600
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_dns_cname_record" "m365-enterpriseenrollment" {
@@ -397,7 +397,7 @@ resource "azurerm_dns_cname_record" "m365-enterpriseenrollment" {
   resource_group_name = module.environment_resource_group.resource.name
   record              = "enterpriseenrollment-s.manage.microsoft.com"
   ttl                 = 3600
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_dns_cname_record" "lyncdiscover" {
@@ -408,7 +408,7 @@ resource "azurerm_dns_cname_record" "lyncdiscover" {
   resource_group_name = module.environment_resource_group.resource.name
   record              = "webdir.online.lync.com"
   ttl                 = 3600
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_dns_txt_record" "dmarc" {
@@ -421,7 +421,7 @@ resource "azurerm_dns_txt_record" "dmarc" {
     value = "v=DMARC1; p=quarantine; pct=100"
   }
   ttl  = 3600
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_cdn_frontdoor_custom_domain" "this" {
@@ -447,7 +447,7 @@ resource "azurerm_dns_txt_record" "frontdoor_validation" {
   record {
     value = azurerm_cdn_frontdoor_custom_domain.this[each.key].validation_token
   }
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_dns_txt_record" "txt1" {
@@ -476,7 +476,7 @@ resource "azurerm_dns_txt_record" "txt1" {
       value = "v=spf1 include:spf.protection.outlook.com ~all"
     }
   }
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_dns_txt_record" "msrdc" {
@@ -494,7 +494,7 @@ resource "azurerm_dns_txt_record" "msrdc" {
     ## Windows 365 / DevBox - https://rdweb.<domain>/RDWeb/Feed/webfeed.aspx
     value = "https://rdweb.${replace(azurerm_dns_zone.environment.name, ".", "-")}/RDWeb/Feed/webfeed.aspx"
   }
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_dns_srv_record" "m365_sipfederationtls_tcp" {
@@ -512,7 +512,7 @@ resource "azurerm_dns_srv_record" "m365_sipfederationtls_tcp" {
     target   = "sipfed.online.lync.com."
   }
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   ## Resolve-DnsName -Name "_sipfederationtls._tcp.${azurerm_dns_zone.environment.name}" -Type SRV
 }
 
@@ -528,7 +528,7 @@ resource "azurerm_dns_srv_record" "m365_sip_tls" {
     port     = 443
     target   = "sipdir.online.lync.com."
   }
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 /*

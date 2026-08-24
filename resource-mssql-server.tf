@@ -25,10 +25,10 @@ resource "azurerm_user_assigned_identity" "sqlserver" {
   name = "id-${local.sql_server_location}-sqlserver-readwrite"
 
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   isolation_scope     = var.deploy_sql_failover ? null : "Regional"
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   lifecycle {
     create_before_destroy = true
   }
@@ -41,9 +41,9 @@ resource "time_sleep" "sqlserver_identity_create_wait" {
 resource "azurerm_network_security_group" "inbound_sqlserver" {
   count = tobool(var.deploy_private_endpoints) ? 1 : 0
 
-  name                = "nsg-sqlserver-${lower(azurerm_resource_group.environment.location)}-inbound"
+  name                = "nsg-sqlserver-${lower(module.environment_resource_group.resource.location)}-inbound"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
 
   security_rule {
     name                       = "Inbound-SQL-Server-Database-From-Internet"
@@ -124,7 +124,7 @@ resource "azurerm_network_security_group" "inbound_sqlserver" {
     destination_address_prefix = "*"
     description                = "Deny ALL Outbound as part of Zero Trust Networking"
   }
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_role_assignment" "sqlstorage1" {
@@ -141,13 +141,13 @@ resource "azurerm_role_assignment" "sqlstorage2" {
 }
 
 resource "azurerm_role_assignment" "sql_svr_contributor" {
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "SQL Server Contributor"
   principal_id         = azurerm_user_assigned_identity.environment.principal_id
   description          = local.iac_message
 }
 resource "azurerm_role_assignment" "sql_db_contributor" {
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "SQL DB Contributor"
   principal_id         = azurerm_user_assigned_identity.environment.principal_id
   description          = local.iac_message
@@ -156,13 +156,13 @@ resource "azurerm_role_assignment" "sql_db_contributor" {
 resource "azurerm_key_vault" "sql_kv" {
   name                       = local.sql_server_hostname
   resource_group_name        = module.environment_resource_group.resource.name
-  location                   = azurerm_resource_group.environment.location
+  location                   = module.environment_resource_group.resource.location
   sku_name                   = "standard"
   tenant_id                  = data.azurerm_client_config.current.tenant_id
   purge_protection_enabled   = true
   rbac_authorization_enabled = true
   soft_delete_retention_days = 7
-  tags                       = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                       = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 # Grant the deploying principal permissions to create the key
@@ -196,7 +196,7 @@ resource "azurerm_key_vault_key" "tde" {
       time_before_expiry = "P30D"
     }
   }
-  tags       = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags       = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [azurerm_role_assignment.sql_kv_admin]
 }
 
@@ -207,7 +207,7 @@ module "sql_server_this" {
   enable_telemetry = var.enable_telemetry
 
   name                = "${local.sql_server_location}-p1"
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   resource_group_name = module.environment_resource_group.resource.name
   server_version      = "12.0"
   azuread_administrator = {
@@ -247,20 +247,20 @@ module "sql_server_this" {
 /*
   public_network_access_enabled = false
   tags = merge(
-    azurerm_resource_group.environment.tags,
-    lookup(azurerm_resource_group.environment.tags, "stateless", "") == "yes" ? { stateless = "no" } : {}
+    module.environment_resource_group.resource.tags,
+    lookup(module.environment_resource_group.resource.tags, "stateless", "") == "yes" ? { stateless = "no" } : {}
   )
   lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
     kind = "CanNotDelete"
   } : null
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 */
 
 resource "azurerm_mssql_server" "this" {
   name                                 = "${local.sql_server_location}-p1"
   resource_group_name                  = module.environment_resource_group.resource.name
-  location                             = azurerm_resource_group.environment.location
+  location                             = module.environment_resource_group.resource.location
   version                              = "12.0"
   public_network_access_enabled        = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
   outbound_network_restriction_enabled = false
@@ -278,7 +278,7 @@ resource "azurerm_mssql_server" "this" {
   ## Possible values are Default, Proxy, and Redirect.
   connection_policy = "Default"
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 ## https://learn.microsoft.com/en-us/azure/azure-sql/database/dns-alias-overview?view=azuresql
@@ -299,7 +299,7 @@ resource "azurerm_mssql_server" "this-failover" {
 
   name                                 = "${local.sql_server_location}-f1"
   resource_group_name                  = module.environment_resource_group.resource.name
-  location                             = local.regions[azurerm_resource_group.environment.location].default_rep_location
+  location                             = local.regions[module.environment_resource_group.resource.location].default_rep_location
   version                              = "12.0"
   public_network_access_enabled        = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
   outbound_network_restriction_enabled = false
@@ -317,7 +317,7 @@ resource "azurerm_mssql_server" "this-failover" {
   ## Possible values are Default, Proxy, and Redirect.
   connection_policy = "Default"
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 /*
 resource "azurerm_mssql_firewall_rule" "this_rule1" {
@@ -384,7 +384,7 @@ resource "azurerm_storage_container" "sqldiag" {
 
 resource "time_sleep" "resource_group_create_wait" {
   create_duration = "30s"
-  depends_on      = [azurerm_resource_group.environment]
+  depends_on      = [module.environment_resource_group]
 }
 
 /*
@@ -420,7 +420,7 @@ resource "azurerm_mssql_server_security_alert_policy" "this" {
 resource "azurerm_role_definition" "mssql-db-reader" {
   name        = "Database-MSSQL-Server-Reader"
   description = "Just enough SQL Database access to read a MS SQL Server and its Databases configuration (but not its data)"
-  scope       = azurerm_resource_group.environment.id
+  scope       = module.environment_resource_group.resource_id
 
   permissions {
     actions = [
@@ -445,7 +445,7 @@ resource "azurerm_role_definition" "mssql-db-reader" {
 resource "azurerm_role_definition" "mssql-db-restore" {
   name        = "Database-MSSQL-Server-Restore"
   description = "Just enough SQL Database access to overwrite (restore) a MS SQL Server and any of its Databases configuration (but not its data)"
-  scope       = azurerm_resource_group.environment.id
+  scope       = module.environment_resource_group.resource_id
 
   permissions {
     actions = [
@@ -521,7 +521,7 @@ resource "azapi_resource_action" "sql_server_automatic_tuning" {
 resource "azurerm_mssql_elasticpool" "basic" {
   name                = "${azurerm_mssql_server.this.name}-basic-epool"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   server_name         = azurerm_mssql_server.this.name
   license_type        = "LicenseIncluded"
   max_size_gb         = 756

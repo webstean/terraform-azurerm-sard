@@ -16,7 +16,7 @@ module "log_analytics_workspace" {
 
   name                                      = local.law_name_location
   resource_group_name                       = module.environment_resource_group.resource.name
-  location                                  = azurerm_resource_group.environment.location
+  location                                  = module.environment_resource_group.resource.location
   log_analytics_workspace_sku               = "PerGB2018"
   log_analytics_workspace_daily_quota_gb    = 5
   log_analytics_workspace_retention_in_days = 30 ## free
@@ -54,7 +54,7 @@ module "log_analytics_workspace" {
   lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
     kind = "CanNotDelete"
   } : null
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 module "application_insights" {
@@ -64,7 +64,7 @@ module "application_insights" {
 
   name                          = "insights-${local.law_name}"
   resource_group_name           = module.environment_resource_group.resource.name
-  location                      = azurerm_resource_group.environment.location
+  location                      = module.environment_resource_group.resource.location
   workspace_id                  = module.log_analytics_workspace.resource_id
   retention_in_days             = 30
   daily_data_cap_in_gb          = (try(var.data_pii, false) || try(var.data_phi, false)) ? 10 : 1
@@ -148,7 +148,7 @@ module "application_insights" {
   lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
     kind = "CanNotDelete"
   } : null
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 locals {
@@ -221,7 +221,7 @@ resource "azurerm_application_insights_workbook" "workbook1" {
   name                = uuid() ## must be a GUID
   description         = "Example Workbook created via Terraform"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   display_name        = "Workbook1"
   data_json = jsonencode({
     "version" = "Notebook/1.0",
@@ -239,7 +239,7 @@ resource "azurerm_application_insights_workbook" "workbook1" {
       "Azure Monitor"
     ]
   })
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 # Sets every table currently in the Log Analytics workspace to the Basic
@@ -357,7 +357,7 @@ resource "azurerm_role_assignment" "defender_log_analytics2" {
 resource "azurerm_monitor_data_collection_endpoint" "otel" {
   name                = local.law_name_hostname
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
 
   # true = publicly reachable Azure Monitor endpoint
   # false = private link / AMPLS style only
@@ -365,7 +365,7 @@ resource "azurerm_monitor_data_collection_endpoint" "otel" {
 
   description = "Public Azure Monitor Data Collection Endpoint for OTLP/custom ingestion"
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 output "logs_otel_dce_id" {

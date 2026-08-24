@@ -15,7 +15,7 @@ module "search_keyvault" {
 
   name                            = local.search_name_hostname
   resource_group_name             = module.environment_resource_group.resource.name
-  location                        = azurerm_resource_group.environment.location
+  location                        = module.environment_resource_group.resource.location
   tenant_id                       = data.azurerm_client_config.current.tenant_id
   sku_name                        = "standard"
   purge_protection_enabled        = true
@@ -58,7 +58,7 @@ module "search_keyvault" {
   lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
     kind = "CanNotDelete"
   } : null
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [
     azurerm_role_assignment.kvault_admin,
     azurerm_user_assigned_identity.environment
@@ -72,7 +72,7 @@ module "ai_search_service" {
 
   name                = local.search_name_location
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
 
   sku                          = local.search_sku
   semantic_search_sku          = local.search_sku == "free" ? null : local.search_semantic_sku
@@ -115,7 +115,7 @@ module "ai_search_service" {
   lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
     kind = "CanNotDelete"
   } : null
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_storage_container" "rag_documents" {

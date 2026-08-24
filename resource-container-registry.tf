@@ -13,7 +13,7 @@ module "containerregistry" {
 
   name                          = local.acr_name_hostname
   resource_group_name           = module.environment_resource_group.resource.name
-  location                      = azurerm_resource_group.environment.location
+  location                      = module.environment_resource_group.resource.location
   sku                           = local.acr_sku
   admin_enabled                 = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
   public_network_access_enabled = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
@@ -67,7 +67,7 @@ module "containerregistry" {
   lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
     kind = "CanNotDelete"
   } : null
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 // Cache will only occur after at least one image pull is complete on the available container image.

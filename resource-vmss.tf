@@ -28,7 +28,7 @@ resource "azurerm_public_ip" "nat" {
 
   name                = "pip-${local.nat_name_location}"
   allocation_method   = "Static"
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   resource_group_name = module.environment_resource_group.resource.name
   sku                 = "StandardV2"
   sku_tier            = "Regional" ## "Global"
@@ -37,7 +37,7 @@ resource "azurerm_public_ip" "nat" {
   # an A DNS record is created for the public IP in the Microsoft Azure DNS system with a hashed value
   # includes in FQDN. Possible values are NoReuse, ResourceGroupReuse, SubscriptionReuse and TenantReuse.
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 /*
@@ -70,9 +70,9 @@ resource "azurerm_nat_gateway" "this" {
 
   name                = "nat-${local.nat_name_location}"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   sku_name            = "StandardV2" ## There is no cost difference between the two SKUs. Standard and Standardv2 - StandardV2 is multi-zones for free
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_nat_gateway_public_ip_association" "vnet-nat-gateway" {
@@ -120,7 +120,7 @@ module "vmss_keyvault" {
 
   name                            = local.vmss_name_hostname
   resource_group_name             = module.environment_resource_group.resource.name
-  location                        = azurerm_resource_group.environment.location
+  location                        = module.environment_resource_group.resource.location
   tenant_id                       = data.azurerm_client_config.current.tenant_id
   sku_name                        = "standard"
   purge_protection_enabled        = true
@@ -169,7 +169,7 @@ module "vmss_keyvault" {
   lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
     kind = "CanNotDelete"
   } : null
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [
     azurerm_role_assignment.kvault_admin,
     azurerm_user_assigned_identity.environment
@@ -211,7 +211,7 @@ module "avm_ptn_ephemeral_credential" {
 #module "get_valid_sku_for_deployment_region" {
 #  source = "../modules/sku_selector"
 #
-#  deployment_region = azurerm_resource_group.environment.location
+#  deployment_region = module.environment_resource_group.resource.location
 #}
 
 output "vmss_admin_username" {
@@ -247,8 +247,8 @@ module "virtualmachinescaleset" {
   enable_telemetry = var.enable_telemetry
 
   name                        = local.vmss_name
-  parent_id                   = azurerm_resource_group.environment.id
-  location                    = azurerm_resource_group.environment.location
+  parent_id                   = module.environment_resource_group.resource_id
+  location                    = module.environment_resource_group.resource.location
   extension_protected_setting = {}
   user_data_base64            = null
   admin_password              = random_string.id.result
@@ -437,7 +437,7 @@ module "virtualmachinescaleset" {
       enable_automatic_updates        = true
       patch_mode                      = "AutomaticByPlatform"
       patch_assessment_mode           = local.vmss_patching_mode == "Manual" ? "ImageDefault" : "AutomaticByPlatform"
-      timezone                        = local.regions[azurerm_resource_group.environment.location].timezone
+      timezone                        = local.regions[module.environment_resource_group.resource.location].timezone
       provision_vm_agent              = true
       winrm_listener = [{
         protocol = "Http"
@@ -507,7 +507,7 @@ module "virtualmachinescaleset" {
   lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
     kind = "CanNotDelete"
   } : null
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [
     module.vm_x64_skus,
     azurerm_user_assigned_identity.environment
@@ -523,7 +523,7 @@ module "vmss_autoscale_setting" {
 
   name                = "${local.vmss_name}-autoscale"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   target_resource_id  = module.virtualmachinescaleset.resource_id
   enabled             = true
 
@@ -566,7 +566,7 @@ module "vmss_autoscale_setting" {
       # non-scheduled profile can never actually become active, so Azure disables it. Giving
       # this profile its own weekday-morning trigger makes all three profiles unambiguous.
       recurrence = {
-        timezone = local.regions[azurerm_resource_group.environment.location].timezone
+        timezone = local.regions[module.environment_resource_group.resource.location].timezone
         days     = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
         hours    = [var.vmss_autoscale_business_hours_start]
         minutes  = [0]
@@ -580,7 +580,7 @@ module "vmss_autoscale_setting" {
         maximum = var.vmss_autoscale_weekend_capacity
       }
       recurrence = {
-        timezone = local.regions[azurerm_resource_group.environment.location].timezone
+        timezone = local.regions[module.environment_resource_group.resource.location].timezone
         days     = ["Saturday", "Sunday"]
         hours    = [0]
         minutes  = [0]
@@ -596,7 +596,7 @@ module "vmss_autoscale_setting" {
       # Weekdays only — Sat/Sun overnight is already covered by the "weekend" profile's
       # floor, so "zero" no longer needs to (and shouldn't) fire on those days too.
       recurrence = {
-        timezone = local.regions[azurerm_resource_group.environment.location].timezone
+        timezone = local.regions[module.environment_resource_group.resource.location].timezone
         days     = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
         hours    = [17]
         minutes  = [10]
@@ -611,7 +611,7 @@ module "vmss_autoscale_setting" {
       #custom_emails                         = [var.alert_email, var.owner_email]
     }
   }
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 /*
@@ -683,7 +683,7 @@ data "azapi_resource_action" "test" {
 resource "azurerm_role_assignment" "standby_pool_permission1" {
   count = local.vmss_enable_standby_pool ? 1 : 0
 
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "Virtual Machine Contributor"
   principal_id         = "05482a4e-4826-4fa3-8276-a8f74baccbe0" ## Standby Pool Resource Provider
   description          = local.iac_message
@@ -691,7 +691,7 @@ resource "azurerm_role_assignment" "standby_pool_permission1" {
 resource "azurerm_role_assignment" "standby_pool_permission2" {
   count = local.vmss_enable_standby_pool ? 1 : 0
 
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "Network Contributor"
   principal_id         = "05482a4e-4826-4fa3-8276-a8f74baccbe0" ## Standby Pool Resource Provider
   description          = local.iac_message
@@ -699,7 +699,7 @@ resource "azurerm_role_assignment" "standby_pool_permission2" {
 resource "azurerm_role_assignment" "standby_pool_permission3" {
   count = local.vmss_enable_standby_pool ? 1 : 0
 
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "Managed Identity Contributor"
   principal_id         = "05482a4e-4826-4fa3-8276-a8f74baccbe0" ## Standby Pool Resource Provider
   description          = local.iac_message
@@ -707,7 +707,7 @@ resource "azurerm_role_assignment" "standby_pool_permission3" {
 resource "azurerm_role_assignment" "standby_pool_permission4" {
   count = local.vmss_enable_standby_pool ? 1 : 0
 
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "Compute Gallery Sharing Admin"
   principal_id         = "05482a4e-4826-4fa3-8276-a8f74baccbe0" ## Standby Pool Resource Provider
   description          = local.iac_message
@@ -715,14 +715,14 @@ resource "azurerm_role_assignment" "standby_pool_permission4" {
 resource "azurerm_role_assignment" "standby_pool_permission5" {
   count = local.vmss_enable_standby_pool ? 1 : 0
 
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "Compute Gallery Artifacts Publisher"
   principal_id         = "05482a4e-4826-4fa3-8276-a8f74baccbe0" ## Standby Pool Resource Provider
   description          = local.iac_message
 }
 
 resource "azurerm_role_assignment" "compute_recommendations" {
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "Compute Diagnostics Role"
   principal_id         = "089139a2-afde-492b-9ffb-85096212422d" ## Compute Recommendation Service
   description          = local.iac_message
@@ -734,7 +734,7 @@ resource "azurerm_virtual_machine_scale_set_standby_pool" "hibernated" {
 
   name                                  = "${local.vmss_name}-hibernated-pool"
   resource_group_name                   = module.environment_resource_group.resource.name
-  location                              = azurerm_resource_group.environment.location
+  location                              = module.environment_resource_group.resource.location
   attached_virtual_machine_scale_set_id = module.virtualmachinescaleset.resource_id
   virtual_machine_state                 = "Hibernated"
 
@@ -743,7 +743,7 @@ resource "azurerm_virtual_machine_scale_set_standby_pool" "hibernated" {
     min_ready_capacity = 1 ## Specifies the desired minimum number of virtual machines in the standby pool.
   }
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [
     module.virtualmachinescaleset.resource_id,
     azurerm_role_assignment.standby_pool_permission1,
@@ -796,7 +796,7 @@ resource "azurerm_network_connection_monitor" "this" {
     test_configuration_names = ["tcp-443"]
     enabled                  = true
   }
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 
   depends_on = [
     module.virtualmachinescaleset

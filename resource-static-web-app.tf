@@ -13,7 +13,7 @@ resource "azurerm_static_web_app" "this" {
   name                = local.swa_name
   resource_group_name = module.environment_resource_group.resource.name
   // only available in: westus2,centralus,eastus2,westeurope,eastasia,eastasiastage
-  location = local.regions[azurerm_resource_group.environment.location].swa_location
+  location = local.regions[module.environment_resource_group.resource.location].swa_location
 
   sku_tier                           = local.swa_sku_tier
   sku_size                           = local.swa_sku_size
@@ -42,7 +42,7 @@ resource "azurerm_static_web_app" "this" {
   }
 */
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 /*
@@ -88,7 +88,7 @@ resource "local_file" "homepage" {
     environment_home_page = local.environment_home_page
     portal_link           = local.portal_link
     owner_email           = var.owner_email
-    location              = azurerm_resource_group.environment.location
+    location              = module.environment_resource_group.resource.location
   })
 }
 

@@ -44,10 +44,10 @@ resource "azurerm_public_ip" "app_gateway" {
 
   name                = local.app_gateway_public_ip_name
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   allocation_method   = "Static"
 
-  tags       = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags       = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [azurerm_role_assignment.sql_kv_admin]
 }
 
@@ -82,7 +82,7 @@ resource "azurerm_web_application_firewall_policy" "gateway" {
 
   name                = "wafp-${local.gateway_name_location}"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
 
   policy_settings {
     enabled                                   = true
@@ -102,7 +102,7 @@ resource "azurerm_web_application_firewall_policy" "gateway" {
     }
   }
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_application_gateway" "this" {
@@ -110,7 +110,7 @@ resource "azurerm_application_gateway" "this" {
 
   name                = local.gateway_name_location
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   firewall_policy_id  = azurerm_web_application_firewall_policy.gateway[0].id
 
   identity {
@@ -237,7 +237,7 @@ resource "azurerm_application_gateway" "this" {
     }
   }
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 /*

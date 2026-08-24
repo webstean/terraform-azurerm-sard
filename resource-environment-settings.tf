@@ -160,9 +160,9 @@ resource "azurerm_user_assigned_identity" "environment" {
   name = "id-${local.environment_name_location}"
 
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   isolation_scope     = "Regional"
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 resource "time_sleep" "environment_identity_create_wait" {
   create_duration = "1m"
@@ -177,28 +177,28 @@ resource "azurerm_role_assignment" "contributor_for_emm" {
 }
 
 resource "azurerm_role_assignment" "umi_reader1" {
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "Reader"
   principal_id         = azurerm_user_assigned_identity.environment.principal_id
   description          = local.iac_message
 }
 
 resource "azurerm_role_assignment" "user_reader" {
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "Reader and Data Access"
   principal_id         = var.owner_entra_object_id
   description          = local.iac_message
 }
 
 resource "azurerm_role_assignment" "user_owner" {
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "Owner"
   principal_id         = var.owner_entra_object_id
   description          = local.iac_message
 }
 
 resource "azurerm_role_assignment" "kvault_admin" {
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "Key Vault Administrator"
   principal_id         = data.azurerm_client_config.current.object_id
   description          = local.iac_message

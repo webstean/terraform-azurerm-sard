@@ -11,10 +11,10 @@ resource "azurerm_public_ip" "relay" {
 
   name                = "pip-${local.relay_name}"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   allocation_method   = "Static"
   sku                 = "Standard"
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_lb" "relay" {
@@ -22,14 +22,14 @@ resource "azurerm_lb" "relay" {
 
   name                = "lb-tcp-relay"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   sku                 = "Standard"
 
   frontend_ip_configuration {
     name                 = "public-frontend"
     public_ip_address_id = azurerm_public_ip.relay[0].id
   }
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 # IP-based backend pool: points at a private IP directly, no NIC/VM

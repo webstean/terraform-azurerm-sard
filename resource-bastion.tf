@@ -20,12 +20,12 @@ resource "azurerm_public_ip" "bastion" {
 
   name                = "pip-${local.bastion_name_location}"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   allocation_method   = "Static"
   sku                 = "Standard"
   sku_tier            = "Regional"
   domain_name_label   = local.bastion_name_hostname
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 /*
@@ -75,7 +75,7 @@ resource "azurerm_subnet" "bastion" {
 resource "azurerm_bastion_host" "this" {
   name                = local.bastion_name_location
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
 
   dynamic "ip_configuration" {
     for_each = var.bastion_sku != "Developer" ? [1] : []
@@ -112,7 +112,7 @@ resource "azurerm_bastion_host" "this" {
     create = "90m"
   }
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 output "bastion_id" {
@@ -168,9 +168,9 @@ resource "azurerm_monitor_diagnostic_setting" "bastion2" {
 resource "azurerm_network_security_group" "bastion" {
   for_each = { for k, v in azurerm_virtual_network.this : k => v if var.bastion_sku != "Developer" }
 
-  name                = "nsg-bastion-${lower(azurerm_resource_group.environment.location)}"
+  name                = "nsg-bastion-${lower(module.environment_resource_group.resource.location)}"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
 
   ### Ingress Traffic from public internet:
   ### The Azure Bastion will create a public IP that needs port 443 enabled on the public IP for ingress traffic.
@@ -323,6 +323,6 @@ resource "azurerm_network_security_group" "bastion" {
     description                = "Deny ALL Outbound as part of Zero Trust Networking"
   }
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 

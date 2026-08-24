@@ -11,13 +11,13 @@ locals {
 #}
 
 resource "azurerm_role_assignment" "environment_appconfig_reader" {
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "App Configuration Data Reader"
   principal_id         = azurerm_user_assigned_identity.environment.principal_id
   description          = local.iac_message
 }
 resource "azurerm_role_assignment" "runner_appconfig_owner" {
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "App Configuration Data Owner"
   principal_id         = data.azurerm_client_config.current.object_id
   description          = local.iac_message
@@ -29,8 +29,8 @@ module "appconfiguration" {
   enable_telemetry = var.enable_telemetry ## see variables.tf
 
   name                            = local.appconfiguration_env_name_location
-  location                        = azurerm_resource_group.environment.location
-  resource_group_resource_id      = azurerm_resource_group.environment.id
+  location                        = module.environment_resource_group.resource.location
+  resource_group_resource_id      = module.environment_resource_group.resource_id
   azapi_schema_validation_enabled = false
   sku                             = local.appconfiguration_sku
   public_network_access_enabled   = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
@@ -113,14 +113,14 @@ module "appconfiguration" {
   replicas = contains(["standard", "premium"], local.appconfiguration_sku) ? {
     replica_1 = {
       name     = "replica-1"
-      location = local.regions[azurerm_resource_group.environment.location].default_rep_location
+      location = local.regions[module.environment_resource_group.resource.location].default_rep_location
     }
   } : null
 
   lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
     kind = "CanNotDelete"
   } : null
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [
     azurerm_user_assigned_identity.environment,
     azurerm_role_assignment.runner_appconfig_owner,
@@ -142,7 +142,7 @@ resource "azurerm_app_configuration_feature" "test_feature" {
   description = local.feature_test_feature.description
   enabled     = true
   locked      = false
-  tags        = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags        = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_role_assignment" "user_appconfig_reader" {

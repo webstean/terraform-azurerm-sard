@@ -51,7 +51,7 @@ resource "azurerm_storage_share" "containerappenv_shared" {
 resource "azurerm_container_app_environment" "this" {
   name                = local.aca_env_name_location
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
 
   logs_destination = "azure-monitor"
   #log_analytics_workspace_id = module.log_analytics_workspace.resource_id
@@ -92,13 +92,13 @@ resource "azurerm_container_app_environment" "this" {
   }
 */
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azapi_update_resource" "aca_env_otel" {
   type      = "Microsoft.App/managedEnvironments@2024-10-02-preview"
   name      = azurerm_container_app_environment.this.name
-  parent_id = azurerm_resource_group.environment.id
+  parent_id = module.environment_resource_group.resource_id
 
   body = {
     properties = {

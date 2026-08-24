@@ -270,8 +270,8 @@ module "ai-services" {
   enable_telemetry = var.enable_telemetry
 
   name                               = each.value.classic == true ? "classic-${local.cog_name}-${lower(each.value.kind)}" : "${local.cog_name}-${lower(each.value.kind)}"
-  parent_id                          = azurerm_resource_group.environment.id
-  location                           = azurerm_resource_group.environment.location
+  parent_id                          = module.environment_resource_group.resource_id
+  location                           = module.environment_resource_group.resource.location
   kind                               = each.value.kind
   sku_name                           = each.value.sku_name
   allow_project_management           = true
@@ -351,7 +351,7 @@ module "ai-services" {
   #  identity_client_id = azurerm_user_assigned_identity.environment.client_id
   #  storage_account_id = azurerm_storage_account.this.id
   #}] : []
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 /*

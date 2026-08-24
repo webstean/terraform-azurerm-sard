@@ -3,7 +3,7 @@
 resource "azurerm_dashboard_grafana" "grafana" {
   name                              = "graf-aca-aue"
   resource_group_name               = module.environment_resource_group.resource.name
-  location                          = azurerm_resource_group.environment.location
+  location                          = module.environment_resource_group.resource.location
   grafana_major_version             = "13"
   sku                               = "Standard"
   sku_size                          = "X1" ## X1 or X2
@@ -34,7 +34,7 @@ resource "azurerm_dashboard_grafana" "grafana" {
     identity_ids = [azurerm_user_assigned_identity.environment.id]
   }
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_role_assignment" "user_grafana_admin" {

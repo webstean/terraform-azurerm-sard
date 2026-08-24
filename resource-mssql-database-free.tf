@@ -10,10 +10,10 @@ resource "azurerm_user_assigned_identity" "free_sql_database" {
   name = "id-${local.sql_free_database_location}-readwrite"
 
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   isolation_scope     = var.deploy_sql_failover ? null : "Regional"
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 resource "time_sleep" "free_sql_database_identity_create_wait" {
   create_duration = "1m"
@@ -66,7 +66,7 @@ resource "azapi_resource" "free_sql_database" {
     }
   }
   response_export_values = ["*"]
-  tags                   = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                   = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_mssql_database_extended_auditing_policy" "free_sql_database" {

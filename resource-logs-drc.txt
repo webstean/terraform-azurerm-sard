@@ -4,14 +4,14 @@ locals {
 }
 
 resource "azurerm_role_assignment" "azure_monitor" {
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "Monitoring Metrics Publisher"
   principal_id         = azurerm_user_assigned_identity.environment.principal_id
 }
 
 resource "azurerm_log_analytics_solution" "change_tracking" {
   solution_name         = "ChangeTracking"
-  location              = azurerm_resource_group.environment.location
+  location              = module.environment_resource_group.resource.location
   resource_group_name   = module.environment_resource_group.resource.name
   workspace_resource_id = module.log_analytics_workspace.resource.resource_id
   workspace_name        = module.log_analytics_workspace.resource.name
@@ -24,7 +24,7 @@ resource "azurerm_log_analytics_solution" "change_tracking" {
 
 resource "azurerm_monitor_data_collection_rule" "common_vm" {
   name                = "${local.dcr_prefix}common${local.dcr_suffix}"
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   resource_group_name = module.environment_resource_group.resource.name
   # kind = any
   # A rule of kind Linux does not allow for windows_event_log data sources.
@@ -63,8 +63,8 @@ resource "azurerm_monitor_data_collection_rule" "common_vm" {
     identity_ids = [azurerm_user_assigned_identity.environment.id]
   }
   tags = merge(
-    azurerm_resource_group.environment.tags,
-    lookup(azurerm_resource_group.environment.tags, "stateless", "") == "yes" ? { stateless = "no" } : {}
+    module.environment_resource_group.resource.tags,
+    lookup(module.environment_resource_group.resource.tags, "stateless", "") == "yes" ? { stateless = "no" } : {}
   )
   lifecycle {
     ignore_changes = [tags.created]
@@ -73,7 +73,7 @@ resource "azurerm_monitor_data_collection_rule" "common_vm" {
 
 resource "azurerm_monitor_data_collection_rule" "windows_vm" {
   name                = "${local.dcr_prefix}windows${local.dcr_suffix}"
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   resource_group_name = module.environment_resource_group.resource.name
 
   kind = "Windows"
@@ -303,13 +303,13 @@ resource "azurerm_monitor_data_collection_rule" "windows_vm" {
     type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.environment.id]
   }
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [azurerm_log_analytics_solution.change_tracking]
 }
 
 resource "azurerm_monitor_data_collection_rule" "linux_vm" {
   name                = "${local.dcr_prefix}linux${local.dcr_suffix}"
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   resource_group_name = module.environment_resource_group.resource.name
 
   kind = "Linux"
@@ -355,7 +355,7 @@ resource "azurerm_monitor_data_collection_rule" "linux_vm" {
     type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.environment.id]
   }
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 ## https://learn.microsoft.com/en-us/azure/azure-monitor/containers/opentelemetry-protocol-ingestion?utm_source=chatgpt.com
@@ -385,7 +385,7 @@ resource "azurerm_role_assignment" "otel_sender_monitoring" {
 resource "azurerm_monitor_data_collection_rule" "windows_change_tracking" {
   name                = "${local.dcr_prefix}windows-change-tracking-${local.dcr_suffix}"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   kind                = "Windows" # or "Linux"
 
   destinations {
@@ -421,7 +421,7 @@ resource "azurerm_monitor_data_collection_rule" "windows_change_tracking" {
     identity_ids = [azurerm_user_assigned_identity.environment.id]
   }
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [azurerm_log_analytics_solution.change_tracking]
 }
 

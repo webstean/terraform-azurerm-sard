@@ -29,7 +29,7 @@ module "private_endpoint_sqlserver" {
 
   name                           = "${local.pep_name_location}-${azurerm_mssql_server.this.name}"
   resource_group_name            = module.environment_resource_group.resource.name
-  location                       = azurerm_resource_group.environment.location
+  location                       = module.environment_resource_group.resource.location
   network_interface_name         = "pep-${azurerm_mssql_server.this.name}"
   private_connection_resource_id = azurerm_mssql_server.this.id
   subnet_resource_id             = azurerm_subnet.private_endpoints[0].id
@@ -37,7 +37,7 @@ module "private_endpoint_sqlserver" {
   lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
     kind = "CanNotDelete"
   } : null
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 /*
@@ -50,7 +50,7 @@ module "private_endpoint_keyvault" {
 
   name                           = "pep-${azurerm_key_vault.this.name}"
   resource_group_name            = module.environment_resource_group.resource.name
-  location                       = azurerm_resource_group.environment.location
+  location                       = module.environment_resource_group.resource.location
   network_interface_name         = "pep-${azurerm_key_vault.this.name}"
   private_connection_resource_id = azurerm_key_vault.this.id
   subnet_resource_id             = azurerm_subnet.private_endpoints[0].id
@@ -58,7 +58,7 @@ module "private_endpoint_keyvault" {
   lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
     kind = "CanNotDelete"
   } : null
-  tags                           = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags                           = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 */
 
@@ -151,7 +151,7 @@ resource "azurerm_private_dns_zone" "privatelink-dns1" {
     ttl   = 3600
     tags  = local.dns_tags_private
   }
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 ## region specific DNS privatelink zones
@@ -165,7 +165,7 @@ resource "azurerm_private_dns_zone" "privatelink-dns1" {
 #    ttl   = 3600
 #    tags  = local.dns_tags_private
 #  }
-#  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+#  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 #}
 
 #resource "azurerm_private_dns_zone" "privatelink-dns3" {
@@ -178,7 +178,7 @@ resource "azurerm_private_dns_zone" "privatelink-dns1" {
 #    ttl   = 3600
 #    tags  = local.dns_tags_private
 #  }
-#  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+#  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 #}
 
 #resource "azurerm_private_dns_zone" "privatelink-dns4" {
@@ -191,7 +191,7 @@ resource "azurerm_private_dns_zone" "privatelink-dns1" {
 #    ttl   = 3600
 #    tags  = local.dns_tags_private
 #  }
-#  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+#  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 #}
 
 ## Eg. "privatelink.australiaeast.kusto.windows.net",
@@ -205,5 +205,5 @@ resource "azurerm_private_dns_zone" "privatelink-dns1" {
 #    ttl   = 3600
 #    tags  = local.dns_tags_private
 #  }
-#  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+#  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 #}

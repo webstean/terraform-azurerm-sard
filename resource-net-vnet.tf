@@ -17,7 +17,7 @@ Get-AzEdgeZonesExtendedZone -Name 'perth'
 
 resource "azurerm_virtual_network" "this" {
   name                = local.vnet_name_location
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   resource_group_name = module.environment_resource_group.resource.name
 
   address_space = local.regions[var.location].vnet_address_space
@@ -28,7 +28,7 @@ resource "azurerm_virtual_network" "this" {
     enforcement = "AllowUnencrypted"
   }
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_subnet" "outbound" {
@@ -73,7 +73,7 @@ resource "azurerm_monitor_diagnostic_setting" "vnet_logs" {
 resource "azurerm_route_table" "this" {
   name                          = "Direct-Internet-Routes"
   resource_group_name           = module.environment_resource_group.resource.name
-  location                      = azurerm_resource_group.environment.location
+  location                      = module.environment_resource_group.resource.location
   bgp_route_propagation_enabled = false ## keep them, as simple static routes
 
   route {
@@ -125,7 +125,7 @@ resource "azurerm_route_table" "this" {
   }
 
   ## to route traffic to a Secure vWAN (see routing intent) - do not use a route table, like this one.
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 ## Attach the route table to the subnet hosting the VMs
@@ -156,9 +156,9 @@ resource "azurerm_virtual_hub_routing_intent" "this" {
 }
 
 resource "azurerm_network_security_group" "general" { ## designed to be associated to NIC or subnets or both!
-  name                = "nsg-general-access-${lower(azurerm_resource_group.environment.location)}"
+  name                = "nsg-general-access-${lower(module.environment_resource_group.resource.location)}"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
 
   ## ===========================================================================================================
   ## Outbound: Azure Instance Metadata Service endpoint
@@ -625,7 +625,7 @@ resource "azurerm_network_security_group" "general" { ## designed to be associat
     description                = "Deny ALL Outbound as part of Zero Trust Networking"
   }
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_subnet_network_security_group_association" "general1" {
@@ -661,7 +661,7 @@ resource "azurerm_network_watcher_flow_log" "vnet" {
     workspace_resource_id = module.log_analytics_workspace.resource_id
     interval_in_minutes   = 10
   }
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_network_connection_monitor" "sql_1433" {

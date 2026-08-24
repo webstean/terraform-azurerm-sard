@@ -8,7 +8,7 @@ locals {
 
 resource "azurerm_web_pubsub" "this" {
   name                = local.pubsub_name_hostname
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   resource_group_name = module.environment_resource_group.resource.name
 
   sku      = "Free_F1" # Free_F1, Standard_S1, Premium_P1
@@ -30,7 +30,7 @@ resource "azurerm_web_pubsub" "this" {
     http_request_logs_enabled = true
   }
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_role_assignment" "web_pubsub_owner1" {

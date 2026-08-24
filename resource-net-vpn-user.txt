@@ -16,7 +16,7 @@ resource "azurerm_subnet" "gateway" {
 resource "azurerm_public_ip" "vpn" {
   name                = "pip-${local.vpn_name}"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   allocation_method   = "Static"
   sku                 = "Standard"
 }
@@ -24,7 +24,7 @@ resource "azurerm_public_ip" "vpn" {
 resource "azurerm_virtual_network_gateway" "this-client" {
   name                = "vgw-example"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
 
   type     = "Vpn" # or "ExpressRoute"
   vpn_type = "RouteBased"

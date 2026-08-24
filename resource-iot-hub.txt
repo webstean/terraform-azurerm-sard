@@ -15,25 +15,25 @@ IoT Hub Registry Contributor
 IoT Hub Twin Contributor
 */
 resource "azurerm_role_assignment" "iot-hub1" {
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "IoT Hub Registry Administrator"
   principal_id         = data.azurerm_client_config.current.object_id
   description          = local.iac_message
 }
 resource "azurerm_role_assignment" "iot-hub2" {
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "IoT Hub Data Contributor"
   principal_id         = data.azurerm_client_config.current.object_id
   description          = local.iac_message
 }
 resource "azurerm_role_assignment" "iot-hub2a" {
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "IoT Hub Data Contributor"
   principal_id         = azurerm_user_assigned_identity.environment.id
   description          = local.iac_message
 }
 resource "azurerm_role_assignment" "iot-hub3" {
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "IoT Hub Twin Contributor"
   principal_id         = data.azurerm_client_config.current.object_id
   description          = local.iac_message
@@ -42,7 +42,7 @@ resource "azurerm_role_assignment" "iot-hub3" {
 resource "azurerm_iothub" "this" {
   name                = local.iothub_name_hostname
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
 
   event_hub_partition_count = 2
 
@@ -83,7 +83,7 @@ resource "azurerm_iothub" "this" {
     identity_ids = [azurerm_user_assigned_identity.environment.id]
   }
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_iot_security_solution" "this" {
@@ -93,10 +93,10 @@ resource "azurerm_iot_security_solution" "this" {
   enabled                    = true
   display_name               = "${azurerm_iothub.this.name} Defender IOT Experience / Solution"
   resource_group_name        = module.environment_resource_group.resource.name
-  location                   = azurerm_resource_group.environment.location
+  location                   = module.environment_resource_group.resource.location
   iothub_ids                 = [azurerm_iothub.this.id]
   log_analytics_workspace_id = module.log_analytics_workspace.resource.workspace_id
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_app_configuration_key" "iot_connection_string" {
@@ -332,7 +332,7 @@ resource "azurerm_iothub_device_update_account" "this" {
     identity_ids = [azurerm_user_assigned_identity.environment.id]
   }
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   lifecycle {
     ignore_changes = [tags.created]
   }
@@ -353,6 +353,6 @@ resource "azurerm_iothub_device_update_instance" "iot-hub" {
     id                = azurerm_storage_account.diag.id
   }
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 

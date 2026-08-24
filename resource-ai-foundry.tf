@@ -13,7 +13,7 @@ module "foundry_keyvault" {
 
   name                            = local.foundry_name_hostname
   resource_group_name             = module.environment_resource_group.resource.name
-  location                        = azurerm_resource_group.environment.location
+  location                        = module.environment_resource_group.resource.location
   tenant_id                       = data.azurerm_client_config.current.tenant_id
   sku_name                        = "standard"
   purge_protection_enabled        = true
@@ -65,7 +65,7 @@ module "foundry_keyvault" {
   lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
     kind = "CanNotDelete"
   } : null
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [
     azurerm_role_assignment.kvault_admin,
     azurerm_user_assigned_identity.environment
@@ -75,8 +75,8 @@ module "foundry_keyvault" {
 resource "azapi_resource" "foundry" {
   type      = "Microsoft.CognitiveServices/accounts@2025-06-01"
   name      = local.foundry_name_location
-  parent_id = azurerm_resource_group.environment.id
-  location  = azurerm_resource_group.environment.location
+  parent_id = module.environment_resource_group.resource_id
+  location  = module.environment_resource_group.resource.location
 
   schema_validation_enabled = true
 
@@ -107,7 +107,7 @@ resource "azapi_resource" "foundry" {
     "properties.endpoint"
   ]
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 /*
@@ -153,7 +153,7 @@ resource "azapi_resource" "default_project" {
     "identity.principalId"
   ]
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 /*

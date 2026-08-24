@@ -13,7 +13,7 @@ locals {
 resource "azurerm_storage_account" "this" {
   name                            = local.storage_name_hostname
   resource_group_name             = module.environment_resource_group.resource.name
-  location                        = azurerm_resource_group.environment.location
+  location                        = module.environment_resource_group.resource.location
   account_tier                    = "Standard"
   account_replication_type        = "LRS"
   account_kind                    = "StorageV2"
@@ -54,7 +54,7 @@ resource "azurerm_storage_account" "this" {
     identity_ids = [azurerm_user_assigned_identity.environment.id]
   }
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_storage_share" "global" {
@@ -126,7 +126,7 @@ resource "azurerm_monitor_diagnostic_setting" "storage_metrics" {
 resource "azurerm_subnet_service_endpoint_storage_policy" "storage" {
   name                = "sep-storage-allowed"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
 
   definition {
     name        = "allow-only-specific-storage-account"
@@ -143,7 +143,7 @@ resource "azurerm_subnet_service_endpoint_storage_policy" "storage" {
 resource "azurerm_storage_account" "diag" {
   name                            = local.diag_storage_name_hostname
   resource_group_name             = module.environment_resource_group.resource.name
-  location                        = azurerm_resource_group.environment.location
+  location                        = module.environment_resource_group.resource.location
   account_tier                    = "Standard"
   account_replication_type        = "LRS"
   account_kind                    = "StorageV2"
@@ -168,7 +168,7 @@ resource "azurerm_storage_account" "diag" {
     identity_ids = [azurerm_user_assigned_identity.environment.id]
   }
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 /*

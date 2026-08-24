@@ -113,7 +113,7 @@ resource "azapi_resource" "dns_zone" {
   type = "Microsoft.Network/dnsZones@2018-05-01"
 
   name      = "dnszone-${module.environment_resource_group.resource.name}.com"
-  parent_id = azurerm_resource_group.environment.id
+  parent_id = module.environment_resource_group.resource_id
   location  = "global"
 }
 
@@ -145,5 +145,5 @@ module "certificate" {
   lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
     kind = "CanNotDelete"
   } : null
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }

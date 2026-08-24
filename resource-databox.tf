@@ -13,7 +13,7 @@ resource "azurerm_databox_edge_device" "gateway" {
   location = "southeastasia"
 
   sku_name = "Gateway-Standard"
-  tags     = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags     = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 output "databox_gateway_id" {

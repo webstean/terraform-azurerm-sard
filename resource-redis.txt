@@ -12,8 +12,8 @@ module "redis" {
   enable_telemetry  = var.enable_telemetry ## see variables.tf
 
   name              = local.redis_name_location
-  parent_id         = azurerm_resource_group.environment.id
-  location          = azurerm_resource_group.environment.location
+  parent_id         = module.environment_resource_group.resource_id
+  location          = module.environment_resource_group.resource.location
   sku_name          = "Balanced_B0"
   clustering_policy = "EnterpriseCluster"
   eviction_policy   = "AllKeysLRU"
@@ -48,7 +48,7 @@ module "redis" {
   lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
     kind = "CanNotDelete"
   } : null
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 output "redis_id" {

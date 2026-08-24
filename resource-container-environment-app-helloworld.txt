@@ -77,7 +77,7 @@ resource "azurerm_container_app" "helloworld" {
       # }
     }
   }
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [
     azurerm_container_app_environment.this,
     azurerm_container_app_environment_storage.logs,

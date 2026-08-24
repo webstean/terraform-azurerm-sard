@@ -27,7 +27,7 @@ resource "azurerm_subnet" "pls_nat" {
 resource "azurerm_lb" "pls" {
   name                = "lb-local.${local.pls_name}"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
   sku                 = "Standard"
 
   frontend_ip_configuration {
@@ -68,7 +68,7 @@ resource "azurerm_lb_rule" "pls" {
 resource "azurerm_private_link_service" "this" {
   name                = local.pls_name_location
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
 
   load_balancer_frontend_ip_configuration_ids = [
     azurerm_lb.pls.frontend_ip_configuration[0].id,

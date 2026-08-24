@@ -23,7 +23,7 @@ locals {
 resource "azurerm_automation_account" "this" {
   name                = local.aaa_name_location
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
 
   local_authentication_enabled  = false
   public_network_access_enabled = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
@@ -34,13 +34,13 @@ resource "azurerm_automation_account" "this" {
   }
   sku_name = "Basic"
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_automation_runtime_environment" "pwsh76" {
   name                  = "PowerShell-7.6-custom"
   automation_account_id = azurerm_automation_account.this.id
-  location              = azurerm_resource_group.environment.location
+  location              = module.environment_resource_group.resource.location
   description           = "PowerShell 7.6 runtime environment"
   runtime_language      = "PowerShell"
   runtime_version       = "7.6"
@@ -52,7 +52,7 @@ resource "azurerm_automation_runtime_environment" "pwsh76" {
 
 /*
 resource "azurerm_role_assignment" "automation_reader" {
-  scope                = azurerm_resource_group.environment.id
+  scope                = module.environment_resource_group.resource_id
   role_definition_name = "Reader"
   principal_id         = azurerm_automation_account.this.identity[0].principal_id
   depends_on           = [azurerm_automation_account.this]
@@ -152,7 +152,7 @@ resource "azurerm_automation_variable_string" "resource-group-id" {
   automation_account_name = azurerm_automation_account.this.name
   encrypted               = (var.data_pii == "yes" || var.data_phi == "yes") ? true : false
 
-  value       = azurerm_resource_group.environment.id
+  value       = module.environment_resource_group.resource_id
   description = "Resource Group ID for this environment"
 }
 resource "azurerm_automation_variable_string" "resource-group-name" {
@@ -315,7 +315,7 @@ resource "azurerm_automation_runbook" "demo_rb2" {
     uri = "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/c4935ffb69246a6058eb24f54640f53f69d3ac9f/101-automation-runbook-getvms/Runbooks/Get-AzureVMTutorial.ps1"
   }
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 /*
@@ -382,7 +382,7 @@ resource "azurerm_automation_watcher" "watcher" {
     foo = "bar"
   }
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 */
 
@@ -802,7 +802,7 @@ function Get-AzResourceGroupInfo {
 Get-AzResourceGroupInfo | Format-List
 EOF
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [
     azurerm_automation_runtime_environment.pwsh76,
   ]

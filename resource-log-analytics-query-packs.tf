@@ -174,19 +174,19 @@ locals {
 resource "azurerm_log_analytics_query_pack" "platform" {
   name                = "default-query-pack-${var.prefix}-${var.customer}"
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  location            = module.environment_resource_group.resource.location
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 ## OpenTelemetry metrics, plus Prometheus
 resource "azurerm_monitor_workspace" "this" {
   name                = local.law_name_location
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
 
   public_network_access_enabled = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 /*
@@ -207,7 +207,7 @@ resource "azurerm_log_analytics_query_pack_query" "queries" {
     min(5, length(compact(distinct(try(each.value.categories, [each.value.category])))))
   )
 
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 */
 

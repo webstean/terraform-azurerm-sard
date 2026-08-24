@@ -12,7 +12,7 @@ module "cosmos" {
 
   name                = local.cosmos_name_location
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
+  location            = module.environment_resource_group.resource.location
 
   managed_identities = {
     system_assigned = false
@@ -70,7 +70,7 @@ module "cosmos" {
   lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
     kind = "CanNotDelete"
   } : null
-  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 ## 'Cosmos DB Built-in Data Contributor' is an Azure Cosmos DB data-plane role (Microsoft.DocumentDB)

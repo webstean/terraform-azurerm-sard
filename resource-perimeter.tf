@@ -24,8 +24,8 @@ locals {
 resource "azurerm_network_security_perimeter" "this" {
   name                = local.perimeter_name
   resource_group_name = module.environment_resource_group.resource.name
-  location            = azurerm_resource_group.environment.location
-  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  location            = module.environment_resource_group.resource.location
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 resource "azurerm_network_security_perimeter_profile" "this" {
   name                          = "profile-${local.perimeter_name}"
