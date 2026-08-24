@@ -1,31 +1,19 @@
+// +===========================================================================================================+
+// NO defaults
 
 variable "customer" {
   type        = string
   description = "The name of the customer (free-text)"
-  default     = "andrew"
 }
 
 variable "prefix" {
   type        = string
   description = "The short name of the customer - used for naming Azure resources."
-  default     = "jit"
-}
-
-variable "location" {
-  type        = string
-  description = "The Azure region where resources will be deployed."
-  default     = "australiaeast"
-
-  validation {
-    condition     = contains(["australiasoutheast", "australiaeast", "australiacentral", "australiacentral2", "perth", "centralindia", "westus3"], lower(trimspace(var.location)))
-    error_message = "location must be one of the currently known Azure regions defined in locals.regions."
-  }
 }
 
 variable "subscription_id" {
   type        = string
   description = "The Azure subscription ID in which the resources will be deployed."
-  default     = "3fdbf472-cbf2-43ca-9f61-3c34bdc1397c"
 
   validation {
     condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.subscription_id)))
@@ -36,7 +24,6 @@ variable "subscription_id" {
 variable "alert_email" {
   type        = string
   description = "The email address for alerts"
-  default     = "webstean@gmail.com"
 
   validation {
     condition     = can(regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", trimspace(var.alert_email)))
@@ -47,7 +34,6 @@ variable "alert_email" {
 variable "owner_email" {
   type        = string
   description = "The email address for the owner of the environment"
-  default     = "Andrew.Webster@unisys.com"
 
   validation {
     condition     = can(regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", trimspace(var.owner_email)))
@@ -58,7 +44,6 @@ variable "owner_email" {
 variable "owner_entra_object_id" {
   type        = string
   description = "The Entra ID object ID for the owner of this environment"
-  default     = "6acb0d56-1549-40f0-b90e-170dcd10674a"
 
   validation {
     condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.owner_entra_object_id)))
@@ -68,13 +53,11 @@ variable "owner_entra_object_id" {
 variable "owner_entra_display_name" {
   type        = string
   description = "The Entra ID display name for the owner of this environment"
-  default     = "Webster, Andrew"
 }
 
 variable "sql_administrator_group_object_id" {
   type        = string
   description = "The Entra ID object ID for the SQL administrator group (can be a user or a group)"
-  default     = "b01746a3-ab71-4d5c-baee-44708bb11b0d"
 
   validation {
     condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.sql_administrator_group_object_id)))
@@ -84,20 +67,16 @@ variable "sql_administrator_group_object_id" {
 variable "sql_administrator_group_display_name" {
   type        = string
   description = "The Entra ID display name for the SQL administrators (can be a user or a group)"
-  default     = "DWS Professional Services"
 }
 
-variable "alert_sms_country" {
-  type        = string
-  description = "The country code for SMS alerts"
-  default     = "+61"
-}
 
 variable "alert_sms_number" {
   type        = string
   description = "The phone number for SMS alerts"
-  default     = "490846099"
 }
+
+// +===========================================================================================================+
+// have defaults
 
 variable "security_perimeter_inbound_public_ips" {
   type        = list(string)
@@ -110,7 +89,6 @@ variable "security_perimeter_outbound_fqdns" {
   description = "Allowed outbound FQDNs for the Azure Security Perimeter."
   default     = ["*"]
 }
-
 
 variable "vmss_number_of_instances" {
   type        = number
@@ -137,7 +115,21 @@ variable "bastion_sku" {
   }
 }
 
-// +===========================================================================================================+
+variable "alert_sms_country" {
+  type        = string
+  description = "The country code for SMS alerts"
+  default     = "+61"
+}
+
+variable "location" {
+  type        = string
+  description = "The Azure region where resources will be deployed."
+  default     = "australiaeast"
+  validation {
+    condition     = contains(["australiasoutheast", "australiaeast", "australiacentral", "australiacentral2", "perth", "centralindia", "westus3"], lower(trimspace(var.location)))
+    error_message = "location must be one of the currently known Azure regions defined in locals.regions."
+  }
+}
 
 variable "enable_telemetry" {
   type        = bool
