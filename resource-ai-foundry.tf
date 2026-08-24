@@ -3,7 +3,7 @@ locals {
   foundry_name               = "aifoundry-${var.prefix}"
   foundry_name_location      = lower("${local.foundry_name}-${lower(var.location)}")
   foundry_name_random_suffix = substr(md5(local.foundry_name_location), 0, 6)
-  foundry_name_hostname      = lower(substr(replace("f${local.foundry_name_random_suffix}${local.foundry_name_location}", "-", ""), 0, 24))
+  foundry_name_hostname      = lower(substr(replace("g${local.foundry_name_random_suffix}${local.foundry_name_location}", "-", ""), 0, 24))
 }
 
 module "foundry_keyvault" {
