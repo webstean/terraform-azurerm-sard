@@ -279,7 +279,7 @@ module "virtualmachinescaleset" {
   boot_diagnostics = {
     ## Enable boot diagnostics ( Managed storage )
   }
-  custom_data         = base64encode(file("resource-vmss-init-script.ps1"))
+  custom_data         = base64encode(file("${path.module}/resource-vmss-init-script.ps1"))
   custom_data_version = "1"
   #data_disk = [{
   #  caching                   = "ReadWrite"
