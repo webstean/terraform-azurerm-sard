@@ -17,35 +17,362 @@ module "sard" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0, < 2.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0, < 2.0 |
+| <a name="requirement_acme"></a> [acme](#requirement\_acme) | ~>2.0, < 3.0 |
+| <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | ~>2.0, < 3.0 |
 | <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | ~>2.0, < 3.0 |
 | <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) | ~>3.0, < 4.0 |
+| <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) | ~>3.0, < 4.0 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~>4.0, < 5.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~>4.0, < 5.0 |
+| <a name="requirement_local"></a> [local](#requirement\_local) | ~>2.0, < 3.0 |
+| <a name="requirement_msgraph"></a> [msgraph](#requirement\_msgraph) | ~> 0.0, < 1.0 |
 | <a name="requirement_msgraph"></a> [msgraph](#requirement\_msgraph) | ~> 0.0, < 1.0 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | ~>3.0, < 4.0 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | ~>3.0, < 4.0 |
+| <a name="requirement_time"></a> [time](#requirement\_time) | ~>0.11, < 1.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~>4.0, < 5.0 |
+| <a name="provider_azapi"></a> [azapi](#provider\_azapi) | ~>2.0, < 3.0 ~>2.0, < 3.0 |
+| <a name="provider_azuread"></a> [azuread](#provider\_azuread) | ~>3.0, < 4.0 ~>3.0, < 4.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~>4.0, < 5.0 ~>4.0, < 5.0 |
+| <a name="provider_local"></a> [local](#provider\_local) | ~>2.0, < 3.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | ~>3.0, < 4.0 ~>3.0, < 4.0 |
+| <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
+| <a name="provider_time"></a> [time](#provider\_time) | ~>0.11, < 1.0 |
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_ai_search_service"></a> [ai\_search\_service](#module\_ai\_search\_service) | Azure/avm-res-search-searchservice/azurerm | ~>0.0, < 1.0 |
+| <a name="module_appconfiguration"></a> [appconfiguration](#module\_appconfiguration) | Azure/avm-res-appconfiguration-configurationstore/azure | ~>0.0, < 1.0 |
+| <a name="module_application_insights"></a> [application\_insights](#module\_application\_insights) | Azure/avm-res-insights-component/azurerm | ~>0.0, < 1.0 |
+| <a name="module_comms_keyvault"></a> [comms\_keyvault](#module\_comms\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
+| <a name="module_cosmos"></a> [cosmos](#module\_cosmos) | Azure/avm-res-documentdb-databaseaccount/azurerm | ~>0.0, < 1.0 |
+| <a name="module_environment_resource_group"></a> [environment\_resource\_group](#module\_environment\_resource\_group) | Azure/avm-res-resources-resourcegroup/azurerm | ~>0.0, < 1.0 |
+| <a name="module_foundry_keyvault"></a> [foundry\_keyvault](#module\_foundry\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
+| <a name="module_log_analytics_workspace"></a> [log\_analytics\_workspace](#module\_log\_analytics\_workspace) | Azure/avm-res-operationalinsights-workspace/azurerm | ~>0.0, < 1.0 |
+| <a name="module_private_endpoint_sqlserver"></a> [private\_endpoint\_sqlserver](#module\_private\_endpoint\_sqlserver) | Azure/avm-res-network-privateendpoint/azurerm | ~>0.0, < 1.0 |
+| <a name="module_search_keyvault"></a> [search\_keyvault](#module\_search\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
+| <a name="module_virtualmachinescaleset"></a> [virtualmachinescaleset](#module\_virtualmachinescaleset) | Azure/avm-res-compute-virtualmachinescaleset/azurerm | ~>0.0, < 1.0 |
+| <a name="module_vm_x64_skus"></a> [vm\_x64\_skus](#module\_vm\_x64\_skus) | Azure/avm-utl-sku-finder/azapi | ~>0.0, < 1.0 |
+| <a name="module_vmss_autoscale_setting"></a> [vmss\_autoscale\_setting](#module\_vmss\_autoscale\_setting) | Azure/avm-res-insights-autoscalesetting/azurerm | ~>0.0, < 1.0 |
+| <a name="module_vmss_keyvault"></a> [vmss\_keyvault](#module\_vmss\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
+| [azapi_resource.default_project](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
+| [azapi_resource.embedding_gpt4o](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
+| [azapi_resource.embedding_small](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
+| [azapi_resource.foundry](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
+| [azapi_resource.free_sql_database](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
+| [azapi_resource_action.comms-link-notification-hub](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource_action) | resource |
+| [azapi_resource_action.sql_server_automatic_tuning](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource_action) | resource |
+| [azapi_update_resource.comms-identity](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/update_resource) | resource |
+| [azapi_update_resource.configurationStore_telemetry](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/update_resource) | resource |
+| [azurerm_api_connection.arm-connection](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_connection) | resource |
+| [azurerm_api_connection.office365-connection](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_connection) | resource |
+| [azurerm_app_configuration_feature.test_feature](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/app_configuration_feature) | resource |
+| [azurerm_app_configuration_key.comms_api_key_primary](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/app_configuration_key) | resource |
+| [azurerm_app_configuration_key.comms_api_key_secondary](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/app_configuration_key) | resource |
+| [azurerm_app_configuration_key.comms_primary_string](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/app_configuration_key) | resource |
+| [azurerm_app_configuration_key.comms_secondary_string](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/app_configuration_key) | resource |
+| [azurerm_application_gateway.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_gateway) | resource |
+| [azurerm_application_insights_smart_detection_rule.rules](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_smart_detection_rule) | resource |
+| [azurerm_application_insights_workbook.workbook1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_workbook) | resource |
+| [azurerm_automation_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_account) | resource |
+| [azurerm_automation_credential.vcenter-create](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_credential) | resource |
+| [azurerm_automation_module.packagemanagement](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_module) | resource |
+| [azurerm_automation_module.pnp_powershell](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_module) | resource |
+| [azurerm_automation_module.powershellget](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_module) | resource |
+| [azurerm_automation_module.pswindowsupdate](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_module) | resource |
+| [azurerm_automation_module.sharepoint](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_module) | resource |
+| [azurerm_automation_module.vmware_powercli](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_module) | resource |
+| [azurerm_automation_runbook.demo_powershell_script1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_runbook) | resource |
+| [azurerm_automation_runbook.demo_rb2](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_runbook) | resource |
+| [azurerm_automation_runtime_environment.pwsh76](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_runtime_environment) | resource |
+| [azurerm_automation_runtime_environment_package.msgraph](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_runtime_environment_package) | resource |
+| [azurerm_automation_runtime_environment_package.pswindowsupdate](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_runtime_environment_package) | resource |
+| [azurerm_automation_runtime_environment_package.vmware_powercli](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_runtime_environment_package) | resource |
+| [azurerm_automation_schedule.friday](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_schedule) | resource |
+| [azurerm_automation_schedule.monday](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_schedule) | resource |
+| [azurerm_automation_schedule.monthly](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_schedule) | resource |
+| [azurerm_automation_schedule.saturday](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_schedule) | resource |
+| [azurerm_automation_schedule.sunday](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_schedule) | resource |
+| [azurerm_automation_schedule.thursday](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_schedule) | resource |
+| [azurerm_automation_schedule.tuesday](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_schedule) | resource |
+| [azurerm_automation_schedule.wednesday](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_schedule) | resource |
+| [azurerm_automation_variable_bool.data_phi](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_bool) | resource |
+| [azurerm_automation_variable_bool.data_pii](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_bool) | resource |
+| [azurerm_automation_variable_string.admin_dns_0](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_string) | resource |
+| [azurerm_automation_variable_string.admin_dssc_domain](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_string) | resource |
+| [azurerm_automation_variable_string.app](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_string) | resource |
+| [azurerm_automation_variable_string.azure_tenant](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_string) | resource |
+| [azurerm_automation_variable_string.customer](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_string) | resource |
+| [azurerm_automation_variable_string.fabric_tenant](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_string) | resource |
+| [azurerm_automation_variable_string.power_tenant](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_string) | resource |
+| [azurerm_automation_variable_string.resource-group-id](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_string) | resource |
+| [azurerm_automation_variable_string.resource-group-name](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_string) | resource |
+| [azurerm_automation_variable_string.sql_database_connection_free_encrypted](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_string) | resource |
+| [azurerm_automation_variable_string.sql_database_connection_free_unencrypted](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_string) | resource |
+| [azurerm_automation_variable_string.subscription-id](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_string) | resource |
+| [azurerm_automation_variable_string.user_assigned_identity](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_string) | resource |
+| [azurerm_bastion_host.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/bastion_host) | resource |
+| [azurerm_communication_service.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/communication_service) | resource |
+| [azurerm_communication_service_email_domain_association.comms](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/communication_service_email_domain_association) | resource |
+| [azurerm_cosmosdb_sql_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cosmosdb_sql_role_assignment) | resource |
+| [azurerm_databox_edge_device.gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/databox_edge_device) | resource |
+| [azurerm_email_communication_service.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/email_communication_service) | resource |
+| [azurerm_email_communication_service_domain.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/email_communication_service_domain) | resource |
+| [azurerm_email_communication_service_domain_sender_username.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/email_communication_service_domain_sender_username) | resource |
+| [azurerm_key_vault.sql_kv](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault) | resource |
+| [azurerm_key_vault_key.tde](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_key) | resource |
+| [azurerm_key_vault_secret.primary-connection](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
+| [azurerm_key_vault_secret.primary-key](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
+| [azurerm_key_vault_secret.secondary-connection](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
+| [azurerm_key_vault_secret.secondary-key](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
+| [azurerm_key_vault_secret.sql_database_connection_free_encrypted](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
+| [azurerm_key_vault_secret.sql_database_connection_free_unencrypted](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
+| [azurerm_key_vault_secret.vmss_admin_password](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
+| [azurerm_lb.relay](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb) | resource |
+| [azurerm_lb_backend_address_pool.relay](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_backend_address_pool) | resource |
+| [azurerm_lb_backend_address_pool_address.target](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_backend_address_pool_address) | resource |
+| [azurerm_lb_probe.tcp](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_probe) | resource |
+| [azurerm_lb_rule.relay](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_rule) | resource |
+| [azurerm_log_analytics_linked_service.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_linked_service) | resource |
+| [azurerm_log_analytics_query_pack.platform](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_query_pack) | resource |
+| [azurerm_monitor_data_collection_endpoint.otel](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_data_collection_endpoint) | resource |
+| [azurerm_monitor_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_workspace) | resource |
+| [azurerm_mssql_database_extended_auditing_policy.free_sql_database](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database_extended_auditing_policy) | resource |
+| [azurerm_mssql_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) | resource |
+| [azurerm_mssql_server.this-failover](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) | resource |
+| [azurerm_mssql_server_dns_alias.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server_dns_alias) | resource |
+| [azurerm_mssql_server_dns_alias.this_failover](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server_dns_alias) | resource |
+| [azurerm_mssql_server_extended_auditing_policy.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server_extended_auditing_policy) | resource |
+| [azurerm_nat_gateway.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/nat_gateway) | resource |
+| [azurerm_nat_gateway_public_ip_association.vnet-nat-gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/nat_gateway_public_ip_association) | resource |
+| [azurerm_network_security_group.bastion](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
+| [azurerm_network_security_group.general](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
+| [azurerm_network_security_group.inbound_sqlserver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
+| [azurerm_network_security_perimeter.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_perimeter) | resource |
+| [azurerm_network_security_perimeter_access_rule.inbound-rule1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_perimeter_access_rule) | resource |
+| [azurerm_network_security_perimeter_access_rule.inbound-rule3](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_perimeter_access_rule) | resource |
+| [azurerm_network_security_perimeter_access_rule.outbound-rule1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_perimeter_access_rule) | resource |
+| [azurerm_network_security_perimeter_profile.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_perimeter_profile) | resource |
+| [azurerm_notification_hub.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/notification_hub) | resource |
+| [azurerm_notification_hub_authorization_rule.rule1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/notification_hub_authorization_rule) | resource |
+| [azurerm_notification_hub_namespace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/notification_hub_namespace) | resource |
+| [azurerm_private_dns_zone.privatelink-dns1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone) | resource |
+| [azurerm_public_ip.app_gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
+| [azurerm_public_ip.bastion](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
+| [azurerm_public_ip.nat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
+| [azurerm_public_ip.relay](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
+| [azurerm_resource_group.environment](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
 | [azurerm_resource_provider_feature_registration.encryption_at_host](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_provider_feature_registration) | resource |
+| [azurerm_role_assignment.comms_service_owner1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.comms_service_owner2](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.compute_recommendations](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.contributor_for_emm](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.environment_appconfig_reader](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.github_storage_diag_owner_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.github_storage_owner_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.kvault_admin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.mssql-db-restore](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.project_storage_blob_data_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.runner_appconfig_owner](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.search_blob_reader](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.sku_finder_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.sql_db_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.sql_kv_admin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.sql_kv_crypto](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.sql_svr_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.sqlstorage1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.sqlstorage2](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.standby_pool_permission1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.standby_pool_permission2](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.standby_pool_permission3](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.standby_pool_permission4](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.standby_pool_permission5](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.umi_reader1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.umi_storage_contributor_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.umi_storage_diag_contributor_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.umi_storage_diag_table_data_reader_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.umi_storage_table_data_reader_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.user_appconfig_reader](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.user_owner](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.user_reader](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.web_pubsub_owner1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_definition.mssql-db-reader](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
+| [azurerm_role_definition.mssql-db-restore](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
+| [azurerm_route_table.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/route_table) | resource |
+| [azurerm_static_web_app.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/static_web_app) | resource |
+| [azurerm_storage_account.diag](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
+| [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
+| [azurerm_storage_container.rag_documents](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
+| [azurerm_storage_container.sku_finder_cache](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
+| [azurerm_storage_container.sqldiag](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
+| [azurerm_storage_share.global](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) | resource |
+| [azurerm_subnet.app_gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_subnet.bastion](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_subnet.outbound](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_subnet.private_endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_subnet.sqlserver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_subnet_nat_gateway_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_nat_gateway_association) | resource |
+| [azurerm_subnet_network_security_group_association.general1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_network_security_group_association) | resource |
+| [azurerm_subnet_route_table_association.subnet01_kms_route](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
+| [azurerm_user_assigned_identity.environment](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
+| [azurerm_user_assigned_identity.free_sql_database](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
+| [azurerm_user_assigned_identity.sqlserver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
+| [azurerm_virtual_hub_routing_intent.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_hub_routing_intent) | resource |
+| [azurerm_virtual_machine_scale_set_standby_pool.hibernated](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_scale_set_standby_pool) | resource |
+| [azurerm_virtual_network.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
+| [azurerm_web_application_firewall_policy.gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/web_application_firewall_policy) | resource |
+| [azurerm_web_pubsub.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/web_pubsub) | resource |
+| [local_file.homepage](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
+| [random_integer.vm_x64_sku_pick](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) | resource |
+| [random_string.id](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
+| [terraform_data.deploy_site](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) | resource |
+| [time_sleep.environment_identity_create_wait](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
+| [time_sleep.free_sql_database_identity_create_wait](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
+| [time_sleep.resource_group_create_wait](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
+| [time_sleep.sqlserver_identity_create_wait](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
+| [time_sleep.wait_10_seconds_for_network_watcher_creation](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 
 ## Inputs
 
-No inputs.
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_aca_consumption_gpu_enabled"></a> [aca\_consumption\_gpu\_enabled](#input\_aca\_consumption\_gpu\_enabled) | If true, adds a Consumption GPU workload profile to the Azure Container Apps environment. | `bool` | `false` | no |
+| <a name="input_aca_consumption_gpu_max_count"></a> [aca\_consumption\_gpu\_max\_count](#input\_aca\_consumption\_gpu\_max\_count) | Maximum replica count for the ACA Consumption GPU workload profile. | `number` | `1` | no |
+| <a name="input_aca_consumption_gpu_min_count"></a> [aca\_consumption\_gpu\_min\_count](#input\_aca\_consumption\_gpu\_min\_count) | Minimum replica count for the ACA Consumption GPU workload profile. | `number` | `0` | no |
+| <a name="input_aca_consumption_gpu_profile_type"></a> [aca\_consumption\_gpu\_profile\_type](#input\_aca\_consumption\_gpu\_profile\_type) | Consumption GPU workload profile type for ACA (for example: Consumption-GPU-NC8as-T4). | `string` | `"Consumption-GPU-NC8as-T4"` | no |
+| <a name="input_aca_enable_dapr"></a> [aca\_enable\_dapr](#input\_aca\_enable\_dapr) | If true, enables Dapr for the Azure Container Apps environment. If false, does not enable Dapr. | `bool` | `false` | no |
+| <a name="input_alert_email"></a> [alert\_email](#input\_alert\_email) | The email address for alerts | `string` | `"webstean@gmail.com"` | no |
+| <a name="input_alert_sms_country"></a> [alert\_sms\_country](#input\_alert\_sms\_country) | The country code for SMS alerts | `string` | `"+61"` | no |
+| <a name="input_alert_sms_number"></a> [alert\_sms\_number](#input\_alert\_sms\_number) | The phone number for SMS alerts | `string` | `"490846099"` | no |
+| <a name="input_bastion_premium_private_deployment"></a> [bastion\_premium\_private\_deployment](#input\_bastion\_premium\_private\_deployment) | If true, deploys a Premium Bastion with private deployment (no public IP). If false, deploys a Premium Bastion with public deployment. | `bool` | `false` | no |
+| <a name="input_bastion_sku"></a> [bastion\_sku](#input\_bastion\_sku) | n/a | `string` | `"Developer"` | no |
+| <a name="input_custom_dns_azure_client_id"></a> [custom\_dns\_azure\_client\_id](#input\_custom\_dns\_azure\_client\_id) | The Azure client ID for the identity that has enough access to successfully perform the Let's Encrypt DNS challenge | `string` | `"c25795e5-4f48-4ef7-9a9c-12cf65d16487"` | no |
+| <a name="input_custom_dns_azure_client_secret"></a> [custom\_dns\_azure\_client\_secret](#input\_custom\_dns\_azure\_client\_secret) | The Azure client secret for the identity that has enough access to successfully perform the Let's Encrypt DNS challenge | `string` | `"cH58Q~xi9riJJTcWc5VlKuyFdWZNKFmabMl_tc-S"` | no |
+| <a name="input_custom_dns_azure_resource_group_name"></a> [custom\_dns\_azure\_resource\_group\_name](#input\_custom\_dns\_azure\_resource\_group\_name) | The Azure resource group hosting the DNS zone for Let's Encrypt DNS challenge validation. | `string` | `"lscph-global-dns-public-rg"` | no |
+| <a name="input_custom_dns_azure_subscription_id"></a> [custom\_dns\_azure\_subscription\_id](#input\_custom\_dns\_azure\_subscription\_id) | The Azure subscription ID hosting the DNS zone for Let's Encrypt DNS challenge validation. | `string` | `"2d2089b6-d701-49aa-9600-bc2e3796d53a"` | no |
+| <a name="input_custom_dns_azure_tenant_auth_method"></a> [custom\_dns\_azure\_tenant\_auth\_method](#input\_custom\_dns\_azure\_tenant\_auth\_method) | How to authenticate to the Azure tenant hosting DNS zone for Let's Encrypt DNS challenge validation. | `string` | `"env"` | no |
+| <a name="input_custom_dns_azure_tenant_id"></a> [custom\_dns\_azure\_tenant\_id](#input\_custom\_dns\_azure\_tenant\_id) | The Azure tenant ID hosting the DNS zone for Let's Encrypt DNS challenge validation. | `string` | `"fd72f9ff-96b6-4a20-a870-ceaa17d70bc8"` | no |
+| <a name="input_custom_dns_zone_name"></a> [custom\_dns\_zone\_name](#input\_custom\_dns\_zone\_name) | The purchased (and active) DNS zone name that must both exist and be active in the referenced tenant | `string` | `"webstean.com"` | no |
+| <a name="input_customer"></a> [customer](#input\_customer) | The name of the customer (free-text) | `string` | `"andrew"` | no |
+| <a name="input_data_phi"></a> [data\_phi](#input\_data\_phi) | If true, this environment contains PHI (Protected Health Information) so deploy additional security controls. If false, deploys a non-PHI environment. | `bool` | `false` | no |
+| <a name="input_data_pii"></a> [data\_pii](#input\_data\_pii) | If true, this environment contains PII (Personally Identifiable Information) so deploy additional security controls. If false, deploys a non-PII environment. | `bool` | `false` | no |
+| <a name="input_deploy_ai_embeddings"></a> [deploy\_ai\_embeddings](#input\_deploy\_ai\_embeddings) | If true, deploys AI embeddings for the environment. If false, does not deploy AI embeddings. | `bool` | `false` | no |
+| <a name="input_deploy_private_endpoints"></a> [deploy\_private\_endpoints](#input\_deploy\_private\_endpoints) | If true, deploys private endpoints for secure access to Azure services. If false, does not deploy private endpoints. | `bool` | `false` | no |
+| <a name="input_deploy_sql_failover"></a> [deploy\_sql\_failover](#input\_deploy\_sql\_failover) | If true, deploys a Microsoft SQL failover environment in the linked region. If false, deploys a single SQL instance. | `bool` | `false` | no |
+| <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry) | This variable controls whether or not the AVM (Azure Verified Modules) telemetry is enabled for the module.<br/>For more information see <https://aka.ms/avm/telemetryinfo>.<br/>If it is set to false, then no telemetry will be collected. | `bool` | `false` | no |
+| <a name="input_frontdoor_sku"></a> [frontdoor\_sku](#input\_frontdoor\_sku) | Specifies the SKU for Azure Front Door. Options are: 'Standard' or 'Premium'. | `string` | `"Standard"` | no |
+| <a name="input_inbound_access"></a> [inbound\_access](#input\_inbound\_access) | Specifies the type of inbound access to the environment via the Internet. Options are: 'None' (free), 'App-Gateway' ($$), 'FrontDoor' ($$). | `string` | `"None"` | no |
+| <a name="input_location"></a> [location](#input\_location) | The Azure region where resources will be deployed. | `string` | `"australiaeast"` | no |
+| <a name="input_outbound_access"></a> [outbound\_access](#input\_outbound\_access) | Specifies the type of outbound access to the environment via the Internet. Options are: 'Direct' (free), 'Nat-Gateway' ($$), 'Hub-and-Spoke-with-Nat-Gateway' ($$$).<br/>Note: that 'Direct' does not allowed Virtual Machine Scale Sets to have any OutBound Internet access, you need to use a Nat-Gateway or Hub-and-Spoke | `string` | `"Direct"` | no |
+| <a name="input_owner_email"></a> [owner\_email](#input\_owner\_email) | The email address for the owner of the environment | `string` | `"Andrew.Webster@unisys.com"` | no |
+| <a name="input_owner_entra_display_name"></a> [owner\_entra\_display\_name](#input\_owner\_entra\_display\_name) | The Entra ID display name for the owner of this environment | `string` | `"Webster, Andrew"` | no |
+| <a name="input_owner_entra_object_id"></a> [owner\_entra\_object\_id](#input\_owner\_entra\_object\_id) | The Entra ID object ID for the owner of this environment | `string` | `"6acb0d56-1549-40f0-b90e-170dcd10674a"` | no |
+| <a name="input_pls_allowed_fqdns"></a> [pls\_allowed\_fqdns](#input\_pls\_allowed\_fqdns) | FQDNs allowed for the Private Link Service. | `list(string)` | `[]` | no |
+| <a name="input_pls_nat_ip_configurations"></a> [pls\_nat\_ip\_configurations](#input\_pls\_nat\_ip\_configurations) | One or more (max 8) NAT IP configurations for the Private Link Service. Exactly one must have primary = true. | <pre>list(object({<br/>    name               = string<br/>    primary            = bool<br/>    private_ip_address = optional(string)<br/>  }))</pre> | <pre>[<br/>  {<br/>    "name": "primary",<br/>    "primary": true<br/>  }<br/>]</pre> | no |
+| <a name="input_prefix"></a> [prefix](#input\_prefix) | The short name of the customer - used for naming Azure resources. | `string` | `"jit"` | no |
+| <a name="input_proxy_protocol_enabled"></a> [proxy\_protocol\_enabled](#input\_proxy\_protocol\_enabled) | Whether the Private Link Service should support Proxy Protocol (to preserve source IP to the backend). | `bool` | `false` | no |
+| <a name="input_security_perimeter_inbound_public_ips"></a> [security\_perimeter\_inbound\_public\_ips](#input\_security\_perimeter\_inbound\_public\_ips) | Allowed inbound addresses for the Azure Security Perimeter. | `list(string)` | <pre>[<br/>  "0.0.0.0/0"<br/>]</pre> | no |
+| <a name="input_security_perimeter_outbound_fqdns"></a> [security\_perimeter\_outbound\_fqdns](#input\_security\_perimeter\_outbound\_fqdns) | Allowed outbound FQDNs for the Azure Security Perimeter. | `list(string)` | <pre>[<br/>  "*"<br/>]</pre> | no |
+| <a name="input_sql_administrator_group_display_name"></a> [sql\_administrator\_group\_display\_name](#input\_sql\_administrator\_group\_display\_name) | The Entra ID display name for the SQL administrators (can be a user or a group) | `string` | `"DWS Professional Services"` | no |
+| <a name="input_sql_administrator_group_object_id"></a> [sql\_administrator\_group\_object\_id](#input\_sql\_administrator\_group\_object\_id) | The Entra ID object ID for the SQL administrator group (can be a user or a group) | `string` | `"b01746a3-ab71-4d5c-baee-44708bb11b0d"` | no |
+| <a name="input_sql_connectivity_type"></a> [sql\_connectivity\_type](#input\_sql\_connectivity\_type) | Connectivity mode for the SQL Server endpoint: PRIVATE (VNet via Private Endpoint), or PUBLIC (internet-facing). | `string` | `"PRIVATE"` | no |
+| <a name="input_subscription_id"></a> [subscription\_id](#input\_subscription\_id) | The Azure subscription ID in which the resources will be deployed. | `string` | `"3fdbf472-cbf2-43ca-9f61-3c34bdc1397c"` | no |
+| <a name="input_support_free_sql_database"></a> [support\_free\_sql\_database](#input\_support\_free\_sql\_database) | If true, support the totally Free SQL Server. Failover must be disabled and the SQL Server cannot have an alias. | `bool` | `true` | no |
+| <a name="input_vmss_autoscale_business_hours_start"></a> [vmss\_autoscale\_business\_hours\_start](#input\_vmss\_autoscale\_business\_hours\_start) | Hour (0-23) each weekday when the CPU-based business-hours profile takes over from the overnight 'zero' profile. | `number` | `16` | no |
+| <a name="input_vmss_autoscale_cooldown"></a> [vmss\_autoscale\_cooldown](#input\_vmss\_autoscale\_cooldown) | Time to wait after a scale action before scaling again (ISO 8601 duration). | `string` | `"PT30M"` | no |
+| <a name="input_vmss_autoscale_default_capacity"></a> [vmss\_autoscale\_default\_capacity](#input\_vmss\_autoscale\_default\_capacity) | Default instance count. | `number` | `1` | no |
+| <a name="input_vmss_autoscale_enabled"></a> [vmss\_autoscale\_enabled](#input\_vmss\_autoscale\_enabled) | Whether autoscale is enabled for the Virtual Machine Scale Set. | `bool` | `true` | no |
+| <a name="input_vmss_autoscale_max_capacity"></a> [vmss\_autoscale\_max\_capacity](#input\_vmss\_autoscale\_max\_capacity) | Maximum instance count. | `number` | `1` | no |
+| <a name="input_vmss_autoscale_min_capacity"></a> [vmss\_autoscale\_min\_capacity](#input\_vmss\_autoscale\_min\_capacity) | Minimum instance count. | `number` | `1` | no |
+| <a name="input_vmss_autoscale_predictive_look_ahead_time"></a> [vmss\_autoscale\_predictive\_look\_ahead\_time](#input\_vmss\_autoscale\_predictive\_look\_ahead\_time) | How far ahead predictive autoscale forecasts demand (ISO 8601 duration). | `string` | `"PT5M"` | no |
+| <a name="input_vmss_autoscale_scale_out_cpu_threshold"></a> [vmss\_autoscale\_scale\_out\_cpu\_threshold](#input\_vmss\_autoscale\_scale\_out\_cpu\_threshold) | Average CPU percentage that triggers a scale-out. | `number` | `70` | no |
+| <a name="input_vmss_autoscale_scale_out_increase_count"></a> [vmss\_autoscale\_scale\_out\_increase\_count](#input\_vmss\_autoscale\_scale\_out\_increase\_count) | Number of instances to add per scale-out event ('Increase count by'). | `number` | `1` | no |
+| <a name="input_vmss_autoscale_time_grain"></a> [vmss\_autoscale\_time\_grain](#input\_vmss\_autoscale\_time\_grain) | Granularity of metric data points collected (ISO 8601 duration). | `string` | `"PT1M"` | no |
+| <a name="input_vmss_autoscale_time_window"></a> [vmss\_autoscale\_time\_window](#input\_vmss\_autoscale\_time\_window) | Look-back window for the average CPU calculation (ISO 8601 duration). | `string` | `"PT10M"` | no |
+| <a name="input_vmss_autoscale_weekend_capacity"></a> [vmss\_autoscale\_weekend\_capacity](#input\_vmss\_autoscale\_weekend\_capacity) | Fixed instance count to run during the weekend low-usage window. | `number` | `0` | no |
+| <a name="input_vmss_disk_controller_type"></a> [vmss\_disk\_controller\_type](#input\_vmss\_disk\_controller\_type) | The disk controller type for the Virtual Machine Scale Set. | `string` | `"SCSI"` | no |
+| <a name="input_vmss_number_of_instances"></a> [vmss\_number\_of\_instances](#input\_vmss\_number\_of\_instances) | The number of instances in the Virtual Machine Scale Set. | `number` | `0` | no |
+| <a name="input_vmss_otel_counter_specifiers"></a> [vmss\_otel\_counter\_specifiers](#input\_vmss\_otel\_counter\_specifiers) | OTel system metrics to collect. Defaults to the standard free set. | `list(string)` | <pre>[<br/>  "system.filesystem.usage",<br/>  "system.disk.io",<br/>  "system.disk.operation_time",<br/>  "system.disk.operations",<br/>  "system.memory.usage",<br/>  "system.network.io",<br/>  "system.cpu.time",<br/>  "system.network.dropped",<br/>  "system.network.errors",<br/>  "system.uptime"<br/>]</pre> | no |
+| <a name="input_vmss_sku_name"></a> [vmss\_sku\_name](#input\_vmss\_sku\_name) | The Azure VM SKU to be deployed. (if not set, a random valid SKU will be selected from the list of available SKUs for the deployment region) | `string` | `"Standard_D2s_v5"` | no |
+| <a name="input_vwan_hub_firewall_id"></a> [vwan\_hub\_firewall\_id](#input\_vwan\_hub\_firewall\_id) | The ID of the Azure Virtual WAN hub to which the route table will be associated. | `string` | `null` | no |
+| <a name="input_vwan_hub_id"></a> [vwan\_hub\_id](#input\_vwan\_hub\_id) | The ID of the Azure Virtual WAN hub to which the route table will be associated. | `string` | `null` | no |
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_ai_search_endpoint"></a> [ai\_search\_endpoint](#output\_ai\_search\_endpoint) | The endpoint of the AI search service |
+| <a name="output_ai_search_primary_key"></a> [ai\_search\_primary\_key](#output\_ai\_search\_primary\_key) | The primary key of the AI search service |
+| <a name="output_ai_search_secondary_key"></a> [ai\_search\_secondary\_key](#output\_ai\_search\_secondary\_key) | The secondary key of the AI search service |
+| <a name="output_appconfiguration_endpoint"></a> [appconfiguration\_endpoint](#output\_appconfiguration\_endpoint) | The endpoint of the environment's Azure App Configuration store. |
+| <a name="output_appconfiguration_id"></a> [appconfiguration\_id](#output\_appconfiguration\_id) | The resource ID of the environment's Azure App Configuration store. |
+| <a name="output_appconfiguration_name"></a> [appconfiguration\_name](#output\_appconfiguration\_name) | The name of the environment's Azure App Configuration store. |
+| <a name="output_appconfiguration_replica_resource_ids"></a> [appconfiguration\_replica\_resource\_ids](#output\_appconfiguration\_replica\_resource\_ids) | The resource IDs of the environment's Azure App Configuration store replicas. |
+| <a name="output_azure_monitor_workspace_id"></a> [azure\_monitor\_workspace\_id](#output\_azure\_monitor\_workspace\_id) | The ID of the Azure Monitor workspace. |
+| <a name="output_azure_monitor_workspace_location"></a> [azure\_monitor\_workspace\_location](#output\_azure\_monitor\_workspace\_location) | The location of the Azure Monitor workspace. |
+| <a name="output_azure_monitor_workspace_name"></a> [azure\_monitor\_workspace\_name](#output\_azure\_monitor\_workspace\_name) | The name of the Azure Monitor workspace. |
+| <a name="output_bastion_command_native_rdp"></a> [bastion\_command\_native\_rdp](#output\_bastion\_command\_native\_rdp) | Bastion RDP command to access a Windows VM (via native client) - only works with Standard or Premium Bastion SKUs |
+| <a name="output_bastion_command_native_ssh"></a> [bastion\_command\_native\_ssh](#output\_bastion\_command\_native\_ssh) | Bastion SSH command to access a Linux VM (via native client) - only works with Standard or Premium Bastion SKUs |
+| <a name="output_bastion_command_wac_tunnel_pwsh"></a> [bastion\_command\_wac\_tunnel\_pwsh](#output\_bastion\_command\_wac\_tunnel\_pwsh) | Bastion Tunnel command to access Windows Admin Center - only works with Standard or Premium Bastion SKUs |
+| <a name="output_bastion_id"></a> [bastion\_id](#output\_bastion\_id) | Bastion Host ID |
+| <a name="output_comms_email_domain"></a> [comms\_email\_domain](#output\_comms\_email\_domain) | The email domain for the Communication Service. |
+| <a name="output_comms_email_sender_username"></a> [comms\_email\_sender\_username](#output\_comms\_email\_sender\_username) | The email sender username for the Communication Service. |
+| <a name="output_databox_gateway_id"></a> [databox\_gateway\_id](#output\_databox\_gateway\_id) | The ID of the Databox Edge Gateway device. |
+| <a name="output_databox_gateway_properties"></a> [databox\_gateway\_properties](#output\_databox\_gateway\_properties) | The properties of the Databox Edge Gateway device. |
+| <a name="output_environment_resource_group"></a> [environment\_resource\_group](#output\_environment\_resource\_group) | The Azure Resource Group that contains this environment |
+| <a name="output_environment_storage_account_name"></a> [environment\_storage\_account\_name](#output\_environment\_storage\_account\_name) | The name of the main storage account for this environment. |
+| <a name="output_environment_storage_file_connection_script_ps1"></a> [environment\_storage\_file\_connection\_script\_ps1](#output\_environment\_storage\_file\_connection\_script\_ps1) | A PowerShell script to connect dirve Z: to the azure files created as part of this environment. |
+| <a name="output_foundry_endpoint"></a> [foundry\_endpoint](#output\_foundry\_endpoint) | The endpoint of the Foundry resource. |
+| <a name="output_foundry_name"></a> [foundry\_name](#output\_foundry\_name) | The name of the Foundry resource. |
+| <a name="output_foundry_principal_id"></a> [foundry\_principal\_id](#output\_foundry\_principal\_id) | The principal ID of the Foundry resource, used for role assignments. |
+| <a name="output_logs_otel_configuration_access_endpoint"></a> [logs\_otel\_configuration\_access\_endpoint](#output\_logs\_otel\_configuration\_access\_endpoint) | The configuration access endpoint of the Azure Monitor Data Collection Endpoint. |
+| <a name="output_logs_otel_dce_id"></a> [logs\_otel\_dce\_id](#output\_logs\_otel\_dce\_id) | The ID of the Azure Monitor Data Collection Endpoint. |
+| <a name="output_logs_otel_logs_ingestion_endpoint"></a> [logs\_otel\_logs\_ingestion\_endpoint](#output\_logs\_otel\_logs\_ingestion\_endpoint) | The OTEL logs ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
+| <a name="output_logs_otel_metrics_ingestion_endpoint"></a> [logs\_otel\_metrics\_ingestion\_endpoint](#output\_logs\_otel\_metrics\_ingestion\_endpoint) | The OTEL metrics ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
+| <a name="output_network_security_perimeter_profile_id"></a> [network\_security\_perimeter\_profile\_id](#output\_network\_security\_perimeter\_profile\_id) | Azure Network Security Perimeter Profile ID for this environment |
+| <a name="output_relay_public_ip"></a> [relay\_public\_ip](#output\_relay\_public\_ip) | The public IP address of the relay load balancer. |
+| <a name="output_security_perimeter_id"></a> [security\_perimeter\_id](#output\_security\_perimeter\_id) | Azure Network Security Perimeter ID for this environment |
+| <a name="output_security_perimeter_resources"></a> [security\_perimeter\_resources](#output\_security\_perimeter\_resources) | Resources that need to be added to the Azure Network Security Perimeter |
+| <a name="output_sql_database_connection_free_encrypted"></a> [sql\_database\_connection\_free\_encrypted](#output\_sql\_database\_connection\_free\_encrypted) | Connection string for the SQL database using Entra ID authentication with encryption enabled. Ensure that your client supports Azure AD authentication and has the necessary permissions to connect. |
+| <a name="output_sql_database_connection_free_odbc_alias"></a> [sql\_database\_connection\_free\_odbc\_alias](#output\_sql\_database\_connection\_free\_odbc\_alias) | Registry alias for the SQL database connection. |
+| <a name="output_sql_database_connection_free_unencrypted"></a> [sql\_database\_connection\_free\_unencrypted](#output\_sql\_database\_connection\_free\_unencrypted) | Connection string for the SQL database using Entra ID authentication with encryption disabled. Ensure that your client supports Azure AD authentication and has the necessary permissions to connect. |
+| <a name="output_sql_free_database_name"></a> [sql\_free\_database\_name](#output\_sql\_free\_database\_name) | Name of the free SQL database. |
+| <a name="output_sql_server_dns_alias"></a> [sql\_server\_dns\_alias](#output\_sql\_server\_dns\_alias) | The fully qualified domain name (FQDN) alias of the SQL Server instance. |
+| <a name="output_sql_server_failover_dns_alias"></a> [sql\_server\_failover\_dns\_alias](#output\_sql\_server\_failover\_dns\_alias) | The fully qualified domain name (FQDN) alias of the SQL Server failover instance. |
+| <a name="output_sql_server_failover_hostname"></a> [sql\_server\_failover\_hostname](#output\_sql\_server\_failover\_hostname) | The fully qualified domain name of the SQL Server failover instance. |
+| <a name="output_sql_server_failover_name"></a> [sql\_server\_failover\_name](#output\_sql\_server\_failover\_name) | The name of the SQL Server failover instance (located in another region). |
+| <a name="output_sql_server_hostname"></a> [sql\_server\_hostname](#output\_sql\_server\_hostname) | The fully qualified domain name (FQDN) of the SQL Server instance. |
+| <a name="output_sql_server_id"></a> [sql\_server\_id](#output\_sql\_server\_id) | The ID of the SQL Server. |
+| <a name="output_sql_server_name"></a> [sql\_server\_name](#output\_sql\_server\_name) | The name of the SQL Server. |
+| <a name="output_sql_server_user_assigned_identity_id"></a> [sql\_server\_user\_assigned\_identity\_id](#output\_sql\_server\_user\_assigned\_identity\_id) | The Azure ID of the SQL Server instance primary user-assigned identity. |
+| <a name="output_sql_server_user_assigned_identity_principal_id"></a> [sql\_server\_user\_assigned\_identity\_principal\_id](#output\_sql\_server\_user\_assigned\_identity\_principal\_id) | The Entra ID principal ID (or Object\_id) of the SQL Server instance primary user-assigned identity. |
+| <a name="output_static_web_app_url"></a> [static\_web\_app\_url](#output\_static\_web\_app\_url) | n/a |
+| <a name="output_subscription_display_name"></a> [subscription\_display\_name](#output\_subscription\_display\_name) | The subscription display name of the current Azure subscription. |
+| <a name="output_subscription_id"></a> [subscription\_id](#output\_subscription\_id) | The subscription ID of the current Azure subscription. |
+| <a name="output_swa_api_key"></a> [swa\_api\_key](#output\_swa\_api\_key) | The API key of the Static Web App. |
+| <a name="output_swa_id"></a> [swa\_id](#output\_swa\_id) | The ID of the Static Web App. |
+| <a name="output_swa_repository_url"></a> [swa\_repository\_url](#output\_swa\_repository\_url) | The repository URL of the Static Web App. |
+| <a name="output_swa_url"></a> [swa\_url](#output\_swa\_url) | The URL for the Static Web App site. |
+| <a name="output_virtual_machine_x64_random"></a> [virtual\_machine\_x64\_random](#output\_virtual\_machine\_x64\_random) | Randomly selected x64 virtual machine SKU |
+| <a name="output_virtual_machine_x64_sku_list"></a> [virtual\_machine\_x64\_sku\_list](#output\_virtual\_machine\_x64\_sku\_list) | List of x64 virtual machine SKUs |
+| <a name="output_vmss_admin_password_keyvault_id"></a> [vmss\_admin\_password\_keyvault\_id](#output\_vmss\_admin\_password\_keyvault\_id) | The Key Vault ID where the VMSS admin password is stored. |
+| <a name="output_vmss_admin_password_keyvault_secret_name"></a> [vmss\_admin\_password\_keyvault\_secret\_name](#output\_vmss\_admin\_password\_keyvault\_secret\_name) | The Key Vault secret name where the VMSS admin password is stored. |
+| <a name="output_vmss_admin_username"></a> [vmss\_admin\_username](#output\_vmss\_admin\_username) | The admin username for the VMSS. |
+| <a name="output_vnet_subnet_details"></a> [vnet\_subnet\_details](#output\_vnet\_subnet\_details) | The details of the subnets within the virtual network. |
+| <a name="output_web_pubsub_hostname"></a> [web\_pubsub\_hostname](#output\_web\_pubsub\_hostname) | The hostname of the Web Pub Sub. |
+| <a name="output_web_pubsub_id"></a> [web\_pubsub\_id](#output\_web\_pubsub\_id) | The ID of the Web Pub Sub. |
 <!-- END_TF_DOCS -->
 
 ## Examples
