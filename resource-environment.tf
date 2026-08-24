@@ -169,40 +169,6 @@ resource "time_sleep" "environment_identity_create_wait" {
   depends_on      = [azurerm_user_assigned_identity.environment]
 }
 ## https://learn.microsoft.com/en-us/azure/operations/configuration-enrollment#managed-identity
-resource "azurerm_role_assignment" "contributor_for_emm" {
-  scope                = data.azurerm_subscription.current.id
-  role_definition_name = "Contributor"
-  principal_id         = azurerm_user_assigned_identity.environment.principal_id
-  description          = local.iac_message
-}
-
-resource "azurerm_role_assignment" "umi_reader1" {
-  scope                = module.environment_resource_group.resource_id
-  role_definition_name = "Reader"
-  principal_id         = azurerm_user_assigned_identity.environment.principal_id
-  description          = local.iac_message
-}
-
-resource "azurerm_role_assignment" "user_reader" {
-  scope                = module.environment_resource_group.resource_id
-  role_definition_name = "Reader and Data Access"
-  principal_id         = var.owner_entra_object_id
-  description          = local.iac_message
-}
-
-resource "azurerm_role_assignment" "user_owner" {
-  scope                = module.environment_resource_group.resource_id
-  role_definition_name = "Owner"
-  principal_id         = var.owner_entra_object_id
-  description          = local.iac_message
-}
-
-resource "azurerm_role_assignment" "kvault_admin" {
-  scope                = module.environment_resource_group.resource_id
-  role_definition_name = "Key Vault Administrator"
-  principal_id         = data.azurerm_client_config.current.object_id
-  description          = local.iac_message
-}
 
 output "subscription_display_name" {
   description = "The subscription display name of the current Azure subscription."
