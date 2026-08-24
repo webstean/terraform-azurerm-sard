@@ -9,7 +9,7 @@ resource "azurerm_subnet" "private_endpoints" {
   count = tobool(var.deploy_private_endpoints) ? 1 : 1
 
   name                            = "private-endpoints"
-  resource_group_name             = azurerm_resource_group.environment.name
+  resource_group_name             = module.environment_resource_group.resource.name
   virtual_network_name            = azurerm_virtual_network.this.name
   address_prefixes                = [format("10.%s.200.0/24", local.regions[var.location].location_number)]
   default_outbound_access_enabled = false
@@ -28,7 +28,7 @@ module "private_endpoint_sqlserver" {
   enable_telemetry = var.enable_telemetry # see variables.tf
 
   name                           = "${local.pep_name_location}-${azurerm_mssql_server.this.name}"
-  resource_group_name            = azurerm_resource_group.environment.name
+  resource_group_name            = module.environment_resource_group.resource.name
   location                       = azurerm_resource_group.environment.location
   network_interface_name         = "pep-${azurerm_mssql_server.this.name}"
   private_connection_resource_id = azurerm_mssql_server.this.id
@@ -49,7 +49,7 @@ module "private_endpoint_keyvault" {
   enable_telemetry = var.enable_telemetry # see variables.tf
 
   name                           = "pep-${azurerm_key_vault.this.name}"
-  resource_group_name            = azurerm_resource_group.environment.name
+  resource_group_name            = module.environment_resource_group.resource.name
   location                       = azurerm_resource_group.environment.location
   network_interface_name         = "pep-${azurerm_key_vault.this.name}"
   private_connection_resource_id = azurerm_key_vault.this.id
@@ -144,7 +144,7 @@ resource "azurerm_private_dns_zone" "privatelink-dns1" {
   for_each = tobool(var.deploy_private_endpoints) ? toset(local.privatednszones) : toset([])
 
   name                = lower(each.value)
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
 
   soa_record {
     email = "hostmaster.${each.value}"
@@ -159,7 +159,7 @@ resource "azurerm_private_dns_zone" "privatelink-dns1" {
 #  for_each = tobool(var.deploy_private_endpoints) ? toset(local.privatednszones) : toset([])
 #
 #  name                = format("%s.%s.%s", "privatelink", each.value.location, "backup.windowsazure.com")
-#  resource_group_name = azurerm_resource_group.environment.name
+#  resource_group_name = module.environment_resource_group.resource.name
 #  soa_record {
 #    email = "hostmaster.${data.azuread_domains.admin.domains[0].domain_name}"
 #    ttl   = 3600
@@ -172,7 +172,7 @@ resource "azurerm_private_dns_zone" "privatelink-dns1" {
 #  for_each = tobool(var.deploy_private_endpoints) ? toset(local.regions) : toset([])
 #
 #  name                = format("%s%s.%s", "privatelink.azurecr.io", each.value.location, "privatelink.azurecr.io")
-#  resource_group_name = azurerm_resource_group.environment.name
+#  resource_group_name = module.environment_resource_group.resource.name
 #  soa_record {
 #    email = "hostmaster.${data.azuread_domains.admin.domains[0].domain_name}"
 #    ttl   = 3600
@@ -185,7 +185,7 @@ resource "azurerm_private_dns_zone" "privatelink-dns1" {
 #  for_each = tobool(var.deploy_private_endpoints) ? toset(local.regions) : toset([])
 #
 #  name                = format("%s.%s", each.value.location, "privatelink.afs.azure.net")
-#  resource_group_name = azurerm_resource_group.environment.name
+#  resource_group_name = module.environment_resource_group.resource.name
 #  soa_record {
 #    email = "hostmaster.${data.azuread_domains.admin.domains[0].domain_name}"
 #    ttl   = 3600
@@ -199,7 +199,7 @@ resource "azurerm_private_dns_zone" "privatelink-dns1" {
 #  for_each = tobool(var.deploy_private_endpoints) ? toset(local.regions) : toset([])
 #  
 #  name                = format("%s.%s.%s", "privatelink", each.value.location, "kusto.windows.net")
-#  resource_group_name = azurerm_resource_group.environment.name
+#  resource_group_name = module.environment_resource_group.resource.name
 #  soa_record {
 #    email = "hostmaster.${data.azuread_domains.admin.domains[0].domain_name}"
 #    ttl   = 3600

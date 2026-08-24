@@ -12,7 +12,7 @@ locals {
 
 resource "azurerm_storage_account" "this" {
   name                            = local.storage_name_hostname
-  resource_group_name             = azurerm_resource_group.environment.name
+  resource_group_name             = module.environment_resource_group.resource.name
   location                        = azurerm_resource_group.environment.location
   account_tier                    = "Standard"
   account_replication_type        = "LRS"
@@ -125,7 +125,7 @@ resource "azurerm_monitor_diagnostic_setting" "storage_metrics" {
 /*
 resource "azurerm_subnet_service_endpoint_storage_policy" "storage" {
   name                = "sep-storage-allowed"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
 
   definition {
@@ -142,7 +142,7 @@ resource "azurerm_subnet_service_endpoint_storage_policy" "storage" {
 
 resource "azurerm_storage_account" "diag" {
   name                            = local.diag_storage_name_hostname
-  resource_group_name             = azurerm_resource_group.environment.name
+  resource_group_name             = module.environment_resource_group.resource.name
   location                        = azurerm_resource_group.environment.location
   account_tier                    = "Standard"
   account_replication_type        = "LRS"

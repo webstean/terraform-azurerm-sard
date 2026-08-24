@@ -15,7 +15,7 @@ module "log_analytics_workspace" {
   enable_telemetry = var.enable_telemetry ## see variables.tf
 
   name                                      = local.law_name_location
-  resource_group_name                       = azurerm_resource_group.environment.name
+  resource_group_name                       = module.environment_resource_group.resource.name
   location                                  = azurerm_resource_group.environment.location
   log_analytics_workspace_sku               = "PerGB2018"
   log_analytics_workspace_daily_quota_gb    = 5
@@ -63,7 +63,7 @@ module "application_insights" {
   enable_telemetry = var.enable_telemetry
 
   name                          = "insights-${local.law_name}"
-  resource_group_name           = azurerm_resource_group.environment.name
+  resource_group_name           = module.environment_resource_group.resource.name
   location                      = azurerm_resource_group.environment.location
   workspace_id                  = module.log_analytics_workspace.resource_id
   retention_in_days             = 30
@@ -176,7 +176,7 @@ resource "azurerm_application_insights_smart_detection_rule" "rules" {
 }
 
 resource "azurerm_log_analytics_linked_service" "this" {
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   workspace_id        = module.log_analytics_workspace.resource_id
   read_access_id      = azurerm_automation_account.this.id
 }
@@ -184,7 +184,7 @@ resource "azurerm_log_analytics_linked_service" "this" {
 /*
 resource "azurerm_log_analytics_datasource_windows_performance_counter" "example" {
   name                = "example-lad-wpc"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   workspace_name      = module.log_analytics_workspace.name
   object_name         = "CPU"
   instance_name       = "*"
@@ -220,7 +220,7 @@ resource "azurerm_log_analytics_workspace_table_custom_log" "this1" {
 resource "azurerm_application_insights_workbook" "workbook1" {
   name                = uuid() ## must be a GUID
   description         = "Example Workbook created via Terraform"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
   display_name        = "Workbook1"
   data_json = jsonencode({
@@ -356,7 +356,7 @@ resource "azurerm_role_assignment" "defender_log_analytics2" {
 
 resource "azurerm_monitor_data_collection_endpoint" "otel" {
   name                = local.law_name_hostname
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
 
   # true = publicly reachable Azure Monitor endpoint

@@ -28,7 +28,7 @@ resource "azurerm_subnet" "app_gateway" {
   count = var.inbound_access == "App-Gateway" ? 1 : 0
 
   name                                          = "ApplicationGatewaySubnet"
-  resource_group_name                           = azurerm_resource_group.environment.name
+  resource_group_name                           = module.environment_resource_group.resource.name
   virtual_network_name                          = azurerm_virtual_network.this.name
   address_prefixes                              = [format("10.%s.66.0/24", local.regions[var.location].location_number)]
   default_outbound_access_enabled               = false
@@ -43,7 +43,7 @@ resource "azurerm_public_ip" "app_gateway" {
   count = var.inbound_access == "App-Gateway" ? 1 : 0
 
   name                = local.app_gateway_public_ip_name
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
   allocation_method   = "Static"
 
@@ -81,7 +81,7 @@ resource "azurerm_web_application_firewall_policy" "gateway" {
   count = var.inbound_access == "App-Gateway" ? 1 : 0
 
   name                = "wafp-${local.gateway_name_location}"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
 
   policy_settings {
@@ -109,7 +109,7 @@ resource "azurerm_application_gateway" "this" {
   count = var.inbound_access == "App-Gateway" ? 1 : 0
 
   name                = local.gateway_name_location
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
   firewall_policy_id  = azurerm_web_application_firewall_policy.gateway[0].id
 

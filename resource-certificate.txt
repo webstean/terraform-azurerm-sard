@@ -112,7 +112,7 @@ resource "azapi_resource" "key_vault" {
 resource "azapi_resource" "dns_zone" {
   type = "Microsoft.Network/dnsZones@2018-05-01"
 
-  name      = "dnszone-${azurerm_resource_group.environment.name}.com"
+  name      = "dnszone-${module.environment_resource_group.resource.name}.com"
   parent_id = azurerm_resource_group.environment.id
   location  = "global"
 }
@@ -124,7 +124,7 @@ module "certificate" {
 
   location            = "global"
   name                = "app-service-certificate-order-${random_string.name_suffix.id}"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   auto_renew          = true
   certificate_order_key_vault_stores = {
     default = {

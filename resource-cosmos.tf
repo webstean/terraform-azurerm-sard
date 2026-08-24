@@ -11,7 +11,7 @@ module "cosmos" {
   enable_telemetry = var.enable_telemetry
 
   name                = local.cosmos_name_location
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
 
   managed_identities = {
@@ -75,7 +75,7 @@ module "cosmos" {
 
 ## 'Cosmos DB Built-in Data Contributor' is an Azure Cosmos DB data-plane role (Microsoft.DocumentDB)
 resource "azurerm_cosmosdb_sql_role_assignment" "this" {
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   account_name        = module.cosmos.name
 
   role_definition_id = "${module.cosmos.resource_id}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002"

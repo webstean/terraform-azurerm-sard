@@ -11,7 +11,7 @@ module "comms_keyvault" {
   enable_telemetry = var.enable_telemetry
 
   name                            = local.comms_name_hostname
-  resource_group_name             = azurerm_resource_group.environment.name
+  resource_group_name             = module.environment_resource_group.resource.name
   location                        = azurerm_resource_group.environment.location
   tenant_id                       = data.azurerm_client_config.current.tenant_id
   sku_name                        = "standard"
@@ -79,7 +79,7 @@ locals {
 resource "azurerm_communication_service" "this" {
 
   name                = local.comms_name_location
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   data_location       = local.regions[azurerm_resource_group.environment.location].data_location
 
   tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
@@ -134,7 +134,7 @@ resource "azurerm_role_assignment" "comms_service_owner2" {
 
 resource "azurerm_email_communication_service" "this" {
   name                = "${local.comms_name_location}-email"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   data_location       = local.regions[azurerm_resource_group.environment.location].data_location
   tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
 }
@@ -251,7 +251,7 @@ locals {
 }
 resource "azurerm_notification_hub_namespace" "this" {
   name                = "${local.comms_name_location}-namespace"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
   namespace_type      = "NotificationHub"
   sku_name            = local.notification_hub_sku
@@ -259,7 +259,7 @@ resource "azurerm_notification_hub_namespace" "this" {
 
 resource "azurerm_notification_hub" "this" {
   name                = "${local.comms_name_location}-hub"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
   namespace_name      = azurerm_notification_hub_namespace.this.name
   /*
@@ -288,7 +288,7 @@ resource "azurerm_notification_hub_authorization_rule" "rule1" {
   name                  = "management-auth-rule"
   notification_hub_name = azurerm_notification_hub.this.name
   namespace_name        = azurerm_notification_hub_namespace.this.name
-  resource_group_name   = azurerm_resource_group.environment.name
+  resource_group_name   = module.environment_resource_group.resource.name
   manage                = true
   send                  = true
   listen                = true

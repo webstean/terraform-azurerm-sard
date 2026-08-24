@@ -29,7 +29,7 @@ resource "azurerm_public_ip" "nat" {
   name                = "pip-${local.nat_name_location}"
   allocation_method   = "Static"
   location            = azurerm_resource_group.environment.location
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   sku                 = "StandardV2"
   sku_tier            = "Regional" ## "Global"
   #domain_name_label = local.vmms_name_hostname
@@ -69,7 +69,7 @@ resource "azurerm_nat_gateway" "this" {
   count = var.vmss_number_of_instances == 0 || var.vmss_autoscale_enabled == false ? 0 : 1
 
   name                = "nat-${local.nat_name_location}"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
   sku_name            = "StandardV2" ## There is no cost difference between the two SKUs. Standard and Standardv2 - StandardV2 is multi-zones for free
   tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
@@ -119,7 +119,7 @@ module "vmss_keyvault" {
   enable_telemetry = var.enable_telemetry
 
   name                            = local.vmss_name_hostname
-  resource_group_name             = azurerm_resource_group.environment.name
+  resource_group_name             = module.environment_resource_group.resource.name
   location                        = azurerm_resource_group.environment.location
   tenant_id                       = data.azurerm_client_config.current.tenant_id
   sku_name                        = "standard"
@@ -522,7 +522,7 @@ module "vmss_autoscale_setting" {
   enable_telemetry = var.enable_telemetry
 
   name                = "${local.vmss_name}-autoscale"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
   target_resource_id  = module.virtualmachinescaleset.resource_id
   enabled             = true
@@ -733,7 +733,7 @@ resource "azurerm_virtual_machine_scale_set_standby_pool" "hibernated" {
   count = local.vmss_enable_standby_pool ? 1 : 0
 
   name                                  = "${local.vmss_name}-hibernated-pool"
-  resource_group_name                   = azurerm_resource_group.environment.name
+  resource_group_name                   = module.environment_resource_group.resource.name
   location                              = azurerm_resource_group.environment.location
   attached_virtual_machine_scale_set_id = module.virtualmachinescaleset.resource_id
   virtual_machine_state                 = "Hibernated"

@@ -9,7 +9,7 @@ locals {
 resource "azurerm_web_pubsub" "this" {
   name                = local.pubsub_name_hostname
   location            = azurerm_resource_group.environment.location
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
 
   sku      = "Free_F1" # Free_F1, Standard_S1, Premium_P1
   capacity = 1

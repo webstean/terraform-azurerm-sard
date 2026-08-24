@@ -12,7 +12,7 @@ module "foundry_keyvault" {
   enable_telemetry = var.enable_telemetry
 
   name                            = local.foundry_name_hostname
-  resource_group_name             = azurerm_resource_group.environment.name
+  resource_group_name             = module.environment_resource_group.resource.name
   location                        = azurerm_resource_group.environment.location
   tenant_id                       = data.azurerm_client_config.current.tenant_id
   sku_name                        = "standard"

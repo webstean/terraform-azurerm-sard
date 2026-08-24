@@ -11,7 +11,7 @@ locals {
 resource "azurerm_static_web_app" "this" {
 
   name                = local.swa_name
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   // only available in: westus2,centralus,eastus2,westeurope,eastasia,eastasiastage
   location = local.regions[azurerm_resource_group.environment.location].swa_location
 

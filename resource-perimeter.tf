@@ -23,7 +23,7 @@ locals {
 
 resource "azurerm_network_security_perimeter" "this" {
   name                = local.perimeter_name
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
   tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
 }
@@ -100,7 +100,7 @@ resource "azurerm_monitor_diagnostic_setting" "nsp2" {
 */
 
 data "azurerm_resources" "environment" {
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   #required_tags       = { "app" = "andrew" }
 }
 

@@ -19,7 +19,7 @@ resource "azurerm_public_ip" "bastion" {
   for_each = { for k, v in azurerm_virtual_network.this : k => v if var.bastion_sku != "Developer" }
 
   name                = "pip-${local.bastion_name_location}"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
   allocation_method   = "Static"
   sku                 = "Standard"
@@ -60,7 +60,7 @@ resource "azurerm_subnet" "bastion" {
   for_each = { for k, v in azurerm_virtual_network.this : k => v if var.bastion_sku != "Developer" }
 
   name                            = "AzureBastionSubnet"
-  resource_group_name             = azurerm_resource_group.environment.name
+  resource_group_name             = module.environment_resource_group.resource.name
   virtual_network_name            = each.value.name
   address_prefixes                = [format(local.subnet_bastion.address_format_ipv4, local.regions[each.key].location_number)]
   default_outbound_access_enabled = false
@@ -74,7 +74,7 @@ resource "azurerm_subnet" "bastion" {
 
 resource "azurerm_bastion_host" "this" {
   name                = local.bastion_name_location
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
 
   dynamic "ip_configuration" {
@@ -169,7 +169,7 @@ resource "azurerm_network_security_group" "bastion" {
   for_each = { for k, v in azurerm_virtual_network.this : k => v if var.bastion_sku != "Developer" }
 
   name                = "nsg-bastion-${lower(azurerm_resource_group.environment.location)}"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
 
   ### Ingress Traffic from public internet:

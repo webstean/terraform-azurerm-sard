@@ -9,7 +9,7 @@ locals {
 
 resource "azurerm_subnet" "sqlserver" {
   name                            = "databases"
-  resource_group_name             = azurerm_resource_group.environment.name
+  resource_group_name             = module.environment_resource_group.resource.name
   virtual_network_name            = azurerm_virtual_network.this.name
   address_prefixes                = [format("10.%s.101.0/24", local.regions[var.location].location_number)]
   default_outbound_access_enabled = false
@@ -24,7 +24,7 @@ resource "azurerm_subnet" "sqlserver" {
 resource "azurerm_user_assigned_identity" "sqlserver" {
   name = "id-${local.sql_server_location}-sqlserver-readwrite"
 
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
   isolation_scope     = var.deploy_sql_failover ? null : "Regional"
 
@@ -42,7 +42,7 @@ resource "azurerm_network_security_group" "inbound_sqlserver" {
   count = tobool(var.deploy_private_endpoints) ? 1 : 0
 
   name                = "nsg-sqlserver-${lower(azurerm_resource_group.environment.location)}-inbound"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
 
   security_rule {
@@ -155,7 +155,7 @@ resource "azurerm_role_assignment" "sql_db_contributor" {
 
 resource "azurerm_key_vault" "sql_kv" {
   name                       = local.sql_server_hostname
-  resource_group_name        = azurerm_resource_group.environment.name
+  resource_group_name        = module.environment_resource_group.resource.name
   location                   = azurerm_resource_group.environment.location
   sku_name                   = "standard"
   tenant_id                  = data.azurerm_client_config.current.tenant_id
@@ -208,7 +208,7 @@ module "sql_server_this" {
 
   name                = "${local.sql_server_location}-p1"
   location            = azurerm_resource_group.environment.location
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   server_version      = "12.0"
   azuread_administrator = {
     login_username              = var.owner_entra_display_name
@@ -259,7 +259,7 @@ module "sql_server_this" {
 
 resource "azurerm_mssql_server" "this" {
   name                                 = "${local.sql_server_location}-p1"
-  resource_group_name                  = azurerm_resource_group.environment.name
+  resource_group_name                  = module.environment_resource_group.resource.name
   location                             = azurerm_resource_group.environment.location
   version                              = "12.0"
   public_network_access_enabled        = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
@@ -298,7 +298,7 @@ resource "azurerm_mssql_server" "this-failover" {
   count = var.deploy_sql_failover ? 1 : 0
 
   name                                 = "${local.sql_server_location}-f1"
-  resource_group_name                  = azurerm_resource_group.environment.name
+  resource_group_name                  = module.environment_resource_group.resource.name
   location                             = local.regions[azurerm_resource_group.environment.location].default_rep_location
   version                              = "12.0"
   public_network_access_enabled        = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
@@ -406,7 +406,7 @@ resource "azurerm_mssql_server_vulnerability_assessment" "this" {
 
 /*
 resource "azurerm_mssql_server_security_alert_policy" "this" {
-  resource_group_name        = azurerm_resource_group.environment.name
+  resource_group_name        = module.environment_resource_group.resource.name
   server_name                = azurerm_mssql_server.this.name
   state                      = "Enabled"
   storage_endpoint           = azurerm_storage_account.diag.primary_blob_endpoint
@@ -520,7 +520,7 @@ resource "azapi_resource_action" "sql_server_automatic_tuning" {
 ## fixed price per month, around $120 per month or Hyperscale $1,200 per month, but you can scale up and down as needed
 resource "azurerm_mssql_elasticpool" "basic" {
   name                = "${azurerm_mssql_server.this.name}-basic-epool"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
   server_name         = azurerm_mssql_server.this.name
   license_type        = "LicenseIncluded"

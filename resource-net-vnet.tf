@@ -18,7 +18,7 @@ Get-AzEdgeZonesExtendedZone -Name 'perth'
 resource "azurerm_virtual_network" "this" {
   name                = local.vnet_name_location
   location            = azurerm_resource_group.environment.location
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
 
   address_space = local.regions[var.location].vnet_address_space
   bgp_community = local.regions[var.location].vnet_bgp_community
@@ -33,7 +33,7 @@ resource "azurerm_virtual_network" "this" {
 
 resource "azurerm_subnet" "outbound" {
   name                 = "outbound"
-  resource_group_name  = azurerm_resource_group.environment.name
+  resource_group_name  = module.environment_resource_group.resource.name
   virtual_network_name = azurerm_virtual_network.this.name
   address_prefixes     = [format("10.%s.99.0/24", local.regions[var.location].location_number)]
   ## Note, the VMSS won't use the default Internet outbound (even if enabled - you have to use a NAT Gateway)
@@ -72,7 +72,7 @@ resource "azurerm_monitor_diagnostic_setting" "vnet_logs" {
 # Activation needs to come from a Azure IP Address, not from a private IP address, so we need to route traffic to the Internet for the KMS endpoints
 resource "azurerm_route_table" "this" {
   name                          = "Direct-Internet-Routes"
-  resource_group_name           = azurerm_resource_group.environment.name
+  resource_group_name           = module.environment_resource_group.resource.name
   location                      = azurerm_resource_group.environment.location
   bgp_route_propagation_enabled = false ## keep them, as simple static routes
 
@@ -157,7 +157,7 @@ resource "azurerm_virtual_hub_routing_intent" "this" {
 
 resource "azurerm_network_security_group" "general" { ## designed to be associated to NIC or subnets or both!
   name                = "nsg-general-access-${lower(azurerm_resource_group.environment.location)}"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
 
   ## ===========================================================================================================

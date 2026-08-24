@@ -8,14 +8,14 @@ locals {
 
 resource "azurerm_subnet" "gateway" {
   name                 = "GatewaySubnet" # this exact name is required, non-negotiable
-  resource_group_name  = azurerm_resource_group.environment.name
+  resource_group_name  = module.environment_resource_group.resource.name
   virtual_network_name = azurerm_virtual_network.this.name
   address_prefixes     = ["10.0.255.0/27"] # /27 minimum recommended, /29 is the hard floor
 }
 
 resource "azurerm_public_ip" "vpn" {
   name                = "pip-${local.vpn_name}"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
   allocation_method   = "Static"
   sku                 = "Standard"
@@ -23,7 +23,7 @@ resource "azurerm_public_ip" "vpn" {
 
 resource "azurerm_virtual_network_gateway" "this-client" {
   name                = "vgw-example"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
 
   type     = "Vpn" # or "ExpressRoute"

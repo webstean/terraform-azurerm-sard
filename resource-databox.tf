@@ -8,7 +8,7 @@ locals {
 
 resource "azurerm_databox_edge_device" "gateway" {
   name                = local.databox_name_hostname
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   ## Supported locations are 'eastus','westeurope','southeastasia'
   location = "southeastasia"
 

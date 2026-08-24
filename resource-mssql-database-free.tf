@@ -9,7 +9,7 @@ locals {
 resource "azurerm_user_assigned_identity" "free_sql_database" {
   name = "id-${local.sql_free_database_location}-readwrite"
 
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
   isolation_scope     = var.deploy_sql_failover ? null : "Regional"
 
@@ -140,7 +140,7 @@ resource "azurerm_key_vault_secret" "sql_database_connection_free_unencrypted" {
 
 resource "azurerm_automation_variable_string" "sql_database_connection_free_encrypted" {
   name                    = "SQL-DATABASE-CONNECTION-STRING-FREE-ENCRYPTED"
-  resource_group_name     = azurerm_resource_group.environment.name
+  resource_group_name     = module.environment_resource_group.resource.name
   automation_account_name = azurerm_automation_account.this.name
   encrypted               = (var.data_pii == "yes" || var.data_phi == "yes") ? true : false
 
@@ -152,7 +152,7 @@ DESC
 
 resource "azurerm_automation_variable_string" "sql_database_connection_free_unencrypted" {
   name                    = "SQL-DATABASE-CONNECTION-STRING-FREE-UNENCRYPTED"
-  resource_group_name     = azurerm_resource_group.environment.name
+  resource_group_name     = module.environment_resource_group.resource.name
   automation_account_name = azurerm_automation_account.this.name
   encrypted               = (var.data_pii == "yes" || var.data_phi == "yes") ? true : false
 

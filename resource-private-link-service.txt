@@ -15,7 +15,7 @@ locals {
 # for its NAT IP configuration(s).
 resource "azurerm_subnet" "pls_nat" {
   name                                          = local.pls_name
-  resource_group_name                           = azurerm_resource_group.environment.name
+  resource_group_name                           = module.environment_resource_group.resource.name
   virtual_network_name                          = azurerm_virtual_network.this.name
   address_prefixes                              = [format("10.%s.66.0/24", local.regions[var.location].location_number)]
   private_link_service_network_policies_enabled = false
@@ -26,7 +26,7 @@ resource "azurerm_subnet" "pls_nat" {
 # --- Internal Standard Load Balancer fronting the service ------------------
 resource "azurerm_lb" "pls" {
   name                = "lb-local.${local.pls_name}"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
   sku                 = "Standard"
 
@@ -67,7 +67,7 @@ resource "azurerm_lb_rule" "pls" {
 
 resource "azurerm_private_link_service" "this" {
   name                = local.pls_name_location
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
 
   load_balancer_frontend_ip_configuration_ids = [

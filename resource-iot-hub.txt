@@ -41,7 +41,7 @@ resource "azurerm_role_assignment" "iot-hub3" {
 
 resource "azurerm_iothub" "this" {
   name                = local.iothub_name_hostname
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
 
   event_hub_partition_count = 2
@@ -92,7 +92,7 @@ resource "azurerm_iot_security_solution" "this" {
   name                       = title("${azurerm_iothub.this.name}-security")
   enabled                    = true
   display_name               = "${azurerm_iothub.this.name} Defender IOT Experience / Solution"
-  resource_group_name        = azurerm_resource_group.environment.name
+  resource_group_name        = module.environment_resource_group.resource.name
   location                   = azurerm_resource_group.environment.location
   iothub_ids                 = [azurerm_iothub.this.id]
   log_analytics_workspace_id = module.log_analytics_workspace.resource.workspace_id
@@ -131,7 +131,7 @@ resource "azurerm_iothub_endpoint_storage_container" "iot_avro" {
   ## events, operationsMonitoringEvents, fileNotifications, $default
   name                       = lower(azurerm_storage_container.iot_avro.name)
   iothub_id                  = azurerm_iothub.this.id
-  resource_group_name        = azurerm_resource_group.environment.name
+  resource_group_name        = module.environment_resource_group.resource.name
   authentication_type        = "identityBased"
   container_name             = azurerm_storage_container.iot_avro.name
   endpoint_uri               = azurerm_storage_account.this.primary_blob_endpoint
@@ -144,7 +144,7 @@ resource "azurerm_iothub_endpoint_storage_container" "iot_avro" {
 }
 resource "azurerm_iothub_enrichment" "avro" {
   iothub_name         = azurerm_iothub.this.name
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
 
   key            = "iothub"
   value          = "$iothubname"
@@ -164,7 +164,7 @@ resource "azurerm_iothub_endpoint_storage_container" "iot_json" {
   ## events, operationsMonitoringEvents, fileNotifications, $default
   name                       = lower(azurerm_storage_container.iot_json.name)
   iothub_id                  = azurerm_iothub.this.id
-  resource_group_name        = azurerm_resource_group.environment.name
+  resource_group_name        = module.environment_resource_group.resource.name
   authentication_type        = "identityBased"
   container_name             = azurerm_storage_container.iot_json.name
   endpoint_uri               = azurerm_storage_account.this.primary_blob_endpoint
@@ -177,7 +177,7 @@ resource "azurerm_iothub_endpoint_storage_container" "iot_json" {
 }
 resource "azurerm_iothub_enrichment" "json" {
   iothub_name         = azurerm_iothub.this.name
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
 
   key            = "iothub"
   value          = "$iothubname"
@@ -188,7 +188,7 @@ resource "azurerm_iothub_enrichment" "json" {
 /*
 resource "azurerm_iothub_route" "default" {
   name                = "default"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   iothub_name         = azurerm_iothub.this.name
   ## Possible values include: DeviceConnectionStateEvents, DeviceJobLifecycleEvents, DeviceLifecycleEvents,
   ##                          DeviceMessages, DigitalTwinChangeEvents, Invalid, TwinChangeEvents
@@ -221,7 +221,7 @@ resource "azurerm_iothub_file_upload" "this" {
 
 resource "azurerm_cosmosdb_sql_database" "telemetry" {
   name                = "iot-telemetry"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   account_name        = module.cosmos.resource.name
 
   ## With free tier, you will get the first 1000 RU/s and 25 GB of storage in this account for free.
@@ -230,7 +230,7 @@ resource "azurerm_cosmosdb_sql_database" "telemetry" {
 }
 resource "azurerm_cosmosdb_sql_role_definition" "readwritedelete" {
   name                = "${module.cosmos.resource.name}-readwritedelete"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   account_name        = module.cosmos.resource.name
   type                = "CustomRole"
   assignable_scopes   = [module.cosmos.resource.id]
@@ -245,7 +245,7 @@ resource "azurerm_cosmosdb_sql_role_definition" "readwritedelete" {
 }
 resource "azurerm_cosmosdb_sql_role_assignment" "readwritedelete" {
   name                = uuid()
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   account_name        = module.cosmos.resource.name
   role_definition_id  = azurerm_cosmosdb_sql_role_definition.readwritedelete.id
   principal_id        = data.azurerm_client_config.current.object_id
@@ -255,7 +255,7 @@ resource "azurerm_cosmosdb_sql_role_assignment" "readwritedelete" {
 /*
 resource "azurerm_cosmosdb_sql_container" "telemetry" {
   name                = "iot-telemetry"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   account_name        = module.cosmos.resource.name
   database_name       = azurerm_cosmosdb_sql_database.telemetry.name
 
@@ -279,7 +279,7 @@ resource "azurerm_cosmosdb_sql_container" "telemetry" {
 
 resource "azurerm_iothub_endpoint_cosmosdb_account" "iot" {
   name                = "${lower(azurerm_iothub.this.name)}-${module.cosmos.resource.name}"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   iothub_id           = azurerm_iothub.this.id
 
   container_name = azurerm_cosmosdb_sql_container.telemetry.name

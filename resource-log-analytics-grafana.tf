@@ -2,7 +2,7 @@
 ## $$
 resource "azurerm_dashboard_grafana" "grafana" {
   name                              = "graf-aca-aue"
-  resource_group_name               = azurerm_resource_group.environment.name
+  resource_group_name               = module.environment_resource_group.resource.name
   location                          = azurerm_resource_group.environment.location
   grafana_major_version             = "13"
   sku                               = "Standard"

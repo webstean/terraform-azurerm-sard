@@ -10,7 +10,7 @@ resource "azurerm_public_ip" "relay" {
   count = tobool(var.deploy_private_endpoints) ? 1 : 0
 
   name                = "pip-${local.relay_name}"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
   allocation_method   = "Static"
   sku                 = "Standard"
@@ -21,7 +21,7 @@ resource "azurerm_lb" "relay" {
   count = tobool(var.deploy_private_endpoints) ? 1 : 0
 
   name                = "lb-tcp-relay"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
   sku                 = "Standard"
 

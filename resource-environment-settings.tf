@@ -124,6 +124,7 @@ module "environment_resource_group" {
   })
 }
 
+/*
 resource "azurerm_resource_group" "environment" {
   name     = "rg-${local.environment_name_location}"
   location = var.location
@@ -132,6 +133,7 @@ resource "azurerm_resource_group" "environment" {
     ignore_changes = [tags.created]
   }
 }
+*/
 
 # Wait 10 seconds for the network watcher to be created as a byproduct of the VNet creation
 resource "time_sleep" "wait_10_seconds_for_network_watcher_creation" {
@@ -151,13 +153,13 @@ data "azurerm_network_watcher" "this" {
 output "environment_resource_group" {
   description = "The Azure Resource Group that contains this environment"
   sensitive   = false
-  value       = azurerm_resource_group.environment.name
+  value       = module.environment_resource_group.resource.name
 }
 
 resource "azurerm_user_assigned_identity" "environment" {
   name = "id-${local.environment_name_location}"
 
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
   isolation_scope     = "Regional"
   tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }

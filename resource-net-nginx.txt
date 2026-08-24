@@ -37,7 +37,7 @@ EOT
 ## $$
 resource "azurerm_public_ip" "nginx" {
   name                = "pip-${local.nginx_name_location}"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
   allocation_method   = "Static"
   sku                 = "Standard"
@@ -47,7 +47,7 @@ resource "azurerm_public_ip" "nginx" {
 
 resource "azurerm_subnet" "nginx" {
   name                                          = local.nginx_name
-  resource_group_name                           = azurerm_resource_group.environment.name
+  resource_group_name                           = module.environment_resource_group.resource.name
   virtual_network_name                          = azurerm_virtual_network.this.name
   address_prefixes                              = [format("10.%s.55.0/24", local.regions[var.location].location_number)]
   default_outbound_access_enabled               = false
@@ -69,7 +69,7 @@ resource "azurerm_subnet" "nginx" {
 resource "azurerm_nginx_deployment" "this" {
   name                = local.nginx_name_hostname
   sku                 = "standardv3_Monthly"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
 
   automatic_upgrade_channel = "stable"
@@ -166,7 +166,7 @@ resource "azurerm_monitor_diagnostic_setting" "nginx_logs" {
 
 resource "azurerm_network_security_group" "nginx" {
   name                = "nsg-nginx-${lower(azurerm_resource_group.environment.location)}"
-  resource_group_name = azurerm_resource_group.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
   location            = azurerm_resource_group.environment.location
 
   security_rule {
