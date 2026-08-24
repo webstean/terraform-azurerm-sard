@@ -12,7 +12,7 @@ module "environment_resource_group" {
   version          = "~>0.0, < 1.0"
   enable_telemetry = var.enable_telemetry
 
-  name     = "rg-2${local.environment_name_location}"
+  name     = "rg-${lower(local.environment_name_location)}"
   location = var.location
   role_assignments = {
     ## ==========================================================================================
