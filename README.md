@@ -52,6 +52,7 @@ module "sard" {
 | <a name="module_appconfiguration"></a> [appconfiguration](#module\_appconfiguration) | Azure/avm-res-appconfiguration-configurationstore/azure | ~>0.0, < 1.0 |
 | <a name="module_application_insights"></a> [application\_insights](#module\_application\_insights) | Azure/avm-res-insights-component/azurerm | ~>0.0, < 1.0 |
 | <a name="module_comms_keyvault"></a> [comms\_keyvault](#module\_comms\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
+| <a name="module_containerregistry"></a> [containerregistry](#module\_containerregistry) | Azure/avm-res-containerregistry-registry/azurerm | ~>0.0, < 1.0 |
 | <a name="module_cosmos"></a> [cosmos](#module\_cosmos) | Azure/avm-res-documentdb-databaseaccount/azurerm | ~>0.0, < 1.0 |
 | <a name="module_environment_resource_group"></a> [environment\_resource\_group](#module\_environment\_resource\_group) | Azure/avm-res-resources-resourcegroup/azurerm | ~>0.0, < 1.0 |
 | <a name="module_foundry_keyvault"></a> [foundry\_keyvault](#module\_foundry\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
@@ -126,6 +127,11 @@ module "sard" {
 | [azurerm_bastion_host.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/bastion_host) | resource |
 | [azurerm_communication_service.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/communication_service) | resource |
 | [azurerm_communication_service_email_domain_association.comms](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/communication_service_email_domain_association) | resource |
+| [azurerm_container_registry_cache_rule.cache_rule2](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry_cache_rule) | resource |
+| [azurerm_container_registry_cache_rule.cache_rule3](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry_cache_rule) | resource |
+| [azurerm_container_registry_cache_rule.cache_rule4](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry_cache_rule) | resource |
+| [azurerm_container_registry_cache_rule.cache_rule5](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry_cache_rule) | resource |
+| [azurerm_container_registry_cache_rule.cache_rule8](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry_cache_rule) | resource |
 | [azurerm_cosmosdb_sql_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cosmosdb_sql_role_assignment) | resource |
 | [azurerm_databox_edge_device.gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/databox_edge_device) | resource |
 | [azurerm_email_communication_service.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/email_communication_service) | resource |
@@ -173,7 +179,6 @@ module "sard" {
 | [azurerm_public_ip.bastion](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_public_ip.nat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_public_ip.relay](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
-| [azurerm_resource_group.environment](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
 | [azurerm_resource_provider_feature_registration.encryption_at_host](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_provider_feature_registration) | resource |
 | [azurerm_role_assignment.comms_service_owner1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.comms_service_owner2](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
@@ -313,6 +318,8 @@ module "sard" {
 
 | Name | Description |
 |------|-------------|
+| <a name="output_acr_id"></a> [acr\_id](#output\_acr\_id) | The ID of the Azure Container Registry. |
+| <a name="output_acr_name"></a> [acr\_name](#output\_acr\_name) | The name of the Azure Container Registry. |
 | <a name="output_ai_search_endpoint"></a> [ai\_search\_endpoint](#output\_ai\_search\_endpoint) | The endpoint of the AI search service |
 | <a name="output_ai_search_primary_key"></a> [ai\_search\_primary\_key](#output\_ai\_search\_primary\_key) | The primary key of the AI search service |
 | <a name="output_ai_search_secondary_key"></a> [ai\_search\_secondary\_key](#output\_ai\_search\_secondary\_key) | The secondary key of the AI search service |
