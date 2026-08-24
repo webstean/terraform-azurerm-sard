@@ -1,0 +1,109 @@
+locals {
+  pls_friendly_name      = "Private Link Service"
+  pls_name               = "pls-${var.prefix}"
+  pls_name_location      = lower("${local.pls_name}-${lower(var.location)}")
+  pls_random_suffix      = substr(md5(local.pls_name_location), 0, 6)
+  pls_name_hostname      = lower(substr(replace("l${local.pls_random_suffix}${local.pls_name_location}", "-", ""), 0, 24))
+  proxy_protocol_enabled = true
+}
+
+# Note: reuses `resource_group_name` and `location` already declared in
+# variables.tf from earlier Terraform in this folder. Add them back if these
+# files are moved to their own directory.
+
+# Private Link Service network policies must be enabled on the subnet used
+# for its NAT IP configuration(s).
+resource "azurerm_subnet" "pls_nat" {
+  name                                          = local.pls_name
+  resource_group_name                           = azurerm_resource_group.environment.name
+  virtual_network_name                          = azurerm_virtual_network.this.name
+  address_prefixes                              = [format("10.%s.66.0/24", local.regions[var.location].location_number)]
+  private_link_service_network_policies_enabled = false
+  ## Possible values are Disabled, Enabled, NetworkSecurityGroupEnabled and RouteTableEnabled.
+  private_endpoint_network_policies = "Enabled"
+}
+
+# --- Internal Standard Load Balancer fronting the service ------------------
+resource "azurerm_lb" "pls" {
+  name                = "lb-local.${local.pls_name}"
+  resource_group_name = azurerm_resource_group.environment.name
+  location            = azurerm_resource_group.environment.location
+  sku                 = "Standard"
+
+  frontend_ip_configuration {
+    name                          = "pls-frontend"
+    subnet_id                     = azurerm_subnet.pls_nat.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_lb_backend_address_pool" "pls" {
+  name            = "pls-backend-pool"
+  loadbalancer_id = azurerm_lb.pls.id
+}
+
+# Placeholder health probe + rule so the LB is functional out of the box.
+# Point the backend pool at your real NICs/VMSS and adjust the probe/rule to
+# match your service's actual port.
+resource "azurerm_lb_probe" "pls" {
+  name            = "pls-probe"
+  loadbalancer_id = azurerm_lb.pls.id
+  protocol        = "Tcp"
+  port            = 80
+}
+
+resource "azurerm_lb_rule" "pls" {
+  name                           = "pls-rule"
+  loadbalancer_id                = azurerm_lb.pls.id
+  protocol                       = "Tcp"
+  frontend_port                  = 80
+  backend_port                   = 80
+  frontend_ip_configuration_name = azurerm_lb.pls.frontend_ip_configuration[0].name
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.pls.id]
+  probe_id                       = azurerm_lb_probe.pls.id
+}
+
+# --- Private Link Service ---------------------------------------------------
+
+resource "azurerm_private_link_service" "this" {
+  name                = local.pls_name_location
+  resource_group_name = azurerm_resource_group.environment.name
+  location            = azurerm_resource_group.environment.location
+
+  load_balancer_frontend_ip_configuration_ids = [
+    azurerm_lb.pls.frontend_ip_configuration[0].id,
+  ]
+
+  dynamic "nat_ip_configuration" {
+    for_each = var.pls_nat_ip_configurations
+    content {
+      name               = nat_ip_configuration.value.name
+      subnet_id          = azurerm_subnet.pls_nat.id
+      primary            = nat_ip_configuration.value.primary
+      private_ip_address = try(nat_ip_configuration.value.private_ip_address, null)
+    }
+  }
+
+  auto_approval_subscription_ids = ["fd72f9ff-96b6-4a20-a870-ceaa17d70bc8"]
+  visibility_subscription_ids    = ["fd72f9ff-96b6-4a20-a870-ceaa17d70bc8"]
+  proxy_protocol_enabled         = local.proxy_protocol_enabled
+  fqdns                          = var.pls_allowed_fqdns
+}
+
+output "pls_id" {
+  description = "The Private Link Service ID."
+  sensitive   = false
+  value       = try(azurerm_private_link_service.this.id,null)
+}
+
+output "pls_name" {
+  description = "The Private Link Service name."
+  sensitive   = false
+  value       = try(azurerm_private_link_service.this.name,null)
+}
+
+output "pls_alias" {
+  description = "The Private Link Service global alias."
+  sensitive   = false
+  value       = try(azurerm_private_link_service.this.alias,null)
+}

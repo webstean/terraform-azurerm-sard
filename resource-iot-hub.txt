@@ -1,0 +1,358 @@
+locals {
+  iothub_friendly_name = "IOT Hub"
+  iothub_name          = "iothub-${var.prefix}"
+  iothub_name_location = lower("${local.iothub_name}-${lower(var.location)}")
+  iothub_random_suffix = substr(md5(local.iothub_name_location), 0, 6)
+  iothub_name_hostname = lower(substr(replace("i${local.iothub_random_suffix}${local.iothub_name_location}", "-", ""), 0, 24))
+  iot_hub_sku          = "F" ## Free (F), Basic (B) -$$ , Standard (S) -$$$
+  iot_hub_capacity     = 1
+}
+
+/*
+IoT Hub Data Contributor
+IoT Hub Data Reader
+IoT Hub Registry Contributor
+IoT Hub Twin Contributor
+*/
+resource "azurerm_role_assignment" "iot-hub1" {
+  scope                = azurerm_resource_group.environment.id
+  role_definition_name = "IoT Hub Registry Administrator"
+  principal_id         = data.azurerm_client_config.current.object_id
+  description          = local.iac_message
+}
+resource "azurerm_role_assignment" "iot-hub2" {
+  scope                = azurerm_resource_group.environment.id
+  role_definition_name = "IoT Hub Data Contributor"
+  principal_id         = data.azurerm_client_config.current.object_id
+  description          = local.iac_message
+}
+resource "azurerm_role_assignment" "iot-hub2a" {
+  scope                = azurerm_resource_group.environment.id
+  role_definition_name = "IoT Hub Data Contributor"
+  principal_id         = azurerm_user_assigned_identity.environment.id
+  description          = local.iac_message
+}
+resource "azurerm_role_assignment" "iot-hub3" {
+  scope                = azurerm_resource_group.environment.id
+  role_definition_name = "IoT Hub Twin Contributor"
+  principal_id         = data.azurerm_client_config.current.object_id
+  description          = local.iac_message
+}
+
+resource "azurerm_iothub" "this" {
+  name                = local.iothub_name_hostname
+  resource_group_name = azurerm_resource_group.environment.name
+  location            = azurerm_resource_group.environment.location
+
+  event_hub_partition_count = 2
+
+  sku {
+    ## Free (F), Basic (B) -$$ , Standard (S) -$$$
+    name     = "${local.iot_hub_sku}${local.iot_hub_capacity}"
+    capacity = local.iot_hub_capacity
+  }
+
+  network_rule_set {
+    default_action = "Allow"
+    ip_rule {
+      name    = "default"
+      action  = "Allow"
+      ip_mask = "0.0.0.0/0"
+    }
+  }
+
+  local_authentication_enabled  = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+  public_network_access_enabled = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+
+  ### endpoint types are:
+  ### AzureIotHub.StorageContainer, AzureIotHub.ServiceBusQueue, AzureIotHub.ServiceBusTopic
+  ### or AzureIotHub.EventHub
+
+  cloud_to_device {
+    max_delivery_count = 30
+    default_ttl        = "PT1H"
+    feedback {
+      time_to_live       = "PT1H10M"
+      max_delivery_count = 15
+      lock_duration      = "PT30S"
+    }
+  }
+
+  identity {
+    type         = "SystemAssigned, UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.environment.id]
+  }
+
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_iot_security_solution" "this" {
+  count = local.iot_hub_sku != "F" ? 0 : 1
+
+  name                       = title("${azurerm_iothub.this.name}-security")
+  enabled                    = true
+  display_name               = "${azurerm_iothub.this.name} Defender IOT Experience / Solution"
+  resource_group_name        = azurerm_resource_group.environment.name
+  location                   = azurerm_resource_group.environment.location
+  iothub_ids                 = [azurerm_iothub.this.id]
+  log_analytics_workspace_id = module.log_analytics_workspace.resource.workspace_id
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_app_configuration_key" "iot_connection_string" {
+  configuration_store_id = module.appconfiguration.resource_id
+  key                    = "IOT-PRIMARY-CONNECTION-STRING"
+  label                  = "basic"
+  value                  = "test123"
+  depends_on = [
+    azurerm_role_assignment.runner_appconfig_owner
+  ]
+}
+resource "azurerm_app_configuration_key" "iot_connection_type" {
+  configuration_store_id = module.appconfiguration.resource_id
+  key                    = "IOT-PRIMARY-CONNECTION-TYPE"
+  label                  = "basic"
+  value                  = "test123"
+  depends_on = [
+    azurerm_role_assignment.runner_appconfig_owner
+  ]
+}
+
+
+/*
+resource "azurerm_storage_container" "iot_avro" {
+  name                  = "iot-avro"
+  storage_account_id    = azurerm_storage_account.this.id
+  container_access_type = "private"
+}
+resource "azurerm_iothub_endpoint_storage_container" "iot_avro" {
+
+  ## The following names are reserved:
+  ## events, operationsMonitoringEvents, fileNotifications, $default
+  name                       = lower(azurerm_storage_container.iot_avro.name)
+  iothub_id                  = azurerm_iothub.this.id
+  resource_group_name        = azurerm_resource_group.environment.name
+  authentication_type        = "identityBased"
+  container_name             = azurerm_storage_container.iot_avro.name
+  endpoint_uri               = azurerm_storage_account.this.primary_blob_endpoint
+  batch_frequency_in_seconds = 60
+  max_chunk_size_in_bytes    = 10485760
+  ## Possible values are Avro, AvroDeflate and JSON.
+  encoding = "Avro"
+  ## This is the default, which is pretty good.
+  file_name_format = "{iothub}/{partition}_{YYYY}_{MM}_{DD}_{HH}_{mm}"
+}
+resource "azurerm_iothub_enrichment" "avro" {
+  iothub_name         = azurerm_iothub.this.name
+  resource_group_name = azurerm_resource_group.environment.name
+
+  key            = "iothub"
+  value          = "$iothubname"
+  endpoint_names = [azurerm_iothub_endpoint_storage_container.iot_avro.name]
+}
+*/
+
+/*
+resource "azurerm_storage_container" "iot_json" {
+  name                  = "iot-json"
+  storage_account_id    = azurerm_storage_account.this.id
+  container_access_type = "private"
+}
+resource "azurerm_iothub_endpoint_storage_container" "iot_json" {
+
+  ## The following names are reserved:
+  ## events, operationsMonitoringEvents, fileNotifications, $default
+  name                       = lower(azurerm_storage_container.iot_json.name)
+  iothub_id                  = azurerm_iothub.this.id
+  resource_group_name        = azurerm_resource_group.environment.name
+  authentication_type        = "identityBased"
+  container_name             = azurerm_storage_container.iot_json.name
+  endpoint_uri               = azurerm_storage_account.this.primary_blob_endpoint
+  batch_frequency_in_seconds = 60
+  max_chunk_size_in_bytes    = 10485760
+  ## Possible values are Avro, AvroDeflate and JSON.
+  encoding = "JSON"
+  ## This is the default, which is pretty good.
+  file_name_format = "{iothub}/{partition}_{YYYY}_{MM}_{DD}_{HH}_{mm}"
+}
+resource "azurerm_iothub_enrichment" "json" {
+  iothub_name         = azurerm_iothub.this.name
+  resource_group_name = azurerm_resource_group.environment.name
+
+  key            = "iothub"
+  value          = "$iothubname"
+  endpoint_names = [azurerm_iothub_endpoint_storage_container.iot_json.name]
+}
+*/
+
+/*
+resource "azurerm_iothub_route" "default" {
+  name                = "default"
+  resource_group_name = azurerm_resource_group.environment.name
+  iothub_name         = azurerm_iothub.this.name
+  ## Possible values include: DeviceConnectionStateEvents, DeviceJobLifecycleEvents, DeviceLifecycleEvents,
+  ##                          DeviceMessages, DigitalTwinChangeEvents, Invalid, TwinChangeEvents
+  source    = "DeviceMessages"
+  enabled   = true
+  condition = "true"
+  endpoint_names = [ # only one is allowed
+    azurerm_iothub_endpoint_storage_container.iot_json.name
+  ]
+}
+*/
+
+/*
+resource "azurerm_storage_container" "iot_file_upload" {
+  name                  = "iot-file-upload"
+  storage_account_id    = azurerm_storage_account.this.id
+  container_access_type = "private"
+}
+resource "azurerm_iothub_file_upload" "this" {
+
+  iothub_id             = azurerm_iothub.this.id
+  authentication_type   = "identityBased"
+  connection_string     = azurerm_storage_account.this.primary_blob_connection_string
+  container_name        = azurerm_storage_container.iot_file_upload.name
+  identity_id           = azurerm_user_assigned_identity.environment.id
+  max_delivery_count    = 10
+  notifications_enabled = true
+}
+*/
+
+resource "azurerm_cosmosdb_sql_database" "telemetry" {
+  name                = "iot-telemetry"
+  resource_group_name = azurerm_resource_group.environment.name
+  account_name        = module.cosmos.resource.name
+
+  ## With free tier, you will get the first 1000 RU/s and 25 GB of storage in this account for free.
+  ## To keep your account free, keep the total RU/s across all resources in the account to 1000 RU/s
+  throughput = 400
+}
+resource "azurerm_cosmosdb_sql_role_definition" "readwritedelete" {
+  name                = "${module.cosmos.resource.name}-readwritedelete"
+  resource_group_name = azurerm_resource_group.environment.name
+  account_name        = module.cosmos.resource.name
+  type                = "CustomRole"
+  assignable_scopes   = [module.cosmos.resource.id]
+
+  permissions {
+    data_actions = [
+      "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/read",
+      "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/write",
+      "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/delete",
+    ]
+  }
+}
+resource "azurerm_cosmosdb_sql_role_assignment" "readwritedelete" {
+  name                = uuid()
+  resource_group_name = azurerm_resource_group.environment.name
+  account_name        = module.cosmos.resource.name
+  role_definition_id  = azurerm_cosmosdb_sql_role_definition.readwritedelete.id
+  principal_id        = data.azurerm_client_config.current.object_id
+  scope               = module.cosmos.resource.id
+}
+
+/*
+resource "azurerm_cosmosdb_sql_container" "telemetry" {
+  name                = "iot-telemetry"
+  resource_group_name = azurerm_resource_group.environment.name
+  account_name        = module.cosmos.resource.name
+  database_name       = azurerm_cosmosdb_sql_database.telemetry.name
+
+  partition_key_paths   = ["/deviceId"]
+  partition_key_kind    = "Hash"
+  partition_key_version = 2
+
+  indexing_policy {
+    indexing_mode = "consistent"
+
+    included_path {
+      path = "/*"
+    }
+
+    excluded_path {
+      path = "/\"_etag\"/?"
+    }
+  }
+  default_ttl = -1
+}
+
+resource "azurerm_iothub_endpoint_cosmosdb_account" "iot" {
+  name                = "${lower(azurerm_iothub.this.name)}-${module.cosmos.resource.name}"
+  resource_group_name = azurerm_resource_group.environment.name
+  iothub_id           = azurerm_iothub.this.id
+
+  container_name = azurerm_cosmosdb_sql_container.telemetry.name
+  database_name  = azurerm_cosmosdb_sql_database.telemetry.name
+  endpoint_uri   = module.cosmos.resource.endpoint
+  primary_key    = module.cosmos.resource.resource.primary_key
+  secondary_key  = module.cosmos.resource.resource.secondary_key
+}
+*/
+
+/*
+resource "azurerm_monitor_diagnostic_setting" "iot-hub" {
+  name = "Logs-Audit-and-Metrics-${azurerm_iothub.this.name}-to-Azure-Monitor"
+
+  target_resource_id         = azurerm_iothub.this.id
+  log_analytics_workspace_id = module.log_analytics_workspace.resource.workspace_id
+
+  enabled_log {
+    category_group = "audit"
+  }
+  enabled_log {
+    category_group = "allLogs"
+  }
+  enabled_metric {
+    category = "AllMetrics"
+  }
+}
+*/
+
+/*
+resource "azurerm_iothub_certificate" "iot-hub" {
+  for_each = azurerm_iothub.iot-hub
+
+  name                = "${each.value.name}cert01"
+  resource_group_name = each.value.resource_group_name
+  location            = each.value.location
+
+  certificate_content = filebase64("example.cer")
+}
+*/
+
+resource "azurerm_iothub_device_update_account" "this" {
+  name = local.iothub_name_hostname
+
+  resource_group_name = azurerm_iothub.this.resource_group_name
+  location            = azurerm_iothub.this.location
+  sku                 = "Free"
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.environment.id]
+  }
+
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  lifecycle {
+    ignore_changes = [tags.created]
+  }
+}
+
+
+## Only supported on IOT Hub with S1 (Standard) tier or above.
+resource "azurerm_iothub_device_update_instance" "iot-hub" {
+  count = local.iot_hub_sku != "F" ? 0 : 1
+
+  name                     = local.iothub_name_hostname
+  device_update_account_id = azurerm_iothub_device_update_account.this.id
+  iothub_id                = azurerm_iothub.this.id
+
+  diagnostic_enabled = true
+  diagnostic_storage_account {
+    connection_string = azurerm_storage_account.diag.primary_connection_string
+    id                = azurerm_storage_account.diag.id
+  }
+
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+

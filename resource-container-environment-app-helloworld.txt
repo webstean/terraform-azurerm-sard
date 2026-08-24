@@ -1,0 +1,290 @@
+resource "azurerm_container_app" "helloworld" {
+  name                         = "helloworld"
+  resource_group_name          = azurerm_resource_group.environment.name
+  container_app_environment_id = azurerm_container_app_environment.this.id
+  revision_mode                = "Single"
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.environment.id]
+  }
+
+  ingress {
+    external_enabled = true
+    target_port      = 80
+
+    traffic_weight {
+      percentage      = 100
+      latest_revision = true
+    }
+  }
+
+  template {
+    volume {
+      name         = azurerm_storage_share.containerappenv_logs.name
+      storage_name = azurerm_container_app_environment_storage.logs.name
+      storage_type = "AzureFile" ## NfsAzureFile
+      #mount_options = local.cifs_mount_options
+    }
+    volume {
+      name         = azurerm_storage_share.containerappenv_shared.name
+      storage_name = azurerm_container_app_environment_storage.shared.name
+      storage_type = "AzureFile" ## NfsAzureFile
+      #mount_options = local.cifs_mount_options
+    }
+    #cooldown_period_in_seconds = 120
+    container {
+      name   = "helloworld"
+      image  = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
+      cpu    = 0.5
+      memory = "1Gi"
+      env { // authentication
+        name  = "ENTRA_ID_CLIENT_ID"
+        value = azurerm_user_assigned_identity.environment.client_id
+      }
+      env { // authentication
+        name  = "ENTRA_ID_CLIENT_SECRET"
+        value = azurerm_user_assigned_identity.environment.client_id
+      }
+      env { // authentication
+        name  = "ENTRA_ID_ISSUER_URL"
+        value = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/v2.0"
+      }
+      env { // configuration information
+        name  = "AZURE_APP_CONFIGURATION_ENDPOINT"
+        value = module.appconfiguration.endpoint
+      }
+      env { // ACA environment information -name
+        name  = "AZURE_ACA_ENVIRONMENT_NAME"
+        value = azurerm_container_app_environment.this.name
+      }
+      env { // ACA environment information -resource group name
+        name  = "AZURE_ACA_ENVIRONMENT_RESOURCE_GROUP_NAME"
+        value = azurerm_container_app_environment.this.resource_group_name
+      }
+      env {
+        name  = "ASPNETCORE_ENVIRONMENT"
+        value = "Production"
+      }
+      #volume_mounts {
+      #  name = azurerm_storage_share.containerappenv_logs.name
+      #  path = "/mnt/logs"
+      #}
+      #volume_mounts {
+      #  name = azurerm_storage_share.containerappenv_shared.name
+      #  storage_type = "AzureFile"
+      #  path = "/mnt/shared"
+      # }
+    }
+  }
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  depends_on = [
+    azurerm_container_app_environment.this,
+    azurerm_container_app_environment_storage.logs,
+    azurerm_container_app_environment_storage.shared,
+    azapi_update_resource.aca_env_otel,
+  ]
+}
+
+/*
+resource "azapi_resource" "helloworld_auth" {
+  type      = "Microsoft.App/containerApps/authConfigs@2026-01-01"
+  name      = "current"
+  parent_id = azurerm_container_app.helloworld.id
+
+  body = {
+    properties = {
+      platform = {
+        enabled        = true
+        runtimeVersion = "~1"
+      }
+
+      globalValidation = {
+        unauthenticatedClientAction = "RedirectToLoginPage"
+        redirectToProvider          = "azureActiveDirectory"
+      }
+
+      httpSettings = {
+        requireHttps = true
+      }
+
+      identityProviders = {
+        azureActiveDirectory = {
+          enabled = true
+
+          registration = {
+            clientId = azuread_application.helloworld.client_id
+
+            openIdIssuer = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/v2.0"
+          }
+
+          validation = {
+            allowedAudiences = [
+              azuread_application.helloworld.client_id,
+              "api://${azuread_application.helloworld.client_id}"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+*/
+
+/*
+resource "azurerm_monitor_diagnostic_setting" "azurerm_container_app_helloworld" {
+  name                       = "Metrics-${azurerm_container_app.helloworld.name}-${azurerm_container_app_environment.this.name}-to-Azure-Monitor"
+  target_resource_id         = azurerm_container_app.helloworld.id
+  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
+
+  enabled_metric {
+    category = "AllMetrics"
+  }
+}
+*/
+
+/*
+resource "azurerm_role_assignment" "aca_blob_data_contributor" {
+  scope                            = azurerm_storage_account.this.id
+  role_definition_name             = "Storage Blob Data Contributor"
+  principal_id                     = azurerm_container_app.helloworld.identity[0].principal_id
+  skip_service_principal_aad_check = true
+  description                      = local.iac_message
+}
+
+resource "azapi_resource" "aca_to_blob_linker" {
+  type      = "Microsoft.ServiceLinker/linkers@2024-07-01-preview"
+  name      = "aca-to-blob"
+  parent_id = azurerm_container_app.helloworld.id
+
+  schema_validation_enabled = false
+
+  body = {
+    properties = {
+      clientType = "none"
+      authInfo = {
+        authType = "systemAssignedIdentity"
+        authMode = "optOutAllAuth"
+      }
+      targetService = {
+        type = "AzureResource"
+        id   = azurerm_storage_account.this.id
+      }
+      configurationInfo = {
+        action = "enable"
+      }
+    }
+  }
+
+  depends_on = [
+    azurerm_role_assignment.aca_blob_data_contributor
+  ]
+}
+*/
+
+/*
+// managed certificate
+resource "azurerm_container_app_custom_dns_zone" "this" {
+  name             = var.custom_dns_zone
+  container_app_id = azurerm_container_app.helloworld.id
+
+validation_type = "CNAME"
+
+  # This tells Azure to issue/use a managed certificate.
+
+  certificate_binding_type = "SniEnabled"
+
+  depends_on
+
+  lifecycle {
+    ignore_changes = [certificate_binding_type, container_app_environment_certificate_id]
+  }
+}
+
+output "aca_app_helloworld_dns_cname_record" {
+  value = {
+     name  = split(".", var.custom_hostname)[0]
+    value = azurerm_container_app.app.ingress[0].fqdn
+  }
+}
+
+output "aca_app_app_helloworld_dns_txt_record" {
+  value = {
+    name  = "asuid.${split(".", var.custom_hostname)[0]}"
+    value = azurerm_container_app.app.custom_dns_zone_verification_id
+  }
+}
+*/
+
+## Examples:-
+## (state stores): state.azure.cosmosdb, state.azure.blobstorage, state.sqlserver
+## (bindings)    : bindings.azure.servicebusqueues, 
+## (configuration): configuration.azure.appconfig
+## 
+
+resource "azapi_resource" "helloworld_resiliency_policy" {
+  type      = "Microsoft.App/containerApps/resiliencyPolicies@2025-10-02-preview"
+  name      = "default"
+  parent_id = azurerm_container_app.helloworld.id
+
+  # Preview API: avoid strict schema mismatches during provider updates.
+  schema_validation_enabled = false
+
+  body = {
+    properties = {
+      circuitBreakerPolicy = {
+        consecutiveErrors  = 5
+        intervalInSeconds  = 60
+        maxEjectionPercent = 50
+      }
+      httpConnectionPool = {
+        http1MaxPendingRequests = 1000
+        http2MaxRequests        = 100
+      }
+      httpRetryPolicy = {
+        matches = {
+          errors = [
+            "cancelled",
+            "deadline-exceeded",
+            "internal",
+            "resource-exhausted",
+            "unavailable",
+            "retriable-headers",
+            "retriable-status-codes"
+          ]
+          headers = [
+            {
+              header = "x-allow-retry"
+              match = {
+                exactMatch = "true"
+              }
+            }
+          ]
+          httpStatusCodes = [
+            408,
+            429,
+            500,
+            502,
+            503,
+            504
+          ]
+        }
+        maxRetries = 3
+        retryBackOff = {
+          initialDelayInMilliseconds = 200
+          maxIntervalInMilliseconds  = 2000
+        }
+      }
+      tcpConnectionPool = {
+        maxConnections = 1000
+      }
+      tcpRetryPolicy = {
+        maxConnectAttempts = 3
+      }
+      timeoutPolicy = {
+        connectionTimeoutInSeconds = 10
+        responseTimeoutInSeconds   = 30
+      }
+    }
+  }
+}

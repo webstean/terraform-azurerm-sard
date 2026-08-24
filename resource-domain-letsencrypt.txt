@@ -1,0 +1,189 @@
+locals {
+  cert_friendly_name = "Lets Encrypt Certificate KeyVault"
+  cert_name          = "cert-letse-${var.prefix}"
+  cert_name_location = lower("${local.cert_name}-${lower(var.location)}")
+  cert_random_suffix = substr(md5(local.cert_name_location), 0, 6)
+  cert_name_hostname = lower(substr(replace("cc${local.cert_random_suffix}${local.cert_name_location}", "-", ""), 0, 24))
+  min_days_remaining = 30
+}
+
+module "cert_keyvault" {
+  source           = "Azure/avm-res-keyvault-vault/azurerm"
+  version          = "~>0.7, < 1.0"
+  enable_telemetry = var.enable_telemetry
+
+  name                            = local.cert_name_hostname
+  resource_group_name             = azurerm_resource_group.environment.name
+  location                        = azurerm_resource_group.environment.location
+  tenant_id                       = data.azurerm_client_config.current.tenant_id
+  sku_name                        = "standard"
+  purge_protection_enabled        = true
+  soft_delete_retention_days      = 7
+  public_network_access_enabled   = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+  legacy_access_policies_enabled  = false
+  enabled_for_deployment          = false ## Whether Azure Virtual Machines are permitted to retrieve certificates
+  enabled_for_disk_encryption     = false ## Whether Azure Disk Encryption is permitted to retrieve secrets from the vault
+  enabled_for_template_deployment = false ## Whether Azure Resource Manager is permitted to retrieve secrets from the vault
+  network_acls = {
+    default_action             = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? "Deny" : "Allow"
+    bypass                     = "AzureServices"
+    virtual_network_subnet_ids = [for subnets in azurerm_virtual_network.this.subnet : subnets.id if contains(subnets.service_endpoints, "Microsoft.KeyVault")]
+  }
+
+  /*
+  diagnostic_settings = {
+    diag_setting_1 = {
+      name                           = "Logs-Metrics-And-Audit to Azure Monitor ${module.log_analytics_workspace.resource.name}"
+      log_groups                     = ["allLogs", "audit"]
+      metric_categories              = ["AllMetrics"]
+      log_analytics_destination_type = null
+      workspace_resource_id          = module.log_analytics_workspace.resource.workspace_id
+    }
+}
+*/
+
+  role_assignments = {
+    role_assignment_1 = {
+      role_definition_id_or_name = "Key Vault Secrets Officer"
+      principal_id               = azurerm_user_assigned_identity.environment.principal_id
+      description                = local.iac_message
+    }
+    role_assignment_2 = {
+      role_definition_id_or_name = "Key Vault Administrator"
+      principal_id               = azurerm_user_assigned_identity.environment.principal_id
+      description                = local.iac_message
+    }
+    role_assignment_3 = {
+      role_definition_id_or_name = "Key Vault Administrator"
+      principal_id               = data.azurerm_client_config.current.object_id
+      description                = local.iac_message
+    }
+  }
+
+  lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
+    kind = "CanNotDelete"
+  } : null
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  depends_on = [
+    azurerm_role_assignment.kvault_admin,
+    azurerm_user_assigned_identity.environment
+  ]
+}
+
+locals {
+  cert_keyvault_id = module.cert_keyvault.resource_id
+  ## goal xxxx.env.customdomain.com
+  cert_domain = var.custom_dns_zone_name == null ? "" : "${var.prefix}.env.${var.custom_dns_zone_name}"
+}
+
+resource "tls_private_key" "letsencrypt" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "acme_registration" "this" {
+  account_key_pem = tls_private_key.letsencrypt.private_key_pem
+  email_address   = var.owner_email
+}
+
+## create certificate for pubsub - expires in 90-day Let's Encrypt expiry, so this GitHub action needs to run every <90 days
+resource "acme_certificate" "pubsub" {
+  for_each = local.appconfiguration_sku == "premium" ? local.ingress_aliases_pubsub : toset([])
+
+  account_key_pem = acme_registration.this.account_key_pem
+  profile         = "tlsserver" ## classic, tlsserver, shortlived
+  common_name     = "pubsub.${azurerm_dns_zone.environment.name}"
+  #subject_alternative_names = [
+  #  "${local.cert_domain}"
+  #]
+  min_days_remaining            = local.min_days_remaining
+  revoke_certificate_on_destroy = true
+  dns_challenge {
+    provider = "azuredns"
+    config = {
+      AZURE_AUTH_METHOD     = "oidc"
+      AZURE_TENANT_ID       = data.azurerm_client_config.current.tenant_id
+      AZURE_CLIENT_ID       = data.azurerm_client_config.current.client_id
+      AZURE_SUBSCRIPTION_ID = data.azurerm_client_config.current.subscription_id
+      AZURE_RESOURCE_GROUP  = azurerm_resource_group.environment.name
+      AZURE_ZONE_NAME       = azurerm_dns_zone.environment.name
+      AZURE_TTL             = 300
+    }
+  }
+  depends_on = [
+    azurerm_dns_cname_record.pubsub,
+  ]
+}
+## write/update certificate in KeyVault so you can use it in other services
+resource "azurerm_key_vault_certificate" "letsencrypt-pubsub" {
+  for_each = local.appconfiguration_sku == "premium" ? local.ingress_aliases_pubsub : toset([])
+
+  name         = "cert-${lower(replace(acme_certificate.pubsub[each.key].certificate_domain, ".", "-"))}"
+  key_vault_id = module.cert_keyvault.resource_id
+
+  certificate {
+    contents = acme_certificate.pubsub[each.key].certificate_p12
+  }
+}
+## azurerm_key_vault_certificate.letsencrypt-pubsub.certificate_data_base64
+
+## create wildcard certificate for aca
+resource "acme_certificate" "aca" {
+  account_key_pem = acme_registration.this.account_key_pem
+  profile         = "tlsserver" ## classic, tlsserver, shortlived
+  common_name     = azurerm_dns_zone.aca.name
+  subject_alternative_names = [
+    "*.${azurerm_dns_zone.aca.name}" ## wildcard SAN - DNS-01 challenge is mandatory for wildcards
+  ]
+  min_days_remaining            = local.min_days_remaining
+  revoke_certificate_on_destroy = true
+  dns_challenge {
+    provider = "azuredns"
+    config = {
+      AZURE_AUTH_METHOD     = "oidc"
+      AZURE_TENANT_ID       = data.azurerm_client_config.current.tenant_id
+      AZURE_CLIENT_ID       = data.azurerm_client_config.current.client_id
+      AZURE_SUBSCRIPTION_ID = data.azurerm_client_config.current.subscription_id
+      AZURE_RESOURCE_GROUP  = azurerm_resource_group.environment.name
+      AZURE_ZONE_NAME       = azurerm_dns_zone.aca.name
+      AZURE_TTL             = 300
+    }
+  }
+  depends_on = [
+    azurerm_dns_a_record.aca,
+    azurerm_dns_txt_record.aca,
+    azurerm_dns_zone.aca,
+    azurerm_dns_ns_record.aca
+  ]
+}
+## write/update certificate in KeyVault so you can use it in other services
+resource "azurerm_key_vault_certificate" "letsencrypt-aca" {
+  name         = "cert-wildcard-${lower(replace(acme_certificate.aca.certificate_domain, ".", "-"))}"
+  key_vault_id = module.cert_keyvault.resource_id
+
+  certificate {
+    contents = acme_certificate.aca.certificate_p12
+  }
+}
+## azurerm_key_vault_certificate.letsencrypt-aca.certificate_data_base64
+
+resource "azurerm_container_app_environment_certificate" "this" {
+  name                         = "${lower(local.ingress_custom_aca)}-certificate"
+  container_app_environment_id = azurerm_container_app_environment.this.id
+
+  certificate_key_vault {
+    identity            = azurerm_user_assigned_identity.environment.id
+    key_vault_secret_id = azurerm_key_vault_certificate.letsencrypt-aca.versionless_secret_id
+  }
+  depends_on = [
+    azurerm_key_vault_certificate.letsencrypt-aca,
+    azurerm_dns_caa_record.aca_cas,
+    azurerm_dns_a_record.aca,
+    azurerm_dns_txt_record.aca,
+    azurerm_dns_ns_record.aca
+  ]
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+

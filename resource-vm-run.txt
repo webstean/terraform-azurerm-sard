@@ -1,0 +1,120 @@
+
+resource "azurerm_storage_container" "run_script" {
+  name                  = "vm-run-script"
+  storage_account_id    = azurerm_storage_account.this.id
+  container_access_type = "blob"
+}
+resource "azurerm_role_assignment" "run_script_blob_contributor1" {
+  scope                = azurerm_storage_container.run_script.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = data.azuread_client_config.current.object_id
+  description          = local.iac_message
+}
+resource "azurerm_role_assignment" "run_script_blob_contributor2" {
+  scope                = azurerm_storage_container.run_script.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_user_assigned_identity.environment.principal_id
+  description          = local.iac_message
+}
+
+resource "azurerm_storage_blob" "run_script_setup" {
+  name                 = "setup.ps1"
+  storage_container_id = azurerm_storage_container.run_script.id
+  type                 = "Block"
+  source_content       = <<-EOF
+Write-Output "Hello World"
+##winget settings export
+##winget install --id Microsoft.PowerShell --disable-interactivity
+
+EOF
+}
+
+resource "azurerm_storage_blob" "run_script_output" {
+  name                 = "output"
+  storage_container_id = azurerm_storage_container.run_script.id
+  type                 = "Append"
+}
+resource "azurerm_role_assignment" "run_output_script_blob_contributor1" {
+  scope                = azurerm_storage_container.run_script.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = data.azuread_client_config.current.object_id
+  description          = local.iac_message
+}
+resource "azurerm_role_assignment" "run_output_script_blob_contributor2" {
+  scope                = azurerm_storage_container.run_script.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_user_assigned_identity.environment.principal_id
+  description          = local.iac_message
+}
+
+resource "azurerm_storage_blob" "run_script_error" {
+  name                 = "error"
+  storage_container_id = azurerm_storage_container.run_script.id
+  type                 = "Append"
+}
+resource "azurerm_role_assignment" "run_error_script_blob_contributor1" {
+  scope                = azurerm_storage_container.run_script.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = data.azuread_client_config.current.object_id
+  description          = local.iac_message
+}
+resource "azurerm_role_assignment" "run_error_script_blob_contributor2" {
+  scope                = azurerm_storage_container.run_script.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_user_assigned_identity.environment.principal_id
+  description          = local.iac_message
+}
+
+# authorize to storage blob using user assigned identity
+resource "azurerm_virtual_machine_run_command" "run_setup_script" {
+  for_each = toset([for i in range(local.vmss_number_of_instances) : format("%s_%d", local.vmms_name, i)])
+
+  name               = "vm-setup-script"
+  location           = azurerm_resource_group.environment.location
+  virtual_machine_id = "${azurerm_resource_group.environment.id}/providers/Microsoft.Compute/virtualMachines/${each.value}"
+  output_blob_uri    = azurerm_storage_blob.run_script_output.url
+  error_blob_uri     = azurerm_storage_blob.run_script_error.url
+  run_as_password    = random_string.id.result
+  run_as_user        = local.vmss_admin_username
+
+  source {
+    script_uri = azurerm_storage_blob.run_script_setup.url
+    script_uri_managed_identity { ## Block Blob
+      client_id = azurerm_user_assigned_identity.environment.client_id
+    }
+  }
+
+  error_blob_managed_identity { ## Append Blob
+    client_id = azurerm_user_assigned_identity.environment.client_id
+  }
+
+  output_blob_managed_identity { ## Append Blob
+    client_id = azurerm_user_assigned_identity.environment.client_id
+  }
+
+  parameter {
+    name  = "examplev1"
+    value = "val1"
+  }
+
+  protected_parameter {
+    name  = "examplev2"
+    value = "val2"
+  }
+
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  depends_on = [
+    module.virtualmachinescaleset,
+    azurerm_role_assignment.run_script_blob_contributor1,
+    azurerm_role_assignment.run_script_blob_contributor2,
+    azurerm_role_assignment.run_output_script_blob_contributor1,
+    azurerm_role_assignment.run_output_script_blob_contributor2,
+    azurerm_role_assignment.run_error_script_blob_contributor1,
+    azurerm_role_assignment.run_error_script_blob_contributor2
+  ]
+}
+
+/*
+#Run SysPrep
+Start-Process -FilePath "C:\Windows\System32\Sysprep\Sysprep.exe" -ArgumentList "/oobe /generalize /shutdown" -NoNewWindow -Wait
+*/

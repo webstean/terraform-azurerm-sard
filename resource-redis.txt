@@ -1,0 +1,70 @@
+locals {
+  redis_friendly_name = "Azure Cache for Redis"
+  redis_name          = "redis-${var.prefix}"
+  redis_name_location = lower("${local.redis_name}-${lower(var.location)}")
+  redis_random_suffix = substr(md5(local.redis_name_location), 0, 6)
+  redis_name_hostname = lower(substr(replace("l${local.redis_random_suffix}${local.redis_name_location}", "-", ""), 0, 24))
+}
+
+module "redis" {
+  source  = "Azure/avm-res-cache-redisenterprise/azurerm"
+  version = "~>0.0, < 1.0"
+  enable_telemetry  = var.enable_telemetry ## see variables.tf
+
+  name              = local.redis_name_location
+  parent_id         = azurerm_resource_group.environment.id
+  location          = azurerm_resource_group.environment.location
+  sku_name          = "Balanced_B0"
+  clustering_policy = "EnterpriseCluster"
+  eviction_policy   = "AllKeysLRU"
+  zones             = null
+  high_availability = "Disabled"
+
+  managed_identities = {
+    system_assigned = false
+    user_assigned_resource_ids = [
+      azurerm_user_assigned_identity.environment.id
+    ]
+  }
+
+  access_policy_assignments = {
+    app_identity = {
+      object_id          = azurerm_user_assigned_identity.environment.principal_id
+      access_policy_name = "default"
+    }
+  }
+
+  #  diagnostic_settings = {
+  #    diag_setting_1 = {
+  #      name       = "Terraform Diagnostic Setting 1"
+  #      log_groups = ["allLogs"]
+  #      metric     = ["AllMetrics"]
+  #      #metric_categories              = ["SLI", "Requests"]
+  #      log_analytics_destination_type = null
+  #      workspace_resource_id          = module.log_analytics_workspace.resource.resource_id
+  #    }
+  #  }
+
+  lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
+    kind = "CanNotDelete"
+  } : null
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+output "redis_id" {
+  description = "The ID of the Redis instance."
+  sensitive   = false
+  value       = module.redis.resource_id
+}
+
+output "redis_name" {
+  description = "The Name of the Redis instance."
+  sensitive   = false
+  value       = module.redis.name
+}
+
+output "redis_resource" {
+  description = "The details of Redis resource"
+  sensitive   = true
+  value       = module.redis.resource
+}

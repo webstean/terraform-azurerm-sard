@@ -1,0 +1,97 @@
+locals {
+  script_name        = "configure-sharepoint.ps1"
+  source_script_name = "${path.module}/scripts/${local.script_name}"
+}
+
+resource "azurerm_storage_container" "scripts" {
+  name                  = "scripts"
+  storage_account_id    = azurerm_storage_account.this.id
+  container_access_type = "private"
+}
+resource "azurerm_role_assignment" "scripts_blob_reader" {
+  scope                = azurerm_storage_container.scripts.id
+  role_definition_name = "Storage Blob Data Reader"
+  principal_id         = azurerm_user_assigned_identity.environment.principal_id
+}
+resource "azurerm_role_assignment" "scripts_blob_contributor" {
+  scope                = azurerm_storage_container.scripts.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = data.azuread_client_config.current.object_id
+}
+
+# The script itself, sourced from a file on disk. content_md5 forces Terraform
+# to detect and re-upload when the file changes, independent of anything else.
+resource "azurerm_storage_blob" "script" {
+  name                 = local.script_name
+  storage_container_id = azurerm_storage_container.scripts.id
+  type                 = "Block"
+  source               = local.source_script_name
+  content_md5          = filemd5(local.source_script_name)
+  content_type         = "text/plain"
+  depends_on = [
+    azurerm_role_assignment.scripts_blob_reader,
+    azurerm_role_assignment.scripts_blob_contributor,
+  ]
+}
+
+# -------------------------------------------------------------------------
+# Deployment script: runs the file-sourced PnP script, only re-executing
+# when the local file's content changes.
+# -------------------------------------------------------------------------
+
+resource "azurerm_resource_deployment_script_azure_power_shell" "sharepoint" {
+  name                = "configure-sharepoint-site"
+  resource_group_name = azurerm_resource_group.environment.name
+  location            = azurerm_resource_group.environment.location
+  version             = "15.6"
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.environment.id]
+  }
+
+  # Points at the blob + SAS rather than embedding script_content, so the
+  # .tf state doesn't carry the full script body and the file stays the
+  # single source of truth.
+  primary_script_uri = azurerm_storage_blob.script.url
+
+  # Re-run only when the local script file's content changes - not on
+  # every apply, and not when unrelated resources in this config change.
+  force_update_tag = filemd5(local.source_script_name)
+
+  environment_variable {
+    name  = "TenantId"
+    value = data.azuread_client_config.current.tenant_id
+  }
+  #  environment_variable {
+  #    name  = "ClientId"
+  #    value = azuread_application.pnp.client_id
+  #  }
+  #  environment_variable {
+  #    name  = "SharePointAdminSiteUrl"
+  #    value = var.sharepoint_site_url
+  #  }
+  #environment_variable {
+  #  name         = "CertBase64"
+  #  secure_value = base64encode(tls_self_signed_cert.pnp.cert_pem)
+  #}
+  #environment_variable {
+  #  name         = "CertKeyBase64"
+  #  secure_value = base64encode(tls_private_key.pnp.private_key_pem)
+  #}
+
+  # Backs the script's own execution logs with a real, persistent storage
+  # account so `az deployment-scripts show-log` and the file share survive
+  # independent of cleanup_preference below.
+  storage_account {
+    name = azurerm_storage_account.this.name
+    key  = azurerm_storage_account.this.primary_access_key
+  }
+
+  retention_interval = "P1D"
+  cleanup_preference = "OnExpiration"
+  timeout            = "PT30M"
+
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+

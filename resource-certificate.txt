@@ -1,0 +1,149 @@
+## https://registry.terraform.io/modules/Azure/avm-res-certificateregistration-certificateorder/azurerm/latest/examples/default
+
+data "azuread_service_principal" "cert_spn" {
+  display_name = "f3c21649-0979-4721-ac85-b0216b2cf413" ## "Microsoft.Azure.CertificateRegistration"
+}
+
+data "azuread_service_principal" "app_service_spn" {
+  display_name = "Microsoft Azure App Service"
+}
+
+resource "azapi_resource" "key_vault" {
+  location  = azapi_resource.resource_group.location
+  name      = "kv-${random_string.name_suffix.id}"
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.KeyVault/vaults@2021-10-01"
+  body = {
+    properties = {
+      accessPolicies = [
+        {
+          objectId = data.azapi_client_config.current.object_id
+          permissions = {
+            certificates = [
+              "Create",
+              "Delete",
+              "Get",
+              "Purge",
+              "Import",
+              "List"
+            ]
+            keys = [
+            ]
+            secrets = [
+              "Delete",
+              "Get",
+              "Purge",
+              "Set",
+              "List"
+            ]
+            storage = [
+            ]
+          }
+          tenantId = data.azapi_client_config.current.tenant_id
+        },
+        {
+          objectId = data.azuread_service_principal.app_service_spn.object_id
+          permissions = {
+            certificates = [
+              "Create",
+              "Delete",
+              "Get",
+              "Purge",
+              "Import",
+              "List"
+            ]
+            keys = [
+            ]
+            secrets = [
+              "Delete",
+              "Get",
+              "Purge",
+              "Set",
+              "List"
+            ]
+            storage = [
+            ]
+          }
+          tenantId = data.azapi_client_config.current.tenant_id
+        },
+        {
+          objectId = data.azuread_service_principal.cert_spn.object_id
+          permissions = {
+            certificates = [
+              "Create",
+              "Delete",
+              "Get",
+              "Purge",
+              "Import",
+              "List"
+            ]
+            keys = [
+            ]
+            secrets = [
+              "Delete",
+              "Get",
+              "Purge",
+              "Set",
+              "List"
+            ]
+            storage = [
+            ]
+          }
+          tenantId = data.azapi_client_config.current.tenant_id
+        }
+      ]
+      createMode                   = "default"
+      enableRbacAuthorization      = false
+      enableSoftDelete             = false
+      enabledForDeployment         = false
+      enabledForDiskEncryption     = false
+      enabledForTemplateDeployment = false
+      publicNetworkAccess          = "Enabled"
+      sku = {
+        family = "A"
+        name   = "standard"
+      }
+      softDeleteRetentionInDays = 7
+      tenantId                  = data.azapi_client_config.current.tenant_id
+    }
+  }
+}
+
+resource "azapi_resource" "dns_zone" {
+  type = "Microsoft.Network/dnsZones@2018-05-01"
+
+  name      = "dnszone-${azurerm_resource_group.environment.name}.com"
+  parent_id = azurerm_resource_group.environment.id
+  location  = "global"
+}
+
+module "certificate" {
+  source           = "Azure/terraform-azurerm-avm-res-certificateregistration-certificateorder"
+  version          = "~>0.0, < 1.0"
+  enable_telemetry = var.enable_telemetry
+
+  location            = "global"
+  name                = "app-service-certificate-order-${random_string.name_suffix.id}"
+  resource_group_name = azurerm_resource_group.environment.name
+  auto_renew          = true
+  certificate_order_key_vault_stores = {
+    default = {
+      name                  = "store1-${random_string.name_suffix.id}"
+      key_vault_id          = azapi_resource.key_vault.id
+      key_vault_secret_name = "kvsec${random_string.name_suffix.id}"
+
+      tags = {
+        env = "Test"
+      }
+    }
+  }
+  distinguished_name = "CN=${azapi_resource.dns_zone.name}"
+  key_size           = 2048
+  product_type       = "Standard"
+  validity_in_years  = 1
+
+  lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
+    kind = "CanNotDelete"
+  } : null
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}

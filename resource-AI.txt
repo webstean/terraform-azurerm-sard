@@ -1,0 +1,429 @@
+locals {
+  cog_name          = "cog-${var.prefix}"
+  cog_name_location = lower("${local.cog_name}-${lower(var.location)}")
+  cog_random_suffix = substr(md5(local.cog_name_location), 0, 6)
+  cog_name_hostname = lower(substr(replace("e${local.cog_random_suffix}${local.cog_name_location}", "-", ""), 0, 24))
+  rai_policy_name   = "policy0"
+}
+
+locals {
+  ai_kind = {
+    Academic = {
+      enable                     = false
+      classic                    = false
+      kind                       = "Academic"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    AIServices = { ## This is AI foundry (we create this separately)
+      enable                     = false
+      classic                    = false
+      kind                       = "AIServices"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = false
+      rai_policy                 = true
+    }
+    AnomalyDetector = { ## Classic
+      enable                     = false
+      classic                    = true
+      kind                       = "AnomalyDetector"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    CognitiveServices = {
+      enable                     = true
+      classic                    = false
+      kind                       = "CognitiveServices"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    ComputerVision = {
+      enable                     = false
+      classic                    = false
+      kind                       = "ComputerVision"
+      storage                    = false
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = false
+      rai_policy                 = false
+    }
+    ContentModerator = {
+      enable                     = false
+      classic                    = false
+      kind                       = "ContentModerator"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    ContentSafety = {
+      enable                     = false
+      classic                    = false
+      kind                       = "ContentSafety"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    CustomSpeech = {
+      enable                     = false
+      classic                    = false
+      kind                       = "CustomSpeech"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    "CustomVision.Prediction" = {
+      enable                     = false
+      classic                    = false
+      kind                       = "CustomVision.Prediction"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    "CustomVision.Training" = {
+      enable                     = false
+      classic                    = false
+      kind                       = "CustomVision.Training"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    Emotion = {
+      kind                       = "Emotion"
+      classic                    = false
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    Face = {
+      enable                     = true
+      classic                    = false
+      kind                       = "Face"
+      storage                    = false
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = false
+      rai_policy                 = false
+    }
+    FormRecognizer = {
+      enable                     = false
+      classic                    = false
+      kind                       = "FormRecognizer"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    ImmersiveReader = {
+      enable                     = false
+      classic                    = false
+      kind                       = "ImmersiveReader"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    LUIS = {
+      enable                     = false
+      classic                    = false
+      kind                       = "LUIS"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    "LUIS.Authoring" = {
+      enable                     = false
+      classic                    = false
+      kind                       = "LUIS.Authoring"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    MetricsAdvisor = { ## Classic
+      enable                     = false
+      classic                    = true
+      kind                       = "MetricsAdvisor"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    OpenAI = {
+      enable                     = true
+      classic                    = false
+      kind                       = "OpenAI"
+      storage                    = false
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = false
+      rai_policy                 = false
+    }
+    Personalizer = { ## Classic
+      enable                     = false
+      classic                    = true
+      kind                       = "Personalizer"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    QnAMaker = { ## Classic
+      enable                     = false
+      classic                    = true
+      kind                       = "QnAMaker"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    Recommendations = {
+      enable                     = false
+      classic                    = false
+      kind                       = "Recommendations"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    SpeakerRecognition = {
+      enable                     = false
+      classic                    = false
+      kind                       = "SpeakerRecognition"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    Speech = {
+      enable                     = false ## not available
+      classic                    = false
+      kind                       = "Speech"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = false
+      rai_policy                 = true
+    }
+    SpeechServices = {
+      enable                     = false
+      classic                    = false
+      kind                       = "SpeechServices"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    SpeechTranslation = {
+      enable                     = false
+      classic                    = false
+      kind                       = "SpeechTranslation"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    TextAnalytics = {
+      enable                     = false
+      classic                    = false
+      kind                       = "TextAnalytics"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    TextTranslation = {
+      enable                     = false
+      classic                    = false
+      kind                       = "TextTranslation"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    WebLM = {
+      enable                     = false
+      classic                    = false
+      kind                       = "WebLM"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+  }
+}
+
+module "ai-services" {
+  for_each = { for k, v in local.ai_kind : k => v if try(v.enable, false) }
+
+  source           = "Azure/avm-res-cognitiveservices-account/azurerm"
+  version          = "~>0.0, < 1.0"
+  enable_telemetry = var.enable_telemetry
+
+  name                               = each.value.classic == true ? "classic-${local.cog_name}-${lower(each.value.kind)}" : "${local.cog_name}-${lower(each.value.kind)}"
+  parent_id                          = azurerm_resource_group.environment.id
+  location                           = azurerm_resource_group.environment.location
+  kind                               = each.value.kind
+  sku_name                           = each.value.sku_name
+  allow_project_management           = true
+  deployment_serialization_enabled   = true
+  dynamic_throttling_enabled         = each.value.dynamic_throttling_enabled
+  local_auth_enabled                 = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+  outbound_network_access_restricted = false
+
+  #custom_question_answering_search_service_id  = each.value.kind == "TextAnalytics" ? module.ai_search_service.resource_id : null
+  #custom_question_answering_search_service_key = each.value.kind == "TextAnalytics" ? data.azurerm_search_service.search.primary_key : null
+  #custom_subdomain_name = "${lower(each.value.kind)}${lower(local.cog_random_suffix)}${lower(local.cog_name_location)}"
+
+  managed_identities = {
+    system_assigned = false
+    user_assigned_resource_ids = [
+      azurerm_user_assigned_identity.environment.id
+    ]
+  }
+
+  /*
+  diagnostic_settings = {
+    diag_setting_1 = {
+      name              = "Logs-Metrics-And-Audit to Azure Monitor ${module.log_analytics_workspace.resource.name}"
+      log_groups        = ["allLogs", "audit"]
+      metric_categories = ["AllMetrics"]
+      #metric_categories              = ["SLI", "Requests"]
+      log_analytics_destination_type = null
+      workspace_resource_id          = module.log_analytics_workspace.resource_id
+    }
+  }
+*/
+
+  role_assignments = {
+    role_assignment_1 = {
+      role_definition_id_or_name = "Cognitive Services OpenAI User"
+      principal_id               = azurerm_user_assigned_identity.environment.principal_id
+      description                = local.iac_message
+    }
+    role_assignment_2 = {
+      role_definition_id_or_name = "Cognitive Services OpenAI User"
+      principal_id               = var.owner_entra_object_id
+      description                = local.iac_message
+    }
+  }
+
+  #  cognitive_deployments = {
+  #    "gpt-4o-mini" = {
+  #      name            = "gpt-4o-mini"
+  #      rai_policy_name = local.rai_policy_name
+  #      model = {
+  #        format  = "OpenAI"
+  #        name    = "gpt-4o-mini"
+  #        version = "2024-07-18"
+  #      }
+  #      scale = {
+  #        type = "Standard"
+  #      }
+  #    }
+  #  }
+
+  rai_policies = each.value.rai_policy == true ? {
+    policy_0 = {
+      name             = local.rai_policy_name
+      base_policy_name = "Microsoft.Default"
+      mode             = "Asynchronous_filter"
+      content_filters = [{
+        name               = "Hate"
+        enabled            = true
+        blocking           = true
+        severity_threshold = "High"
+        source             = "Prompt"
+      }]
+    }
+  } : {}
+
+  #storage = each.value.storage == true ? [{
+  #  identity_client_id = azurerm_user_assigned_identity.environment.client_id
+  #  storage_account_id = azurerm_storage_account.this.id
+  #}] : []
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+/*
+resource "azapi_resource" "ai_keyvault_connection" {
+  for_each = module.ai-services
+
+  type      = "Microsoft.CognitiveServices/accounts/connections@2025-04-01-preview"
+  name      = "${azurerm_key_vault.foundry.name}-connection"
+  parent_id = each.value.resource_id
+
+  schema_validation_enabled = false
+
+  body = {
+    properties = {
+      category      = "AzureKeyVault"
+      target        = azurerm_key_vault.foundry.id
+      authType      = "AccountManagedIdentity"
+      isSharedToAll = true
+
+      metadata = {
+        ApiType    = "Azure"
+        ResourceId = azurerm_key_vault.foundry.id
+        location   = azurerm_key_vault.foundry.location
+      }
+    }
+  }
+
+  depends_on = [
+    azurerm_role_assignment.foundry_keyvault_secrets_officer
+  ]
+}
+*/
+
+resource "azurerm_storage_container" "ai_containers" {
+  for_each = { for k, v in module.ai-services : k => v if try(local.ai_kind[k].storage, false) }
+
+  name                  = lower(each.value.resource.name)
+  storage_account_id    = azurerm_storage_account.this.id
+  container_access_type = "private"
+}
+
+/*
+resource "azapi_resource" "ai_storage_connection" {
+  for_each = azurerm_storage_container.ai_containers
+
+  type      = "Microsoft.CognitiveServices/accounts/projects/connections@2025-06-01"
+  name      = "${azurerm_storage_account.this.name}-${azurerm_storage_container.ai_containers[each.key].name}-connection"
+  parent_id = each.value.resource_id
+
+  schema_validation_enabled = false
+
+  body = {
+    properties = {
+      category      = "AzureBlob"
+      target        = azurerm_storage_account.this.primary_blob_endpoint
+      authType      = "AAD"
+      isSharedToAll = true
+
+      metadata = {
+        ApiType        = "Azure"
+        ResourceId     = azurerm_storage_account.this.id
+        location       = azurerm_storage_account.this.location
+        AccountName    = azurerm_storage_account.this.name
+        ContainerName  = azurerm_storage_container.ai_containers[each.key].name
+        StorageAccount = azurerm_storage_account.this.name
+      }
+    }
+  }
+
+  depends_on = [
+    azapi_resource.keyvault_connection,
+  ]
+}
+*/
+

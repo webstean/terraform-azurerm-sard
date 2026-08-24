@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="refresh" content="60">
+    <meta name="description" content="An fast and easy to deploy Azure resources, all within a single Azure resource group.">
+    <title>SARD ${title(environment_name)} Environment</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%230078D4'/%3E%3Cstop offset='100%25' stop-color='%2300B7C3'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Cpath d='M19 34a10 10 0 0 1 10-10 11 11 0 0 1 21 3 8 8 0 1 1-1 16H22a8 8 0 0 1-3-9z' fill='white' opacity='.95'/%3E%3C/svg%3E">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/site.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top" aria-label="Main navigation">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" aria-label="My Project home">
+                <i class="bi bi-box-fill text-primary" aria-hidden="true"></i>
+                SARD: Environment:${title(environment_name)} located in the Azure ${upper(location)} region
+            </a>
+
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#menu"
+                aria-controls="menu"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="menu">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#introduction">Introduction</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#references">References</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <h1 class="display-3 fw-bold">Simple Azure Resource Deployment</h1>
+                        <p class="lead my-4">
+                            This is a simple landing zone, a single resource group hosting a single environment called ${title(environment_name)}.
+                        </p>
+
+                        <a href="#introduction" class="btn btn-light btn-lg me-2">Get Started</a>
+                        <a href="#references" class="btn btn-outline-light btn-lg">Documentation</a>
+                    </div>
+
+                    <div class="col-lg-6 text-center">
+                        <div class="hero-image">
+                            <i class="bi bi-cloud-check-fill" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="introduction" class="section bg-white">
+            <div class="container">
+                <h2 class="fw-bold mb-4">Introduction</h2>
+                <p class="lead">Welcome to Simple Azure Resource Deployment (SARD).</p>
+                <p>
+                    <b>Think of SARD as a 'poor' person's, Azure Landing Zone.</b><br><br>
+                    SARD (Simple Azure Resource Deployment) is a group of Azure resources (called an 'environment') that is deployed in a single step, to single reosurce group within in a single Azure subscription.<br><br>
+                    Your resouces will also likely be in only one location (Azure region), although there is logic for some exceptions (Azure Static Web App) is only avialalbe in a small number of regions.<br>
+                    Each SARD deploymemt has consistent naming, tagging and security features so it could it could be used for prodction deployment, where you have a dev and test environment all within the same Azure subscription, but different resource groups.<br>
+                    Further, each environment is isoloted via an Azure Security Perimeter.<br>
+                    There are options including deploying 'private endpoints' and three inbound access options: 'NAT Gateway', 'Azure FrontDoor' or 'none'.<br>
+                    SARD is powered by Hashicorp Terraform, leveraging the azurerm and azapi providers, plus the Microsoft Verified Modules (for Terraform)<br> <br>
+                    BTW, there is nothing wrong with Azure Landing Zones, but they get expensive for individual developers and some organisation, because of all the subscriptions and management groups required. It is also complicated and time consuming to managed.<br>
+                    That makes it next to impossible to deploy them for someone with a single Visual Studio MSDN subscription or a single Non-For-Profit (NFP) subscription.<br>
+                    Now you can deploy all your resources, for prod, dev, test, preprod, uat etc... as dedicated Resource Group within the same Azure subscription.<br>
+                    It is not suitable for large organisation who already have lots of subscriptions, but for hobbyist, NFP and developers, it is a viable option.
+
+                    SARD consolidates resources as much as practical, with overall goal of reducing cost. As a result, SARD does NOT follow some of Azure Best Practices. A lot of Azure Best Practices, creating deidcated resource such as a Storage Accounts for nearly every resource that needs ones, can get very 
+                    expensive. But turning on Defender for a storage account, which is something you should do, is charged per Storage Account, so even if it is only $10 a month, 1,000 Storage Accounts is $10,000 per month<br>
+                    In other words, what can appear cheap, can add up quick and become quite astronomincal.<br><br>
+
+                    For example: A resource that is <b>10 cents per hour</b>, at 24 hours a day for 30 days = <b>$72 per month</b>
+
+                    Utlimately, SARD is designed for situations where you want the base cost to be no more than $30-50 USD per month.<br>
+
+                    BTW: As an exception, AZure KeyVaults are create quite liberally, because you cannot apply a RBAC permission to a Key, Secret or Certificate within a Key Vault. So you should create a dedicated one, every time you need one. However, having one or 100 KeyVaults really doesn't make any difference in terms of cost, since the cost is in accessing KeyVault, not creating or have them exist<br>
+
+                    The currently supported resources are:-
+
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th scope="col">Resource</th>
+                                        <th scope="col">Purpose</th>
+                                        <th scope="col">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Resource Group</td>
+                                        <td>Hosts all environment resources</td>
+                                        <td>Supported</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Static Web App</td>
+                                        <td>Serves this landing page</td>
+                                        <td>Supported</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Log Analytics / Azure Monitor and Application Insights</td>
+                                        <td>Tracks logs and diagnostics</td>
+                                        <td>Supported</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Storage Account including Files and Blobs</td>
+                                        <td>Storage for your data</td>
+                                        <td>Supported</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Application Configuration</td>
+                                        <td>Confguration that you apply to your workloads</td>
+                                        <td>Supported</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Automation Account</td>
+                                        <td>Run and schedule scripts to run anything</td>
+                                        <td>Supported</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Azure AI Search</td>
+                                        <td>AI-powered indexing, enrichment, and advanced search capabilities to transform any data into an intelligent, searchable knowledge basesoving information retrieval and understanding.</td>
+                                        <td>Supported</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Comms Service</td>
+                                        <td>Send Email, messages at any scale, with preconfigured integration with a 'free' notification hub.</td>
+                                        <td>Supported</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Container Apps Environment</td>
+                                        <td>The newest and probably best way to run modern workloads in Azure today. Support containers, Azure Function and Logic Apps</td>
+                                        <td>Supported</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Container Apps and Job</td>
+                                        <td>Sample (GitHub Runner, Document Processing) that won't cost you anything if you never run them</td>
+                                        <td>Supported</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Data Box Gateway</td>
+                                        <td>A VMware or Hyper-V image, that you can deploy on-premise for uploading data into Azure</td>
+                                        <td>Supported</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Inbound Access</td>
+                                        <td>Options for None, FrontDoor or Application Gateway. Both FrontDoor and Application Gateways are WAF: Web Application Firewalls</td>
+                                        <td>Supported</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Outbound Access</td>
+                                        <td>Options for None (use Service-Endpoints) or NAT Gateway</td>
+                                        <td>Supported</td>
+                                    </tr>
+                                    <tr>
+                                        <td>MSQL SQL Server</td>
+                                        <td>Options for alias and failover instance</td>
+                                        <td>Supported</td>
+                                    </tr>
+                                    <tr>
+                                        <td>MSQL SQL Database (free)</td>
+                                        <td>Totally free, database (only one allow per subscription)</td>
+                                        <td>Supported</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Virtual Network</td>
+                                        <td>VNet with working subnets</td>
+                                        <td>Supported</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Virtual Machine Scaleset</td>
+                                        <td>One VMSS with a one instance, optional with or without Spot pricing</td>
+                                        <td>Supported</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Bastion</td>
+                                        <td>Allow access from the Internet, into Azure VM/VMSSes. Support for Developer (Free), Basci, Standard and Premium SKUs</td>
+                                        <td>Supported</td>
+                                    </tr>
+                                    <tr>
+                                        <td>TLS Certificates</td>
+                                        <td>LetsEncrypt certificates, based upon an Azure DNS zone, that can be hostred in another tenant.</td>
+                                        <td>Under development</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Private Endpoints</td>
+                                        <td>Turn off external (Internet) access, and only allow the resource to talk to themselves, within the VNet that SARD creates.</td>
+                                        <td>Under development</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    
+                </p>
+            </div>
+        </section>
+
+        <section id="features" class="section">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold">Features</h2>
+                    <p class="text-muted">A simple but effective way to deploy Azure resources.</p>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <article class="card feature-card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-lightning-charge-fill text-primary display-4" aria-hidden="true"></i>
+                                <h3 class="h4 mt-4">Fast</h3>
+                                <p>Lightweight, without any Terrafrom hierachry of modules.</p>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="col-md-4">
+                        <article class="card feature-card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-shield-lock-fill text-success display-4" aria-hidden="true"></i>
+                                <h3 class="h4 mt-4">Secure</h3>
+                                <p>Perfect for any single subscription Azure deployment.</p>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="col-md-4">
+                        <article class="card feature-card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-gear-fill text-warning display-4" aria-hidden="true"></i>
+                                <h3 class="h4 mt-4">Easy to Configure</h3>
+                                <p>Simple to configure.</p>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section bg-white">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <h2 class="fw-bold mb-4">This Deployment</h2>
+                        <p>Do not like, just delete it, is just one resource group.</p>
+                        <p>
+                            Replace this image with your own screenshots,
+                            architecture diagrams, or company branding.
+                        </p>
+
+                    <div class="col-lg-6">
+                        <img
+                            src="https://images.unsplash.com/photo-1519052537078-e6302a4968d4?auto=format&fit=crop&w=900&q=80"
+                            class="img-fluid rounded shadow"
+                            alt="A cat used as a placeholder mascot"
+                            loading="lazy"
+                        >
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="references" class="section bg-light">
+            <div class="container">
+                <h2 class="fw-bold mb-4">References</h2>
+                <div class="list-group">
+                    <a href="https://${environment_home_page}" class="list-group-item list-group-item-action">Project Documentation</a>
+                    <a href="https://${environment_home_page}" class="list-group-item list-group-item-action">GitHub Repository</a>
+                    <a href="${portal_link}" class="list-group-item list-group-item-action">Azure Portal Link</a>
+                    
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-4">
+        <div class="container text-center">
+            <strong>
+              <a href="mailto:${lower(owner_email)}" class="text-decoration-none">${lower(owner_email)}</a>
+              <a href="https://${environment_home_page}" class="list-group-item list-group-item-action">GitHub Repository</a>
+            </strong>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

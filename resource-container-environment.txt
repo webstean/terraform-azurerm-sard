@@ -1,0 +1,258 @@
+locals {
+  aca_env_name          = "aca-env-${var.prefix}"
+  aca_env_name_location = lower("${local.aca_env_name}-${lower(var.location)}")
+  aca_env_random_suffix = substr(md5(local.aca_env_name_location), 0, 6)
+  aca_env_name_hostname = lower(substr(replace("e${local.aca_env_random_suffix}${local.aca_env_name_location}", "-", ""), 0, 24))
+}
+
+resource "azurerm_subnet" "containerappenv" {
+  name                                          = local.aca_env_name
+  resource_group_name                           = azurerm_resource_group.environment.name
+  virtual_network_name                          = azurerm_virtual_network.this.name
+  address_prefixes                              = [format("10.%s.12.0/23", local.regions[var.location].location_number)]
+  default_outbound_access_enabled               = true
+  service_endpoints                             = local.service_endpoints
+  private_link_service_network_policies_enabled = false
+  ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
+  ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
+  private_endpoint_network_policies = "Enabled"
+
+  delegation {
+    name = "azure-container-apps-delegation"
+    service_delegation {
+      name    = "Microsoft.App/environments"
+      actions = local.delegation-actions
+    }
+  }
+}
+/*
+resource "azurerm_subnet_nat_gateway_association" "containerappenv" {
+  count = var.deploy_nat_gateway ? 1 : 0
+
+  subnet_id      = azurerm_subnet.containerappenv.id
+  nat_gateway_id = azurerm_nat_gateway.this[0].id
+}
+*/
+
+resource "azurerm_storage_share" "containerappenv_logs" {
+  name               = "logs-${local.aca_env_name}"
+  storage_account_id = azurerm_storage_account.this.id
+  quota              = 5
+  enabled_protocol   = "SMB"
+}
+resource "azurerm_storage_share" "containerappenv_shared" {
+  name               = "shared-${local.aca_env_name}"
+  storage_account_id = azurerm_storage_account.this.id
+  quota              = 5
+  enabled_protocol   = "SMB"
+}
+
+## This costs money, because of the underlying Load Balancer that will be deployed
+resource "azurerm_container_app_environment" "this" {
+  name                = local.aca_env_name_location
+  resource_group_name = azurerm_resource_group.environment.name
+  location            = azurerm_resource_group.environment.location
+
+  logs_destination = "azure-monitor"
+  #log_analytics_workspace_id = module.log_analytics_workspace.resource_id
+  #dapr_application_insights_connection_string = module.log_analytics_workspace.connection_string
+
+  public_network_access          = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? "Disabled" : "Enabled"
+  internal_load_balancer_enabled = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? true : false
+
+  ## Provided subnet must have a size of at least /23
+  infrastructure_subnet_id = azurerm_subnet.containerappenv.id
+  zone_redundancy_enabled  = false
+  ##multual_tls_enabled = false
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.environment.id]
+  }
+
+  workload_profile {
+    ## A Consumption type must have a name of Consumption and an environment may only have one Consumption Workload Profile.
+    name                  = "Consumption"
+    workload_profile_type = "Consumption"
+    maximum_count         = 6
+    minimum_count         = 0
+  }
+
+  /*
+  ## provider bug: https://github.com/hashicorp/terraform-provider-azurerm/issues/31763
+  dynamic "workload_profile" {
+    for_each = var.aca_consumption_gpu_enabled ? [1] : []
+
+    content {
+      name                  = "ConsumptionGpu"
+      workload_profile_type = var.aca_consumption_gpu_profile_type
+      maximum_count         = var.aca_consumption_gpu_max_count
+      #minimum_count         = var.aca_consumption_gpu_min_count
+    }
+  }
+*/
+
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azapi_update_resource" "aca_env_otel" {
+  type      = "Microsoft.App/managedEnvironments@2024-10-02-preview"
+  name      = azurerm_container_app_environment.this.name
+  parent_id = azurerm_resource_group.environment.id
+
+  body = {
+    properties = {
+      appInsightsConfiguration = {
+        connectionString = module.application_insights.resource.connection_string
+      }
+
+      # This is normal ACA stdout/stderr logging.
+      appLogsConfiguration = {
+        #destination = "azure-monitor" ## 'azure-monitor', 'log-analytics' or 'none'
+        destination = "log-analytics"
+        logAnalyticsConfiguration = {
+          customerId = module.log_analytics_workspace.resource.workspace_id
+          sharedKey  = module.log_analytics_workspace.resource.primary_shared_key
+        }
+      }
+
+      # This is the managed OpenTelemetry routing.
+      openTelemetryConfiguration = {
+        tracesConfiguration = {
+          destinations = ["appInsights"]
+          includeDapr  = false ##tobool(var.enable_dapr)
+        }
+
+        logsConfiguration = {
+          destinations = ["appInsights"]
+        }
+
+        # Do not send metrics to appInsights.
+        # Application Insights endpoint supports logs + traces, not metrics.
+        metricsConfiguration = {
+          destinations = []
+        }
+      }
+    }
+    response_export_values = ["*"]
+  }
+
+  depends_on = [
+    azurerm_container_app_environment.this,
+    module.application_insights,
+    module.log_analytics_workspace
+  ]
+}
+
+/*
+## unbelievably this cost money!
+resource "azapi_resource" "aca_env_maintenance_default" {
+  type      = "Microsoft.App/managedEnvironments/maintenanceConfigurations@2025-07-01"
+  name      = "default"
+  parent_id = azurerm_container_app_environment.this.id
+
+  body = {
+    properties = {
+      scheduledEntries = [
+        {
+          weekDay       = "Sunday"
+          startHourUtc  = 12
+          durationHours = 9
+        }
+      ]
+    }
+  }
+
+  response_export_values = ["*"]
+
+  depends_on = [
+    azurerm_container_app_environment.this
+  ]
+}
+*/
+
+resource "azurerm_role_assignment" "aspire_dotnet_dashboard_access" {
+  scope                = azurerm_container_app_environment.this.id
+  role_definition_name = "Contributor" # or a custom role scoped to Microsoft.App/managedEnvironments/write
+  principal_id         = var.owner_entra_object_id
+}
+
+## The dashboard should be found here:
+## https://<DOTNET_COMPONENT_NAME>.ext.<CLUSTER_NAME>.<REGION>.azurecontainerapps.io
+## https://www.ssllabs.com/ssltest/analyze.html?d=helloworld.app.sard.webstean.com
+
+/*
+resource "azurerm_monitor_diagnostic_setting" "containerappenv1" {
+  name                       = "Logs-Metrics-and-Audit-${azurerm_container_app_environment.this.name}-to-Azure-Monitor"
+  target_resource_id         = azurerm_container_app_environment.this.id
+  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
+
+  enabled_log {
+    category_group = "allLogs"
+  }
+  enabled_log {
+    category_group = "audit"
+  }
+  enabled_metric {
+    category = "AllMetrics"
+  }
+}
+*/
+
+resource "azurerm_container_app_environment_storage" "logs" {
+  name                         = "logs"
+  container_app_environment_id = azurerm_container_app_environment.this.id
+  account_name                 = azurerm_storage_account.this.name
+  share_name                   = azurerm_storage_share.containerappenv_logs.name
+  access_key                   = azurerm_storage_account.this.primary_access_key
+  access_mode                  = "ReadWrite"
+  #nfs_server_url               = azurerm_storage_account.this.primary_file_endpoint
+}
+resource "azurerm_container_app_environment_storage" "shared" {
+  name                         = "shared"
+  container_app_environment_id = azurerm_container_app_environment.this.id
+  account_name                 = azurerm_storage_account.this.name
+  share_name                   = azurerm_storage_share.containerappenv_shared.name
+  access_key                   = azurerm_storage_account.this.primary_access_key
+  access_mode                  = "ReadWrite"
+  #nfs_server_url               = azurerm_storage_account.this.primary_file_endpoint
+}
+
+/*
+resource "azurerm_app_service_connection" "aca_storage" {
+  name           = "${azurerm_container_app_environment.this.name}-to-${azurerm_storage_account.this.name}"
+  app_service_id = azurerm_container_app_environment.this.id
+  ## Possible target resources are Postgres, PostgresFlexible, Mysql, Sql, Redis, RedisEnterprise, CosmosCassandra, CosmosGremlin,
+  ## CosmosMongo, CosmosSql, CosmosTable, StorageBlob, StorageQueue, StorageFile, StorageTable, AppConfig, EventHub, ServiceBus,
+  ## SignalR, WebPubSub, ConfluentKafka
+  target_resource_id = azurerm_storage_account.this.id
+  authentication {
+    type      = "userAssignedIdentity"
+    client_id = azurerm_user_assigned_identity.environment.client_id
+  }
+}
+*/
+
+output "aca_env_id" {
+  description = "The ID of the Container App Environment."
+  sensitive   = false
+  value       = azurerm_container_app_environment.this.id
+}
+
+output "aca_env_default_domain" {
+  description = "The default domain of the Container App Environment."
+  sensitive   = false
+  value       = azurerm_container_app_environment.this.default_domain
+}
+
+output "aca_env_static_ip_address" {
+  description = "The static IP address of the Container App Environment."
+  sensitive   = false
+  value       = azurerm_container_app_environment.this.static_ip_address
+}
+
+output "aca_env_custom_domain_verification_id" {
+  description = "The custom domain verification ID of the Container App Environment."
+  sensitive   = false
+  value       = azurerm_container_app_environment.this.custom_domain_verification_id
+}

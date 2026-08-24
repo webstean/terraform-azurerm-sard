@@ -1,0 +1,106 @@
+locals {
+  doclink_name   = "doclink"
+  docklink_image = "doclink-worker:latest"
+}
+
+
+resource "azurerm_storage_container" "doclink" {
+  name                  = local.doclink_name
+  storage_account_id    = azurerm_storage_account.this.id
+  container_access_type = "private"
+}
+
+resource "azurerm_storage_queue" "doclink" {
+  name               = local.doclink_name
+  storage_account_id = azurerm_storage_account.this.id
+}
+
+resource "azurerm_container_app_job" "docling" {
+  name                         = "job-docling-${random_string.suffix.result}"
+  location                     = azurerm_resource_group.environment.location
+  resource_group_name          = azurerm_resource_group.environment.name
+  container_app_environment_id = azurerm_container_app_environment.this.id
+
+  replica_timeout_in_seconds = 3600
+  replica_retry_limit        = 1
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.job.id]
+  }
+
+  event_trigger_config {
+    parallelism              = 1
+    replica_completion_count = 1
+    scale {
+      min_executions = 0
+      max_executions = 10
+      #polling_interval = 30
+
+      rules {
+        name             = "queue"
+        custom_rule_type = "azure-queue"
+
+        metadata = {
+          queueName   = azurerm_storage_queue.doclink.name
+          accountName = azurerm_storage_account.this.name
+          queueLength = "1"
+        }
+
+        authentication {
+          trigger_parameter = "connection"
+          secret_name       = "storage-connection-string"
+        }
+      }
+    }
+  }
+
+  secret {
+    name  = "storage-connection-string"
+    value = azurerm_storage_account.this.primary_connection_string
+  }
+
+  template {
+    container {
+      name   = "docling-worker"
+      image  = "${azurerm_container_registry.this.login_server}/${local.docklink_image}"
+      cpu    = 2
+      memory = "4Gi"
+
+      env {
+        name  = "AZURE_CLIENT_ID"
+        value = azurerm_user_assigned_identity.environment.client_id
+      }
+      env {
+        name  = "AZURE_APP_CONFIGURATION_ID"
+        value = module.appconfiguration.endpoint
+      }
+
+      env {
+        name  = "AZURE_STORAGE_ACCOUNT"
+        value = azurerm_storage_account.this.name
+      }
+
+      env {
+        name  = "INPUT_CONTAINER"
+        value = azurerm_storage_container.doclink.name
+      }
+
+      env {
+        name  = "OUTPUT_CONTAINER"
+        value = azurerm_storage_container.doclink.name
+      }
+
+      env {
+        name  = "QUEUE_NAME"
+        value = azurerm_storage_queue.doclink.name
+      }
+    }
+  }
+   depends_on = [
+    azurerm_container_app_environment.this,
+    azurerm_container_app_environment_storage.logs,
+    azurerm_container_app_environment_storage.shared,
+    azapi_update_resource.aca_env_otel,
+  ]
+}

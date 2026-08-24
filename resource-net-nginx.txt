@@ -1,0 +1,301 @@
+locals {
+  nginx_friendly_name = 'NGINX Proxy, Cache, API Manager"
+  nginx_name          = "nginx-${var.prefix}"
+  nginx_name_location = lower("${local.nginx_name}-${lower(var.location)}")
+  nginx_random_suffix = substr(md5(local.nginx_name_location), 0, 6)
+  nginx_name_hostname = lower(substr(replace("n${local.nginx_random_suffix}${local.nginx_name_location}", "-", ""), 0, 24))
+  nginx_config = base64encode(<<-EOT
+user nginx;
+worker_processes auto;
+worker_rlimit_nofile 8192;
+pid /run/nginx/nginx.pid;
+
+events {
+    worker_connections 4000;
+}
+
+error_log /var/log/nginx/error.log error;
+
+http {
+    access_log off;
+    server_tokens "";
+    server {
+        listen 80 default_server;
+        server_name localhost;
+        location / {
+            # Points to a directory with a basic html index file with
+            # a "Welcome to NGINX as a Service for Azure!" page
+            root /var/www;
+            index index.html;
+        }
+    }
+}
+EOT
+  )
+}
+
+## $$
+resource "azurerm_public_ip" "nginx" {
+  name                = "pip-${local.nginx_name_location}"
+  resource_group_name = azurerm_resource_group.environment.name
+  location            = azurerm_resource_group.environment.location
+  allocation_method   = "Static"
+  sku                 = "Standard"
+
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_subnet" "nginx" {
+  name                                          = local.nginx_name
+  resource_group_name                           = azurerm_resource_group.environment.name
+  virtual_network_name                          = azurerm_virtual_network.this.name
+  address_prefixes                              = [format("10.%s.55.0/24", local.regions[var.location].location_number)]
+  default_outbound_access_enabled               = false
+  service_endpoints                             = var.deploy_private_endpoints ? null : local.service_endpoints
+  private_link_service_network_policies_enabled = false
+  ## Possible values are Disabled, Enabled, NetworkSecurityGroupEnabled and RouteTableEnabled.
+  private_endpoint_network_policies = "Enabled"
+
+  delegation {
+    name = "delegation"
+    service_delegation {
+      name = "NGINX.NGINXPLUS/nginxDeployments"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+      ]
+    }
+  }
+}
+resource "azurerm_nginx_deployment" "this" {
+  name                = local.nginx_name_hostname
+  sku                 = "standardv3_Monthly"
+  resource_group_name = azurerm_resource_group.environment.name
+  location            = azurerm_resource_group.environment.location
+
+  automatic_upgrade_channel = "stable"
+  auto_scale_profile {
+    name         = "${local.nginx_name_hostname}-auto-scale"
+    min_capacity = 10
+    max_capacity = 20
+  }
+
+  //  frontend_private { ## Internal
+  //    allocation_method = "Static"
+  //    subnet_id         = azurerm_subnet.nginx.id
+  //    ip_address = 
+  //  }
+  frontend_public {
+    ip_address = [azurerm_public_ip.nginx.id]
+  }
+  network_interface {
+    subnet_id = azurerm_subnet.nginx.id
+  }
+
+
+  identity {
+    type         = "SystemAssigned, UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.environment.id]
+  }
+  ##email = azuread_group.cloud_support.mail
+
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  #  depends_on = [
+  #    azurerm_subnet_network_security_group_association.nginx
+  #  ]
+}
+
+resource "azurerm_nginx_configuration" "nginx" {
+  nginx_deployment_id = azurerm_nginx_deployment.this.id
+  root_file           = "/etc/nginx/nginx.conf"
+
+  config_file {
+    content = base64encode(<<-EOT
+http {
+    server {
+        listen 80;
+        location / {
+            default_type text/html;
+            return 200 '<!doctype html><html lang="en"><head></head><body>
+                <div>this one will be updated</div>
+                <div>at 10:38 am</div>
+            </body></html>';
+        }
+        include site/*.conf;
+    }
+}
+EOT
+    )
+    virtual_path = "/etc/nginx/nginx.conf"
+  }
+
+  config_file {
+    content = base64encode(<<-EOT
+location /bbb {
+ default_type text/html;
+ return 200 '<!doctype html><html lang="en"><head></head><body>
+  <div>this one will be updated</div>
+  <div>at 10:38 am</div>
+ </body></html>';
+}
+EOT
+    )
+    virtual_path = "/etc/nginx/site/b.conf"
+  }
+}
+
+/*
+resource "azurerm_monitor_diagnostic_setting" "nginx_metrics" {
+  name                       = "Metrics-${azurerm_nginx_deployment.this.name}-to-Azure-Monitor"
+  target_resource_id         = azurerm_nginx_deployment.this.id
+  log_analytics_workspace_id =   workspace_id = module.log_analytics_workspace.resource.resource_id
+
+  enabled_metric {
+    category = "AllMetrics"
+  }
+}
+resource "azurerm_monitor_diagnostic_setting" "nginx_logs" {
+  name                       = "Logs-${azurerm_nginx_deployment.this.name}-to-Azure-Monitor"
+  target_resource_id         = azurerm_nginx_deployment.this.id
+  log_analytics_workspace_id =   workspace_id = module.log_analytics_workspace.resource.resource_id
+
+  enabled_log {
+    category_group = "allLogs"
+  }
+}
+*/
+
+resource "azurerm_network_security_group" "nginx" {
+  name                = "nsg-nginx-${lower(azurerm_resource_group.environment.location)}"
+  resource_group_name = azurerm_resource_group.environment.name
+  location            = azurerm_resource_group.environment.location
+
+  security_rule {
+    name                       = "AllowHttps-from-Internet"
+    priority                   = 110
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_ranges    = ["80", "443"]
+    source_address_prefix      = "Internet" ## Assuming we would never use the AZure LoaddBalancer or App Gateways    destination_address_prefix = "VirtualNetwork"
+    destination_address_prefix = "VirtualNetwork"
+    description                = "Inbound AllowHttps from Internet"
+  }
+  security_rule {
+    name                       = "AllowHttps-from-VirtualNetwork"
+    priority                   = 111
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_ranges    = ["80", "443"]
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "VirtualNetwork"
+    description                = "Allow to internal VirtualNetwork hosted resources (private endpoints)"
+  }
+
+  ## Outbound: AzureAustraliaEast
+  security_rule {
+    name                       = "Allow-Azure-AustraliaEast"
+    priority                   = 606
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "AzureCloud.australiaeast"
+    description                = "Allow Azure Cloud, but just Australia East region"
+  }
+  ## Outbound: AzureAustraliaSouthEast
+  security_rule {
+    name                       = "Allow-Azure-AustraliaSouthEast"
+    priority                   = 607
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "AzureCloud.australiasoutheast"
+    description                = "Allow Azure Cloud, but just Australia Southeast region"
+  }
+  ## Outbound: AzureAustraliaCentral1
+  security_rule {
+    name                       = "Allow-Azure-AustraliaCentral"
+    priority                   = 608
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "AzureCloud.australiacentral"
+    description                = "Allow Azure Cloud, but just Australia Central1 region"
+  }
+  ## Outbound: AzureAustraliaCentral2
+  security_rule {
+    name                       = "Allow-Azure-AustraliaCentral2"
+    priority                   = 609
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "AzureCloud.australiacentral2"
+    description                = "Allow Azure Cloud, but just Australia Central2 region"
+  }
+  ## Outbound: AzureSouthAsia
+  security_rule {
+    name                       = "Allow-Azure-SouthEastAsia"
+    priority                   = 610
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "AzureCloud.southeastasia"
+    description                = "Allow Azure Cloud, but just South Asia (Singapore) for Static Web App (not hosted in Australian regions)"
+  }
+
+  ## Outbound: Deny All
+  security_rule {
+    name                       = "Deny-Anything-Else-Inbound"
+    priority                   = 4095
+    direction                  = "Inbound"
+    access                     = "Deny"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+    description                = "Deny ALL Inbound as part of Zero Trust Networking"
+  }
+
+  ## Inbound: Deny All
+  security_rule {
+    name                       = "Deny-Anything-Else-Outound"
+    priority                   = 4096
+    direction                  = "Outbound"
+    access                     = "Deny" ## needs to be "Deny"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+    description                = "Deny ALL Outbound as part of Zero Trust Networking"
+  }
+
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  lifecycle {
+    ignore_changes = [tags.created]
+  }
+}
+
+resource "azurerm_subnet_network_security_group_association" "nginx" {
+  subnet_id                 = azurerm_subnet.nginx.id
+  network_security_group_id = azurerm_network_security_group.nginx.id
+}
+

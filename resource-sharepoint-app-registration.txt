@@ -1,0 +1,54 @@
+/*
+resource "tls_private_key" "pnp" {
+  algorithm = "RSA"
+  rsa_bits  = 2048
+}
+
+resource "tls_self_signed_cert" "pnp" {
+  private_key_pem = tls_private_key.pnp.private_key_pem
+
+  subject {
+    common_name = "pnp-sharepoint-scripting"
+  }
+  validity_period_hours = 24 * 739 ## 2 years
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "client_auth",
+  ]
+}
+*/
+
+/*
+resource "azuread_application" "pnp" {
+  display_name = "pnp-terraform-scripting"
+
+  required_resource_access {
+    resource_app_id = "00000003-0000-0ff1-ce00-000000000000" # SharePoint Online
+
+    resource_access {
+      id   = "678536fe-1083-478a-9c59-b99265e6b0d3" # Sites.FullControl.All (app role)
+      type = "Role"
+    }
+  }
+}
+
+resource "azuread_service_principal" "pnp" {
+  client_id = azuread_application.pnp.client_id
+}
+
+resource "azuread_application_certificate" "pnp" {
+  application_id = azuread_application.pnp.id
+  type           = "AsymmetricX509Cert"
+  encoding       = "pem"
+  value          = tls_self_signed_cert.pnp.cert_pem
+  end_date       = tls_self_signed_cert.pnp.validity_end_time
+}
+
+## Admin Consent
+resource "azuread_app_role_assignment" "pnp_sharepoint" {
+  app_role_id         = "678536fe-1083-478a-9c59-b99265e6b0d3"
+  principal_object_id = azuread_service_principal.pnp.object_id
+  resource_object_id  = data.azuread_service_principal.sharepoint.object_id
+}
+*/

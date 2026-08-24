@@ -1,0 +1,435 @@
+locals {
+  dcr_prefix = "dcr-"
+  dcr_suffix = "-common-${var.prefix}-${var.customer}"
+}
+
+resource "azurerm_role_assignment" "azure_monitor" {
+  scope                = azurerm_resource_group.environment.id
+  role_definition_name = "Monitoring Metrics Publisher"
+  principal_id         = azurerm_user_assigned_identity.environment.principal_id
+}
+
+resource "azurerm_log_analytics_solution" "change_tracking" {
+  solution_name         = "ChangeTracking"
+  location              = azurerm_resource_group.environment.location
+  resource_group_name   = azurerm_resource_group.environment.name
+  workspace_resource_id = module.log_analytics_workspace.resource.resource_id
+  workspace_name        = module.log_analytics_workspace.resource.name
+
+  plan {
+    publisher = "Microsoft"
+    product   = "OMSGallery/ChangeTracking"
+  }
+}
+
+resource "azurerm_monitor_data_collection_rule" "common_vm" {
+  name                = "${local.dcr_prefix}common${local.dcr_suffix}"
+  location            = azurerm_resource_group.environment.location
+  resource_group_name = azurerm_resource_group.environment.name
+  # kind = any
+  # A rule of kind Linux does not allow for windows_event_log data sources.
+  # A rule of kind Windows does not allow for syslog data sources.
+  # If kind is not specified, all kinds of data sources are allowed.
+
+  destinations {
+    azure_monitor_metrics {
+      name = "${local.dcr_prefix}metrics${local.dcr_suffix}"
+    }
+    log_analytics {
+      name                  = "law"
+      workspace_resource_id = module.log_analytics_workspace.resource.resource_id
+    }
+  }
+  data_sources {
+    performance_counter {
+      name                          = "perf-counters"
+      streams                       = ["Microsoft-Perf"]
+      sampling_frequency_in_seconds = 60
+
+      counter_specifiers = [
+        "\\Processor(_Total)\\% Processor Time",
+        "\\Memory\\Available MBytes",
+        "\\LogicalDisk(_Total)\\% Free Space",
+        "\\Network Interface(*)\\Bytes Total/sec"
+      ]
+    }
+  }
+  data_flow {
+    streams      = ["Microsoft-Perf"]
+    destinations = ["law"]
+  }
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.environment.id]
+  }
+  tags = merge(
+    azurerm_resource_group.environment.tags,
+    lookup(azurerm_resource_group.environment.tags, "stateless", "") == "yes" ? { stateless = "no" } : {}
+  )
+  lifecycle {
+    ignore_changes = [tags.created]
+  }
+}
+
+resource "azurerm_monitor_data_collection_rule" "windows_vm" {
+  name                = "${local.dcr_prefix}windows${local.dcr_suffix}"
+  location            = azurerm_resource_group.environment.location
+  resource_group_name = azurerm_resource_group.environment.name
+
+  kind = "Windows"
+
+  destinations {
+    azure_monitor_metrics {
+      name = "${local.dcr_prefix}metrics${local.dcr_suffix}"
+    }
+    log_analytics {
+      name                  = "law"
+      workspace_resource_id = module.log_analytics_workspace.resource.resource_id
+    }
+  }
+  data_sources {
+    windows_event_log {
+      name    = "windows-events"
+      streams = ["Microsoft-Event"]
+
+      x_path_queries = [
+        "System!*[System[(Level=1 or Level=2 or Level=3)]]",
+        "Application!*[System[(Level=1 or Level=2 or Level=3)]]",
+        "Security!*[System[(Level=1 or Level=2 or Level=3 or Level=4)]]"
+      ]
+    }
+
+    extension {
+      name           = "CTDataSource-Windows"
+      extension_name = "ChangeTracking-Windows"
+      streams = [
+        "Microsoft-ConfigurationChange",
+        "Microsoft-ConfigurationChangeV2",
+        "Microsoft-ConfigurationData"
+      ]
+
+      extension_json = jsonencode({
+        enableFiles     = true
+        enableSoftware  = true
+        enableRegistry  = true
+        enableServices  = true
+        enableInventory = true
+        registrySettings = {
+          registryCollectionFrequency = 3000
+          registryInfo = [
+            {
+              name        = "Registry_1"
+              groupTag    = "Recommended"
+              enabled     = true
+              recurse     = true
+              description = ""
+              keyName     = "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Group Policy\\Scripts\\Startup"
+              valueName   = ""
+            },
+            {
+              name        = "Registry_2"
+              groupTag    = "Recommended"
+              enabled     = true
+              recurse     = true
+              description = ""
+              keyName     = "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Group Policy\\Scripts\\Shutdown"
+              valueName   = ""
+            },
+            {
+              name        = "Registry_3"
+              groupTag    = "Recommended"
+              enabled     = true
+              recurse     = true
+              description = ""
+              keyName     = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Run"
+              valueName   = ""
+            },
+            {
+              name        = "Registry_4"
+              groupTag    = "Recommended"
+              enabled     = true
+              recurse     = true
+              description = ""
+              keyName     = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Active Setup\\Installed Components"
+              valueName   = ""
+            },
+            {
+              name        = "Registry_5"
+              groupTag    = "Recommended"
+              enabled     = true
+              recurse     = true
+              description = ""
+              keyName     = "HKEY_LOCAL_MACHINE\\Software\\Classes\\Directory\\ShellEx\\ContextMenuHandlers"
+              valueName   = ""
+            },
+            {
+              name        = "Registry_6"
+              groupTag    = "Recommended"
+              enabled     = true
+              recurse     = true
+              description = ""
+              keyName     = "HKEY_LOCAL_MACHINE\\Software\\Classes\\Directory\\Background\\ShellEx\\ContextMenuHandlers"
+              valueName   = ""
+            },
+            {
+              name        = "Registry_7"
+              groupTag    = "Recommended"
+              enabled     = true
+              recurse     = true
+              description = ""
+              keyName     = "HKEY_LOCAL_MACHINE\\Software\\Classes\\Directory\\ShellEx\\CopyHookHandlers"
+              valueName   = ""
+            },
+            {
+              name        = "Registry_8"
+              groupTag    = "Recommended"
+              enabled     = true
+              recurse     = true
+              description = ""
+              keyName     = "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellIconOverlayIdentifiers"
+              valueName   = ""
+            },
+            {
+              name        = "Registry_9"
+              groupTag    = "Recommended"
+              enabled     = true
+              recurse     = true
+              description = ""
+              keyName     = "HKEY_LOCAL_MACHINE\\Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellIconOverlayIdentifiers"
+              valueName   = ""
+            },
+            {
+              name        = "Registry_10"
+              groupTag    = "Recommended"
+              enabled     = true
+              recurse     = true
+              description = ""
+              keyName     = "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Browser Helper Objects"
+              valueName   = ""
+            },
+            {
+              name        = "Registry_11"
+              groupTag    = "Recommended"
+              enabled     = true
+              recurse     = true
+              description = ""
+              keyName     = "HKEY_LOCAL_MACHINE\\Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Browser Helper Objects"
+              valueName   = ""
+            },
+            {
+              name        = "Registry_12"
+              groupTag    = "Recommended"
+              enabled     = true
+              recurse     = true
+              description = ""
+              keyName     = "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Internet Explorer\\Extensions"
+              valueName   = ""
+            },
+            {
+              name        = "Registry_13"
+              groupTag    = "Recommended"
+              enabled     = true
+              recurse     = true
+              description = ""
+              keyName     = "HKEY_LOCAL_MACHINE\\Software\\Wow6432Node\\Microsoft\\Internet Explorer\\Extensions"
+              valueName   = ""
+            },
+            {
+              name        = "Registry_14"
+              groupTag    = "Recommended"
+              enabled     = true
+              recurse     = true
+              description = ""
+              keyName     = "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Drivers32"
+              valueName   = ""
+            },
+            {
+              name        = "Registry_15"
+              groupTag    = "Recommended"
+              enabled     = true
+              recurse     = true
+              description = ""
+              keyName     = "HKEY_LOCAL_MACHINE\\Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Drivers32"
+              valueName   = ""
+            },
+            {
+              name        = "Registry_16"
+              groupTag    = "Recommended"
+              enabled     = true
+              recurse     = true
+              description = ""
+              keyName     = "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Session Manager\\KnownDlls"
+              valueName   = ""
+            },
+            {
+              name        = "Registry_17"
+              groupTag    = "Recommended"
+              enabled     = true
+              recurse     = true
+              description = ""
+              keyName     = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify"
+              valueName   = ""
+            }
+          ]
+        }
+        fileSettings = {
+          fileCollectionFrequency = 2700
+        }
+        softwareSettings = {
+          softwareCollectionFrequency = 1800
+        }
+        inventorySettings = {
+          inventoryCollectionFrequency = 36000
+        }
+        servicesSettings = {
+          serviceCollectionFrequency = 1800
+        }
+      })
+    }
+  }
+  data_flow {
+    streams      = ["Microsoft-Event"]
+    destinations = ["law"]
+  }
+  data_flow {
+    streams = [
+      "Microsoft-ConfigurationChange",
+      "Microsoft-ConfigurationChangeV2",
+      "Microsoft-ConfigurationData"
+    ]
+    destinations = ["law"]
+  }
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.environment.id]
+  }
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  depends_on = [azurerm_log_analytics_solution.change_tracking]
+}
+
+resource "azurerm_monitor_data_collection_rule" "linux_vm" {
+  name                = "${local.dcr_prefix}linux${local.dcr_suffix}"
+  location            = azurerm_resource_group.environment.location
+  resource_group_name = azurerm_resource_group.environment.name
+
+  kind = "Linux"
+
+  destinations {
+    azure_monitor_metrics {
+      name = "${local.dcr_prefix}metrics${local.dcr_suffix}"
+    }
+    log_analytics {
+      name                  = "law"
+      workspace_resource_id = module.log_analytics_workspace.resource.resource_id
+    }
+  }
+  data_sources {
+    syslog {
+      name    = "linux-syslog"
+      streams = ["Microsoft-Syslog"]
+
+      facility_names = [
+        "auth",
+        "authpriv",
+        "cron",
+        "daemon",
+        "kern",
+        "syslog",
+        "user"
+      ]
+
+      log_levels = [
+        "Emergency",
+        "Alert",
+        "Critical",
+        "Error",
+        "Warning"
+      ]
+    }
+  }
+  data_flow {
+    streams      = ["Microsoft-Syslog"]
+    destinations = ["law"]
+  }
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.environment.id]
+  }
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+## https://learn.microsoft.com/en-us/azure/azure-monitor/containers/opentelemetry-protocol-ingestion?utm_source=chatgpt.com
+
+/*
+resource "azuread_application" "otel_sender" {
+  display_name = "app-otel-external-sender"
+}
+
+resource "azuread_service_principal" "otel_sender" {
+  client_id = azuread_application.otel_sender.client_id
+}
+
+resource "azuread_application_password" "otel_sender" {
+  application_id = azuread_application.otel_sender.id
+}
+*/
+
+/*
+resource "azurerm_role_assignment" "otel_sender_monitoring" {
+  scope                = "<DCR_RESOURCE_ID_FROM_APPLICATION_INSIGHTS_OTLP_INFO>"
+  role_definition_name = "Monitoring Metrics Publisher"
+  principal_id         = azuread_service_principal.otel_sender.object_id
+}
+*/
+
+resource "azurerm_monitor_data_collection_rule" "windows_change_tracking" {
+  name                = "${local.dcr_prefix}windows-change-tracking-${local.dcr_suffix}"
+  resource_group_name = azurerm_resource_group.environment.name
+  location            = azurerm_resource_group.environment.location
+  kind                = "Windows" # or "Linux"
+
+  destinations {
+    log_analytics {
+      workspace_resource_id = module.log_analytics_workspace.resource.resource_id
+      name                  = "law-destination"
+    }
+  }
+
+  data_flow {
+    streams      = ["Microsoft-ConfigurationChange", "Microsoft-ConfigurationChangeV2", "Microsoft-ConfigurationData"]
+    destinations = ["law-destination"]
+  }
+
+  data_sources {
+    extension {
+      streams        = ["Microsoft-ConfigurationChange", "Microsoft-ConfigurationChangeV2", "Microsoft-ConfigurationData"]
+      extension_name = "ChangeTracking-Windows"
+      name           = "ct-datasource"
+
+      extension_json = jsonencode({
+        enableFiles     = true
+        enableSoftware  = true
+        enableRegistry  = true
+        enableServices  = true
+        enableInventory = true
+      })
+    }
+  }
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.environment.id]
+  }
+
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  depends_on = [azurerm_log_analytics_solution.change_tracking]
+}
+
+/*
+resource "azurerm_monitor_data_collection_rule_association" "change_tracking" {
+  name                    = "dcra-changetracking"
+  target_resource_id      = azurerm_windows_virtual_machine.this.id
+  data_collection_rule_id = azurerm_monitor_data_collection_rule.change_tracking.id
+}
+*/
+

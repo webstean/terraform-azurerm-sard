@@ -1,0 +1,562 @@
+locals {
+  create_m365_records  = false
+  static_web_app_alias = "www"
+  ## Azure Container Apps
+  ingress_custom_aca = "app"
+  ## AI Foundry
+  ingress_aliases_ai = toset(["ai", "aifoundry"])
+  ## Storage Accounts (need FrontDoor or CDN for custom domain support)
+  ingress_aliases_storage_this = toset(["sa1d"])
+  ingress_aliases_storage_diag = toset(["sa1"])
+  ## PubSub (FYI: need Premium SKU for custom domain support)
+  ingress_aliases_pubsub = toset(["pubsub"])
+  ## FrontDoor
+  ingress_aliases_frontdoor = toset(["fd"])
+}
+
+data "azurerm_dns_zone" "specified" {
+  provider = azurerm.dns
+
+  name                = var.custom_dns_zone_name
+  resource_group_name = var.custom_dns_azure_resource_group_name
+}
+
+resource "azurerm_dns_zone" "environment" {
+  name                = "${var.prefix}.${var.custom_dns_zone_name}"
+  resource_group_name = azurerm_resource_group.environment.name
+  # soa record is automatically created by Azure DNS and is essentially cosmetic, as its about zone transfers, that Azure DNS does not support.
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_dns_ns_record" "delegation" {
+  provider = azurerm.dns ## in parent zone
+
+  name                = var.prefix
+  zone_name           = data.azurerm_dns_zone.specified.name
+  resource_group_name = data.azurerm_dns_zone.specified.resource_group_name
+  ttl                 = 10
+  records             = azurerm_dns_zone.environment.name_servers
+  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+locals {
+  caa_records = [
+    { flags = 0, tag = "issue", value = "letsencrypt.org" },
+    { flags = 0, tag = "issuewild", value = "letsencrypt.org" },
+    { flags = 0, tag = "issue", value = "digicert.com" },
+    { flags = 0, tag = "issuewild", value = "digicert.com" },
+    # { flags = 0, tag = "issue",     value = "godaddy.com" },
+    # { flags = 0, tag = "issuewild", value = "godaddy.com" },
+    # { flags = 0, tag = "issue",     value = "pki.goog" },
+    # { flags = 0, tag = "issuewild", value = "pki.goog" },
+    { flags = 0, tag = "iodef", value = "mailto:${var.owner_email}" },
+  ]
+}
+
+resource "azurerm_dns_caa_record" "cas" {
+  name                = "@"
+  resource_group_name = azurerm_resource_group.environment.name
+  zone_name           = azurerm_dns_zone.environment.name
+  ttl                 = 30
+
+  dynamic "record" {
+    for_each = local.caa_records
+    content {
+      flags = record.value.flags
+      tag   = record.value.tag
+      value = record.value.value
+    }
+  }
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_dns_a_record" "testv4" {
+  name                = "testv4"
+  resource_group_name = azurerm_resource_group.environment.name
+  zone_name           = azurerm_dns_zone.environment.name
+  records             = ["8.8.8.8", "8.8.4.4", "1.1.1.1", "1.0.0.1"]
+  ttl                 = 300
+  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+resource "azurerm_dns_cname_record" "t4" {
+  name                = "t4"
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  record              = azurerm_dns_a_record.testv4.fqdn
+  ttl                 = 30
+  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+resource "azurerm_dns_cname_record" "test" {
+  name                = "t"
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  record              = azurerm_dns_a_record.testv4.fqdn
+  ttl                 = 30
+  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_dns_aaaa_record" "testv6" {
+  name                = "testv6"
+  resource_group_name = azurerm_resource_group.environment.name
+  zone_name           = azurerm_dns_zone.environment.name
+  records             = ["2001:4860:4860::8888", "2001:4860:4860::8844", "2606:4700:4700::1111", "2606:4700:4700::1001"]
+  ttl                 = 300
+  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+resource "azurerm_dns_cname_record" "t6" {
+  name                = "t6"
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  record              = azurerm_dns_aaaa_record.testv6.fqdn
+  ttl                 = 30
+  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_dns_cname_record" "web" {
+  name                = local.static_web_app_alias
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  record              = azurerm_static_web_app.this.default_host_name
+  ttl                 = 30
+  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_static_web_app_custom_domain" "this" {
+  static_web_app_id = azurerm_static_web_app.this.id
+  domain_name       = "${local.static_web_app_alias}.${azurerm_dns_zone.environment.name}"
+  validation_type   = "cname-delegation" # use "dns-txt-token" for apex/root domains
+
+  # Ensure DNS record exists before Azure attempts validation
+  depends_on = [
+    #azurerm_dns_cname_record.web,
+    azurerm_dns_ns_record.delegation,
+    azurerm_dns_caa_record.cas,
+    azurerm_dns_caa_record.aca_cas
+  ]
+  timeouts {
+    delete = "90m"
+  }
+}
+
+resource "azurerm_dns_a_record" "apex_alias" { ## ${var.prefix}.${var.custom_dns_zone_name}
+  name                = "@"
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  ttl                 = 360
+
+  target_resource_id = azurerm_static_web_app.this.id
+  # or target_resource_id pointing at a public IP, Traffic Manager profile, etc.
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+resource "azurerm_static_web_app_custom_domain" "apex" {
+  static_web_app_id = azurerm_static_web_app.this.id
+  domain_name       = azurerm_dns_zone.environment.name
+  validation_type   = "dns-txt-token" # use "dns-txt-token" for apex/root domains
+
+  # Ensure DNS record exists before Azure attempts validation
+  depends_on = [
+    azurerm_static_web_app_custom_domain.this,
+    azurerm_dns_a_record.apex_alias,
+  ]
+  timeouts {
+    delete = "90m"
+  }
+}
+/*
+resource "azurerm_dns_txt_record" "swa_dnsauth" {
+  name                = "_dnsauth.${local.static_web_app_alias}"
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  ttl                 = 300
+  record {
+    value = azurerm_static_web_app_custom_domain.apex.validation_token
+  }
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  depends_on = [
+    azurerm_dns_a_record.apex_alias,
+  ]
+}
+*/
+resource "azurerm_dns_txt_record" "swa_dnsauth_verify" {
+  name                = "@" ## local.static_web_app_alias ## www
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  ttl                 = 300
+  record {
+    value = try(azurerm_static_web_app_custom_domain.apex.validation_token, "already-used")
+  }
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  depends_on = [
+    azurerm_static_web_app_custom_domain.apex,
+    azurerm_dns_a_record.apex_alias,
+  ]
+}
+
+resource "azurerm_dns_zone" "aca" {
+  name                = "${local.ingress_custom_aca}.${var.prefix}.${var.custom_dns_zone_name}"
+  resource_group_name = azurerm_resource_group.environment.name
+  # soa record is automatically created by Azure DNS and is essentially cosmetic, as its about zone transfers, that Azure DNS does not support.
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+resource "azurerm_dns_ns_record" "aca" {
+  name                = local.ingress_custom_aca
+  resource_group_name = azurerm_resource_group.environment.name
+  zone_name           = azurerm_dns_zone.environment.name
+  ttl                 = 10
+  records             = azurerm_dns_zone.aca.name_servers
+  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+resource "azurerm_dns_a_record" "aca" { ## establish domain ownership
+  name                = "*"
+  resource_group_name = azurerm_resource_group.environment.name
+  zone_name           = azurerm_dns_zone.aca.name
+  records = [
+    azurerm_container_app_environment.this.static_ip_address,
+  ]
+  ttl  = 300
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+resource "azurerm_dns_a_record" "acatest" {
+  name                = "t"
+  resource_group_name = azurerm_resource_group.environment.name
+  zone_name           = azurerm_dns_zone.aca.name
+  records             = ["8.8.8.8", "8.8.4.4", "1.1.1.1", "1.0.0.1"]
+  ttl                 = 300
+  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+resource "azurerm_dns_txt_record" "aca" { ## establish domain ownership
+
+  name                = "asuid" ## .${each.value}.${var.custom_dns_zone_name}"
+  zone_name           = azurerm_dns_zone.aca.name
+  resource_group_name = azurerm_resource_group.environment.name
+  record {
+    value = azurerm_container_app_environment.this.custom_domain_verification_id
+  }
+  ttl  = 300
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+resource "azurerm_dns_caa_record" "aca_cas" {
+  name                = "@"
+  zone_name           = azurerm_dns_zone.aca.name
+  resource_group_name = azurerm_resource_group.environment.name
+  ttl                 = 30
+
+  dynamic "record" {
+    for_each = local.caa_records
+    content {
+      flags = record.value.flags
+      tag   = record.value.tag
+      value = record.value.value
+    }
+  }
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_dns_cname_record" "pubsub" { ## custom domain, needs premium SKU
+  for_each = local.appconfiguration_sku == "premium" ? local.ingress_aliases_pubsub : toset([])
+
+  name                = each.value
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  record              = azurerm_web_pubsub.this.hostname
+  ttl                 = 300
+  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_dns_cname_record" "storage1" {
+  for_each = var.inbound_access == "FrontDoor" ? local.ingress_aliases_storage_this : toset([])
+
+  name                = each.value
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  ttl                 = 300
+  record              = azurerm_storage_account.this.primary_blob_host
+  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+resource "azurerm_dns_cname_record" "storage2" {
+  for_each = var.inbound_access == "FrontDoor" ? local.ingress_aliases_storage_diag : toset([])
+
+  name                = each.value
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  ttl                 = 300
+  record              = azurerm_storage_account.diag.primary_blob_host
+  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_dns_cname_record" "ingress_frontdoor" {
+  for_each = var.inbound_access == "FrontDoor" ? local.ingress_aliases_frontdoor : toset([])
+
+  name                = each.value
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  record              = azurerm_cdn_frontdoor_endpoint.this[0].host_name
+  ttl                 = 300
+  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+/*
+resource "azurerm_dns_srv_record" "ingress_frontdoor_tls1" {
+  count = var.inbound_access == "FrontDoor" ? 1 : 0
+
+  name                = "_tcp._tls"
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  ttl                 = 3600
+
+  record {
+    priority = 100
+    weight   = 1
+    target   = azurerm_cdn_frontdoor_origin.this[0].host_name
+    port     = (tobool(var.data_pii) || tobool(var.data_phi)) ? 443 : 8443
+  }
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+resource "azurerm_dns_srv_record" "ingress_frontdoor_tls2" {
+  for_each = var.inbound_access == "FrontDoor" ? local.ingress_aliases_aca : toset([])
+
+  name                = "_tcp._tls"
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  ttl                 = 3600
+
+  record {
+    priority = 100
+    weight   = 1
+    target   = each.value
+    port     = (tobool(var.data_pii) || tobool(var.data_phi)) ? 443 : 8443
+  }
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+*/
+
+resource "azurerm_dns_a_record" "ingress_app_gateway" {
+  for_each = var.inbound_access == "App-Gateway" ? local.ingress_aliases_frontdoor : toset([])
+
+  name                = each.value
+  resource_group_name = azurerm_resource_group.environment.name
+  zone_name           = azurerm_dns_zone.environment.name
+  records             = [azurerm_public_ip.app_gateway[0].ip_address]
+  ttl                 = 300
+  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_dns_mx_record" "mail" {
+  count = local.create_m365_records ? 1 : 0
+
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  record {
+    preference = 1
+    exchange   = "${replace(azurerm_dns_zone.environment.name, ".", "-")}.mail.protection.outlook.com."
+  }
+  ttl  = 300
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+/*
+resource "azurerm_dns_cname_record" "m365_dkim1" {
+  for_each = var.domains
+
+  name                = "selector1._domainkey"
+  zone_name           = azurerm_dns_zone.environment[each.key].name
+  resource_group_name = azurerm_resource_group.environment.name
+  record              = "selector1-${replace(each.key, ".", "-")}._domainkey.${var.m365_tenant_onmicrosoft_domain}"
+  ttl                 = 3600
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+*/
+
+resource "azurerm_dns_cname_record" "autodiscover" {
+  count = local.create_m365_records ? 1 : 0
+
+  name                = "autodiscover"
+  resource_group_name = azurerm_resource_group.environment.name
+  zone_name           = azurerm_dns_zone.environment.name
+  record              = "autodiscover.outlook.com"
+  ttl                 = 300
+  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_dns_cname_record" "m365-enterpriseregistration" {
+  count = local.create_m365_records ? 1 : 0
+
+  name                = "enterpriseregistration"
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  record              = "enterpriseregistration.windows.net"
+  ttl                 = 3600
+  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_dns_cname_record" "m365-enterpriseenrollment" {
+  count = local.create_m365_records ? 1 : 0
+
+  name                = "enterpriseenrollment"
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  record              = "enterpriseenrollment-s.manage.microsoft.com"
+  ttl                 = 3600
+  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_dns_cname_record" "lyncdiscover" {
+  count = local.create_m365_records ? 1 : 0
+
+  name                = "lyncdiscover"
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  record              = "webdir.online.lync.com"
+  ttl                 = 3600
+  tags                = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_dns_txt_record" "dmarc" {
+  count = local.create_m365_records ? 1 : 0
+
+  name                = "_dmarc"
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  record {
+    value = "v=DMARC1; p=quarantine; pct=100"
+  }
+  ttl  = 3600
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_cdn_frontdoor_custom_domain" "this" {
+  for_each = var.inbound_access == "FrontDoor" ? local.ingress_aliases_frontdoor : toset([])
+
+  name                     = "custom-domain-${each.key}"
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.this[0].id
+  host_name                = each.value
+
+  tls {
+    certificate_type = "ManagedCertificate"
+  }
+}
+
+resource "azurerm_dns_txt_record" "frontdoor_validation" {
+  for_each = var.inbound_access == "FrontDoor" ? local.ingress_aliases_frontdoor : toset([])
+
+  name                = "_dnsauth.app"
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  ttl                 = 3600
+
+  record {
+    value = azurerm_cdn_frontdoor_custom_domain.this[each.key].validation_token
+  }
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_dns_txt_record" "txt1" {
+  name                = "@"
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  ttl                 = 3600
+
+  record { ## FrontDoor
+    value = "_dnsauth.www"
+  }
+  record { ## FrontDoor
+    value = "_dnsauth"
+  }
+
+  dynamic "record" {
+    for_each = local.create_m365_records ? [1] : []
+    content {
+      ## MailChimp = include:mandrillapp.com
+      ## Mailgun = include:mailgun.org
+      ## SendGrid = include:sendgrid.net
+      ## Microsoft 365 = include:spf.protection.outlook.com
+      ## Google Workspace = include:_spf.google.com
+      ## Amazon SES = include:amazonses.com 
+      ## Zoho Mail = include:zoho.com
+      value = "v=spf1 include:spf.protection.outlook.com ~all"
+    }
+  }
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_dns_txt_record" "msrdc" {
+  count = local.create_m365_records ? 1 : 0
+
+  name                = "_msradc"
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  ttl                 = 300
+  #record {
+  #  ## Azure Virtual Desktop - https://rdweb.wvd.microsoft.com/api/arm/feeddiscovery
+  #  value = "https://rdweb.wvd.microsoft.com/api/arm/feeddiscovery"
+  #}
+  record {
+    ## Windows 365 / DevBox - https://rdweb.<domain>/RDWeb/Feed/webfeed.aspx
+    value = "https://rdweb.${replace(azurerm_dns_zone.environment.name, ".", "-")}/RDWeb/Feed/webfeed.aspx"
+  }
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_dns_srv_record" "m365_sipfederationtls_tcp" {
+  count = local.create_m365_records ? 1 : 0
+
+  name                = "_sipfederationtls._tcp"
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  ttl                 = 3600
+
+  record {
+    priority = 100
+    weight   = 1
+    port     = 5061
+    target   = "sipfed.online.lync.com."
+  }
+
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+  ## Resolve-DnsName -Name "_sipfederationtls._tcp.${azurerm_dns_zone.environment.name}" -Type SRV
+}
+
+resource "azurerm_dns_srv_record" "m365_sip_tls" {
+  name                = "_sip._tls"
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = azurerm_resource_group.environment.name
+  ttl                 = 3600
+
+  record {
+    priority = 100
+    weight   = 1
+    port     = 443
+    target   = "sipdir.online.lync.com."
+  }
+  tags = { for key, value in azurerm_resource_group.environment.tags : key => value if lower(key) != "created" }
+}
+
+/*
+## Enable DNSSEC
+resource "azapi_resource" "dnnsec" {
+  name      = "default"
+  parent_id = azurerm_dns_zone.environment.id
+  type      = "Microsoft.Network/dnsZones/dnssecConfigs@2023-07-01-preview"
+}
+
+## Enable DNSSEC -  create DS record in parent zone for delegation
+resource "azapi_resource" "dns_ds_record" {
+  type      = "Microsoft.Network/dnszones/DS@2023-07-01-preview"
+  name      = "dev" # relative record name, e.g. "dev" for dev.example.com
+  parent_id = azurerm_dns_zone.specified.id
+
+  body = {
+    properties = {
+      TTL = 3600
+      DSRecords = [
+        {
+          keyTag     = 12345 # from child zone's DNSSEC key (Azure Portal/CLI exposes this once child zone DNSSEC is enabled)
+          algorithm  = 13    # DNSSEC algorithm number, e.g. 13 = ECDSAP256SHA256
+          digestType = 2     # 1 = SHA-1, 2 = SHA-256, 4 = SHA-384
+          digest     = "ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF01234567"
+        }
+      ]
+    }
+  }
+}
+*/

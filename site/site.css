@@ -1,0 +1,45 @@
+html,
+body {
+    height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #f8fafc;
+}
+
+main {
+    flex: 1;
+}
+
+.hero {
+    background: linear-gradient(135deg, #0d6efd, #3b82f6);
+    color: #fff;
+    padding: 90px 0;
+}
+
+.section {
+    padding: 80px 0;
+}
+
+.feature-card {
+    border: none;
+    box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-6px);
+}
+
+.hero-image {
+    font-size: 10rem;
+    opacity: 0.85;
+}
+
+footer {
+    background: #343a40;
+    color: #fff;
+}
