@@ -1,0 +1,38 @@
+# Default: normalize all text files and prefer LF in the repo
+* text=auto eol=lf
+
+# Windows batch/cmd usually expects CRLF
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+*.ps1xml text eol=lf
+
+# PowerShell  usually expects CRLF
+*.ps1  text eol=crlf
+*.psm1 text eol=crlf
+*.psd1 text eol=crlf
+
+# Shell / scripts
+*.sh   text eol=lf
+*.bash text eol=lf
+*.zsh  text eol=lf
+
+# IaC / config
+*.tf        text eol=lf
+*.tfvars    text eol=lf
+*.hcl       text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.json      text eol=lf
+*.md        text eol=lf
+*.txt       text eol=lf
+
+# Binary (never touch line endings)
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.pdf  binary
+*.zip  binary
+*.7z   binary
+*.exe  binary
+*.dll  binary
