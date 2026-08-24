@@ -157,11 +157,6 @@ module "sard" {
 | [azurerm_network_security_group.bastion](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
 | [azurerm_network_security_group.general](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
 | [azurerm_network_security_group.inbound_sqlserver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
-| [azurerm_network_security_perimeter.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_perimeter) | resource |
-| [azurerm_network_security_perimeter_access_rule.inbound-rule1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_perimeter_access_rule) | resource |
-| [azurerm_network_security_perimeter_access_rule.inbound-rule3](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_perimeter_access_rule) | resource |
-| [azurerm_network_security_perimeter_access_rule.outbound-rule1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_perimeter_access_rule) | resource |
-| [azurerm_network_security_perimeter_profile.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_perimeter_profile) | resource |
 | [azurerm_notification_hub.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/notification_hub) | resource |
 | [azurerm_notification_hub_authorization_rule.rule1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/notification_hub_authorization_rule) | resource |
 | [azurerm_notification_hub_namespace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/notification_hub_namespace) | resource |
@@ -333,10 +328,7 @@ module "sard" {
 | <a name="output_logs_otel_dce_id"></a> [logs\_otel\_dce\_id](#output\_logs\_otel\_dce\_id) | The ID of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_logs_ingestion_endpoint"></a> [logs\_otel\_logs\_ingestion\_endpoint](#output\_logs\_otel\_logs\_ingestion\_endpoint) | The OTEL logs ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_metrics_ingestion_endpoint"></a> [logs\_otel\_metrics\_ingestion\_endpoint](#output\_logs\_otel\_metrics\_ingestion\_endpoint) | The OTEL metrics ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
-| <a name="output_network_security_perimeter_profile_id"></a> [network\_security\_perimeter\_profile\_id](#output\_network\_security\_perimeter\_profile\_id) | Azure Network Security Perimeter Profile ID for this environment |
 | <a name="output_relay_public_ip"></a> [relay\_public\_ip](#output\_relay\_public\_ip) | The public IP address of the relay load balancer. |
-| <a name="output_security_perimeter_id"></a> [security\_perimeter\_id](#output\_security\_perimeter\_id) | Azure Network Security Perimeter ID for this environment |
-| <a name="output_security_perimeter_resources"></a> [security\_perimeter\_resources](#output\_security\_perimeter\_resources) | Resources that need to be added to the Azure Network Security Perimeter |
 | <a name="output_sql_database_connection_free_encrypted"></a> [sql\_database\_connection\_free\_encrypted](#output\_sql\_database\_connection\_free\_encrypted) | Connection string for the SQL database using Entra ID authentication with encryption enabled. Ensure that your client supports Azure AD authentication and has the necessary permissions to connect. |
 | <a name="output_sql_database_connection_free_odbc_alias"></a> [sql\_database\_connection\_free\_odbc\_alias](#output\_sql\_database\_connection\_free\_odbc\_alias) | Registry alias for the SQL database connection. |
 | <a name="output_sql_database_connection_free_unencrypted"></a> [sql\_database\_connection\_free\_unencrypted](#output\_sql\_database\_connection\_free\_unencrypted) | Connection string for the SQL database using Entra ID authentication with encryption disabled. Ensure that your client supports Azure AD authentication and has the necessary permissions to connect. |
