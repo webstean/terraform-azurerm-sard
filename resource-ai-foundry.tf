@@ -1,6 +1,6 @@
 locals {
   foundry_friendly_name      = "Azure AI Foundry"
-  foundry_name               = "aifoundry-${var.prefix}"
+  foundry_name               = "aixsfoundry-${var.prefix}"
   foundry_name_location      = lower("${local.foundry_name}-${lower(var.location)}")
   foundry_name_random_suffix = substr(md5(local.foundry_name_location), 0, 6)
   foundry_name_hostname      = lower(substr(replace("g${local.foundry_name_random_suffix}${local.foundry_name_location}", "-", ""), 0, 24))
@@ -104,7 +104,7 @@ resource "azapi_resource" "foundry" {
     properties = {
       allowProjectManagement        = true
       customSubDomainName           = local.foundry_name_hostname
-      disableLocalAuth              = false
+      disableLocalAuth              = true
       dynamicThrottlingEnabled      = true
       publicNetworkAccess           = "Enabled"
       restrictOutboundNetworkAccess = false
