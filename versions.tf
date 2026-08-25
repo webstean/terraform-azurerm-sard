@@ -99,7 +99,7 @@ provider "azurerm" {
       recover_soft_deleted         = true  # Automatically recover soft-deleted API Management resources.
     }
     cognitive_account {
-      purge_soft_delete_on_destroy = true
+      purge_soft_delete_on_destroy = false
     }
     resource_group {
       prevent_deletion_if_contains_resources = false # Allow deletion of resource groups even if they contain resources.
@@ -159,7 +159,7 @@ provider "azapi" {
 }
 
 /*
-// import only allow in root modules
+// imports only allow in root modules
 resource "azurerm_resource_provider_feature_registration" "encryption_at_host" {
   provider_name = "Microsoft.Compute"
   name          = "EncryptionAtHost"
@@ -168,3 +168,4 @@ import {
   to = azurerm_resource_provider_feature_registration.encryption_at_host
   id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/providers/Microsoft.Features/providers/Microsoft.Compute/features/EncryptionAtHost"
 }
+*/
