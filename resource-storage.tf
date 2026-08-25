@@ -202,3 +202,9 @@ resource "azurerm_role_assignment" "umi_storage_diag_table_data_reader_role" {
   principal_id         = azurerm_user_assigned_identity.environment.principal_id
   description          = local.iac_message
 }
+
+output "environment_diag_storage_account_name" {
+  description = "The name of the main storage account for this environment."
+  sensitive   = false
+  value       = azurerm_storage_account.diag.name
+}

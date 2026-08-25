@@ -74,7 +74,7 @@ resource "azurerm_lb_rule" "relay" {
   probe_id                       = azurerm_lb_probe.tcp[0].id
 }
 
-output "relay_public_ip" {
+output "relay_mssql_public_ip" {
   description = "The public IP address of the relay load balancer."
   sensitive   = false
   value       = try(azurerm_public_ip.relay[0].ip_address, null)

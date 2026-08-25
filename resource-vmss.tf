@@ -493,7 +493,7 @@ module "virtualmachinescaleset" {
     #disk_encryption_set_id = azurerm_disk_encryption_set.this.id
   }
   disk_controller_type = var.vmss_disk_controller_type ## Possible values are 'SCSI' and 'NVMe'. Defaults to 'SCSI'.
-  sku_name             = var.vmss_sku_name != "" ? var.vmss_sku_name : local.virtual_machine_x64_random
+  sku_name             = var.vmss_sku_name != "" ? var.vmss_sku_name : local.virtual_machine_x64_sku_random
   ## az vm image list --publisher MicrosoftWindowsServer --offer WindowsServer --sku 2025 --all
   ## note, that core edition does not support defender, the logon extension, and the admin center extension, so we use the full edition.
   source_image_reference = { ## this SKU supports hibernation

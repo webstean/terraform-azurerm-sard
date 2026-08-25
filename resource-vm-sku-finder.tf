@@ -48,12 +48,6 @@ module "vm_x64_skus" {
   ]
 }
 
-#output "virtual_machine_x64_skus" {
-#  description = "List of x64 virtual machine SKUs"
-#  sensitive   = false
-#  value       = module.vm_x64_skus.sku
-#}
-
 output "virtual_machine_x64_sku_list" {
   description = "List of x64 virtual machine SKUs"
   sensitive   = false
@@ -64,14 +58,13 @@ resource "random_integer" "vm_x64_sku_pick" {
   min = 0
   max = length(module.vm_x64_skus.sku_list) - 1
 }
-
 locals {
-  virtual_machine_x64_random = tolist(module.vm_x64_skus.sku_list)[0] == "no_valid_skus_found" ? "" : tolist(module.vm_x64_skus.sku_list)[random_integer.vm_x64_sku_pick.result]
+  virtual_machine_x64_sku_random = tolist(module.vm_x64_skus.sku_list)[0] == "no_valid_skus_found" ? "" : tolist(module.vm_x64_skus.sku_list)[random_integer.vm_x64_sku_pick.result]
 }
 
-output "virtual_machine_x64_random" {
+output "virtual_machine_x64_sku_random" {
   description = "Randomly selected x64 virtual machine SKU"
   sensitive   = false
-  value       = local.virtual_machine_x64_random
+  value       = local.virtual_machine_x64_sku_random
 }
 
