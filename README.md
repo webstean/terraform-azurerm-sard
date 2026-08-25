@@ -272,6 +272,7 @@ It can be though of as a poor-person's Azure Landing Zone, since it only does no
 | <a name="output_bastion_id"></a> [bastion\_id](#output\_bastion\_id) | Bastion Host ID |
 | <a name="output_databox_gateway_id"></a> [databox\_gateway\_id](#output\_databox\_gateway\_id) | The ID of the Databox Edge Gateway device. |
 | <a name="output_databox_gateway_properties"></a> [databox\_gateway\_properties](#output\_databox\_gateway\_properties) | The properties of the Databox Edge Gateway device. |
+| <a name="output_environment_diag_storage_account_name"></a> [environment\_diag\_storage\_account\_name](#output\_environment\_diag\_storage\_account\_name) | The name of the main storage account for this environment. |
 | <a name="output_environment_resource_group"></a> [environment\_resource\_group](#output\_environment\_resource\_group) | The Azure Resource Group that contains this environment |
 | <a name="output_environment_storage_account_name"></a> [environment\_storage\_account\_name](#output\_environment\_storage\_account\_name) | The name of the main storage account for this environment. |
 | <a name="output_environment_storage_file_connection_script_ps1"></a> [environment\_storage\_file\_connection\_script\_ps1](#output\_environment\_storage\_file\_connection\_script\_ps1) | A PowerShell script to connect dirve Z: to the azure files created as part of this environment. |
@@ -282,7 +283,7 @@ It can be though of as a poor-person's Azure Landing Zone, since it only does no
 | <a name="output_logs_otel_dce_id"></a> [logs\_otel\_dce\_id](#output\_logs\_otel\_dce\_id) | The ID of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_logs_ingestion_endpoint"></a> [logs\_otel\_logs\_ingestion\_endpoint](#output\_logs\_otel\_logs\_ingestion\_endpoint) | The OTEL logs ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_metrics_ingestion_endpoint"></a> [logs\_otel\_metrics\_ingestion\_endpoint](#output\_logs\_otel\_metrics\_ingestion\_endpoint) | The OTEL metrics ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
-| <a name="output_relay_public_ip"></a> [relay\_public\_ip](#output\_relay\_public\_ip) | The public IP address of the relay load balancer. |
+| <a name="output_relay_mssql_public_ip"></a> [relay\_mssql\_public\_ip](#output\_relay\_mssql\_public\_ip) | The public IP address of the relay load balancer. |
 | <a name="output_sql_database_connection_free_encrypted"></a> [sql\_database\_connection\_free\_encrypted](#output\_sql\_database\_connection\_free\_encrypted) | Connection string for the SQL database using Entra ID authentication with encryption enabled. Ensure that your client supports Azure AD authentication and has the necessary permissions to connect. |
 | <a name="output_sql_database_connection_free_odbc_alias"></a> [sql\_database\_connection\_free\_odbc\_alias](#output\_sql\_database\_connection\_free\_odbc\_alias) | Registry alias for the SQL database connection. |
 | <a name="output_sql_database_connection_free_unencrypted"></a> [sql\_database\_connection\_free\_unencrypted](#output\_sql\_database\_connection\_free\_unencrypted) | Connection string for the SQL database using Entra ID authentication with encryption disabled. Ensure that your client supports Azure AD authentication and has the necessary permissions to connect. |
@@ -303,8 +304,8 @@ It can be though of as a poor-person's Azure Landing Zone, since it only does no
 | <a name="output_swa_id"></a> [swa\_id](#output\_swa\_id) | The ID of the Static Web App. |
 | <a name="output_swa_repository_url"></a> [swa\_repository\_url](#output\_swa\_repository\_url) | The repository URL of the Static Web App. |
 | <a name="output_swa_url"></a> [swa\_url](#output\_swa\_url) | The URL for the Static Web App site. |
-| <a name="output_virtual_machine_x64_random"></a> [virtual\_machine\_x64\_random](#output\_virtual\_machine\_x64\_random) | Randomly selected x64 virtual machine SKU |
 | <a name="output_virtual_machine_x64_sku_list"></a> [virtual\_machine\_x64\_sku\_list](#output\_virtual\_machine\_x64\_sku\_list) | List of x64 virtual machine SKUs |
+| <a name="output_virtual_machine_x64_sku_random"></a> [virtual\_machine\_x64\_sku\_random](#output\_virtual\_machine\_x64\_sku\_random) | Randomly selected x64 virtual machine SKU |
 | <a name="output_vmss_admin_password_keyvault_id"></a> [vmss\_admin\_password\_keyvault\_id](#output\_vmss\_admin\_password\_keyvault\_id) | The Key Vault ID where the VMSS admin password is stored. |
 | <a name="output_vmss_admin_password_keyvault_secret_name"></a> [vmss\_admin\_password\_keyvault\_secret\_name](#output\_vmss\_admin\_password\_keyvault\_secret\_name) | The Key Vault secret name where the VMSS admin password is stored. |
 | <a name="output_vmss_admin_username"></a> [vmss\_admin\_username](#output\_vmss\_admin\_username) | The admin username for the VMSS. |
