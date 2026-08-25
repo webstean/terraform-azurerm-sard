@@ -1,0 +1,57 @@
+locals {
+  logic_apps_friendly_name = "Logic Apps Example"
+  logic_apps_name          = "wf-${var.prefix}-example1"
+  logic_apps_location      = lower("${local.logic_apps_name}-${lower(var.location)}")
+  logic_apps_random_suffix = substr(md5(local.logic_apps_location), 0, 6)
+  logic_apps_name_hostname = lower(substr(replace("d${local.logic_apps_random_suffix}${local.logic_apps_location}", "-", ""), 0, 24))
+}
+
+/*
+Type	Abbreviation
+Logic App (Consumption)	logic
+Logic App (Standard)	logic
+Logic App Workflow	wf
+*/
+
+resource "azurerm_logic_app_workflow" "this" {
+  name                = local.logic_apps_name
+  resource_group_name = module.environment_resource_group.resource.name
+  location            = module.environment_resource_group.resource.location
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
+
+# Trigger — HTTP request (Consumption)
+resource "azurerm_logic_app_trigger_http_request" "this" {
+  name         = "http-trigger"
+  logic_app_id = azurerm_logic_app_workflow.this.id
+
+  schema = jsonencode({
+    type = "object"
+    properties = {
+      message = { type = "string" }
+    }
+  })
+}
+
+/*
+# Action — send to Service Bus (Consumption)
+resource "azurerm_logic_app_action_http" "this" {
+  name         = "send-response"
+  logic_app_id = azurerm_logic_app_workflow.this.id
+  method       = "POST"
+  uri          = "https://example.com/webhook"
+
+  body = jsonencode({
+    message = "@triggerBody()?['message']"
+  })
+
+  headers = {
+    "Content-Type" = "application/json"
+  }
+}
+*/
