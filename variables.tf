@@ -8,7 +8,7 @@ variable "customer" {
 
 variable "prefix" {
   type        = string
-  description = "The short name of the customer - used for naming Azure resources."
+  description = "A short name (typically 3-8 characters, lowercase) for the customer, used as a prefix for all Azure resource names to ensure global uniqueness."
 }
 
 variable "subscription_id" {
@@ -23,7 +23,7 @@ variable "subscription_id" {
 
 variable "alert_email" {
   type        = string
-  description = "The email address for alerts"
+  description = "Email address for receiving operational alerts and notifications from deployed services"
 
   validation {
     condition     = can(regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", trimspace(var.alert_email)))
@@ -33,7 +33,7 @@ variable "alert_email" {
 
 variable "owner_email" {
   type        = string
-  description = "The email address for the owner of the environment"
+  description = "Email address of the resource owner, used for contact and billing notifications"
 
   validation {
     condition     = can(regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", trimspace(var.owner_email)))
@@ -52,7 +52,7 @@ variable "owner_entra_object_id" {
 }
 variable "owner_entra_display_name" {
   type        = string
-  description = "The Entra ID display name for the owner of this environment"
+  description = "Display name of the owner in Entra ID for RBAC role assignment and resource access control."
 }
 
 variable "sql_administrator_group_object_id" {
@@ -66,13 +66,13 @@ variable "sql_administrator_group_object_id" {
 }
 variable "sql_administrator_group_display_name" {
   type        = string
-  description = "The Entra ID display name for the SQL administrators (can be a user or a group)"
+  description = "Entra ID display name for the user or group that will have SQL Server administrator permissions."
 }
 
 
 variable "alert_sms_number" {
   type        = string
-  description = "The phone number for SMS alerts"
+  description = "Phone number (E.164 format, e.g., +61412345678) for receiving SMS alerts and notifications."
 }
 
 // +===========================================================================================================+
@@ -103,8 +103,9 @@ variable "vmss_autoscale_enabled" {
 }
 
 variable "bastion_sku" {
-  type    = string
-  default = "Developer"
+  type        = string
+  description = "Azure Bastion SKU tier that determines features and pricing. See https://learn.microsoft.com/en-us/azure/bastion/bastion-sku-comparison"
+  default     = "Developer"
 
   ## https://learn.microsoft.com/en-us/azure/bastion/bastion-sku-comparison
   validation {
@@ -117,7 +118,7 @@ variable "bastion_sku" {
 
 variable "alert_sms_country" {
   type        = string
-  description = "The country code for SMS alerts"
+  description = "Country code prefix (e.g., +61 for Australia, +1 for USA) used for SMS alert delivery."
   default     = "+61"
 }
 
@@ -172,7 +173,7 @@ variable "support_free_sql_database" {
 ## not implemented - yet
 variable "sql_connectivity_type" {
   type        = string
-  description = "Connectivity mode for the SQL Server endpoint: PRIVATE (VNet via Private Endpoint), or PUBLIC (internet-facing)."
+  description = "Connectivity mode for the SQL Server endpoint: 'PRIVATE' (VNet via Private Endpoint), or 'PUBLIC' (internet-facing)."
   default     = "PRIVATE"
 
   validation {
@@ -196,7 +197,7 @@ variable "inbound_access" {
     condition = (
       contains(["None", "App-Gateway", "FrontDoor"], var.inbound_access)
     )
-    error_message = "The variable 'inbound_access' must be one of: None, App-Gateway, FrontDoor."
+    error_message = "The variable 'inbound_access' must be one of: 'None', 'App-Gateway', 'FrontDoor'."
   }
 }
 
@@ -279,7 +280,7 @@ variable "aca_consumption_gpu_enabled" {
 
 variable "aca_consumption_gpu_profile_type" {
   type        = string
-  description = "Consumption GPU workload profile type for ACA (for example: Consumption-GPU-NC8as-T4)."
+  description = "Consumption GPU workload profile type for Azure Container Apps (e.g., Consumption-GPU-NC8as-T4 for NVIDIA T4 GPUs)."
   default     = "Consumption-GPU-NC8as-T4"
 
   validation {
@@ -312,7 +313,7 @@ variable "aca_consumption_gpu_max_count" {
 
 variable "custom_dns_zone_name" {
   type        = string
-  description = "The purchased (and active) DNS zone name that must both exist and be active in the referenced tenant"
+  description = "An active DNS zone name (e.g., example.com) already purchased and configured in the Azure subscription for custom domain configuration."
   default     = "webstean.com" ## "sard.webstean.com"
   validation {
     condition     = !can(regex("^(www|app)", lower(try(trimspace(var.custom_dns_zone_name), ""))))
@@ -339,49 +340,60 @@ variable "vwan_hub_id" {
 
 variable "vwan_hub_firewall_id" {
   type        = string
-  description = "The ID of the Azure Virtual WAN hub to which the route table will be associated."
+  description = "The ID of the Azure Firewall deployed in the Virtual WAN hub for filtering and routing traffic."
   default     = null ## azurerm_firewall.hub.id
 }
 
 variable "vmss_disk_controller_type" {
   type        = string
-  description = "The disk controller type for the Virtual Machine Scale Set."
+  description = "Disk controller type for the Virtual Machine Scale Set. Use 'SCSI' for hibernation support; 'NVMe' is faster but does not support hibernation."
   ## Make currently be set to 'SCSI', NVMe does not support hibernation, which we need.
   default = "SCSI" ## Possible values are 'SCSI' and 'NVMe'. Defaults to 'SCSI'.
 }
 
+variable "vmss_hibernation_enabled" {
+  type        = bool
+  description = "Whether hibernation is enabled for the Virtual Machine Scale Set. Requires 'vmss_disk_controller_type' to be 'SCSI'."
+  default     = true
+
+  validation {
+    condition     = !var.vmss_hibernation_enabled || var.vmss_disk_controller_type == "SCSI"
+    error_message = "The variable 'vmss_hibernation_enabled' can only be true if 'vmss_disk_controller_type' is set to 'SCSI'."
+  }
+}
+
 variable "vmss_sku_name" {
   type        = string
-  description = "The Azure VM SKU to be deployed. (if not set, a random valid SKU will be selected from the list of available SKUs for the deployment region)"
+  description = "Azure Virtual Machine SKU for the scale set (e.g., Standard_D2s_v5). Determines vCPU, memory, and pricing."
   default     = "Standard_D2s_v5" ## Standard_D2s_v5
 }
 
 variable "vmss_autoscale_min_capacity" {
-  description = "Minimum instance count."
+  description = "Virtual Machine Scale Set: minimum number of instances to maintain at all times."
   type        = number
   default     = 1
 }
 
 variable "vmss_autoscale_weekend_capacity" {
-  description = "Fixed instance count to run during the weekend low-usage window."
+  description = "Virtual Machine Scale Set: fixed instance count to run during the weekend low-usage window."
   type        = number
   default     = 0
 }
 
 variable "vmss_autoscale_default_capacity" {
-  description = "Default instance count."
+  description = "Virtual Machine Scale Set: default instance count used during normal business hours."
   type        = number
   default     = 1
 }
 
 variable "vmss_autoscale_max_capacity" {
-  description = "Maximum instance count."
+  description = "Virtual Machine Scale Set: maximum number of instances to scale up to."
   type        = number
   default     = 1
 }
 
 variable "vmss_autoscale_scale_out_cpu_threshold" {
-  description = "Average CPU percentage that triggers a scale-out."
+  description = "Virtual Machine Scale Set: average CPU percentage threshold that triggers a scale-out (add instances)."
   type        = number
   default     = 70
 
@@ -392,44 +404,44 @@ variable "vmss_autoscale_scale_out_cpu_threshold" {
 }
 
 variable "vmss_autoscale_scale_out_increase_count" {
-  description = "Number of instances to add per scale-out event ('Increase count by')."
+  description = "Virtual Machine Scale Set: number of instances to add per scale-out event."
   type        = number
   default     = 1
 }
 
 variable "vmss_autoscale_time_window" {
-  description = "Look-back window for the average CPU calculation (ISO 8601 duration)."
+  description = "Virtual Machine Scale Set: look-back window for the average CPU calculation in ISO 8601 format (e.g., PT10M for 10 minutes)."
   type        = string
   default     = "PT10M"
 }
 
 variable "vmss_autoscale_time_grain" {
-  description = "Granularity of metric data points collected (ISO 8601 duration)."
+  description = "Virtual Machine Scale Set: granularity/frequency of metric data points collected in ISO 8601 format (e.g., PT1M for 1 minute intervals)."
   type        = string
   default     = "PT1M"
 }
 
 variable "vmss_autoscale_predictive_look_ahead_time" {
-  description = "How far ahead predictive autoscale forecasts demand (ISO 8601 duration)."
+  description = "Virtual Machine Scale Set: how far ahead predictive autoscale forecasts demand in ISO 8601 format (e.g., PT5M for 5 minutes ahead)."
   type        = string
   default     = "PT5M"
 }
 
 variable "vmss_autoscale_cooldown" {
-  description = "Time to wait after a scale action before scaling again (ISO 8601 duration)."
+  description = "Virtual Machine Scale Set: time to wait after a scale action before scaling again in ISO 8601 format (e.g., PT30M for 30 minutes)."
   type        = string
   default     = "PT30M"
 }
 
 variable "vmss_autoscale_business_hours_start" {
-  description = "Hour (0-23) each weekday when the CPU-based business-hours profile takes over from the overnight 'zero' profile."
+  description = "Virtual Machine Scale Set: hour (0-23) each weekday when the CPU-based business-hours autoscale profile activates."
   type        = number
   default     = 16
 }
 
 variable "vmss_otel_counter_specifiers" {
   type        = list(string)
-  description = "OTel system metrics to collect. Defaults to the standard free set."
+  description = "Virtual Machine Scale Set: OpenTelemetry system metrics to collect from instances. Defaults to the standard free metrics set."
   default = [
     "system.filesystem.usage",
     "system.disk.io",

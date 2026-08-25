@@ -9,7 +9,7 @@ locals {
   vmss_accelerated_networking_enabled = true
   vmss_spot_instances                 = false
   vmss_ultra_ssd_support              = false
-  vmss_hibernate_enabled              = true
+  vmss_hibernate_enabled              = var.vmss_hibernation_enabled
   vmss_enable_standby_pool            = false
   vmss_patching_mode                  = "Manual" ## "Automatic"
   vmss_subnet_id                      = azurerm_subnet.outbound.id
