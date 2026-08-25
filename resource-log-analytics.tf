@@ -55,6 +55,9 @@ module "log_analytics_workspace" {
     kind = "CanNotDelete"
   } : null
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  depends_on = [
+    module.environment_resource_group
+  ]
 }
 
 module "application_insights" {

@@ -67,6 +67,9 @@ resource "azapi_resource" "free_sql_database" {
   }
   response_export_values = ["*"]
   tags                   = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  depends_on = [
+    module.environment_resource_group
+  ]
 }
 
 resource "azurerm_mssql_database_extended_auditing_policy" "free_sql_database" {

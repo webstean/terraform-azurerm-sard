@@ -112,9 +112,8 @@ resource "azurerm_bastion_host" "this" {
     create = "90m"
   }
   depends_on = [
-    azurerm_subnet.bastion,
-    azurerm_public_ip.bastion,
-    module.environment_resource_group.resource.name
+    module.environment_resource_group,
+    azurerm_virtual_network.this
   ]
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }

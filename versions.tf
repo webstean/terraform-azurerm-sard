@@ -95,8 +95,8 @@ provider "azurerm" {
       recover_soft_deleted         = false
     }
     api_management {
-      purge_soft_delete_on_destroy = true # Keep soft-deleted API Management resources for recovery.
-      recover_soft_deleted         = false  # Automatically recover soft-deleted API Management resources.
+      purge_soft_delete_on_destroy = true  # Keep soft-deleted API Management resources for recovery.
+      recover_soft_deleted         = false # Automatically recover soft-deleted API Management resources.
     }
     cognitive_account {
       purge_soft_delete_on_destroy = false

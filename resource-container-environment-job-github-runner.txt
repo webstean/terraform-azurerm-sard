@@ -84,6 +84,7 @@ resource "azurerm_container_app_job" "github_runner" {
     azurerm_container_app_environment_storage.logs,
     azurerm_container_app_environment_storage.shared,
     azapi_update_resource.aca_env_otel,
+    module.environment_resource_group
   ]
 }
 

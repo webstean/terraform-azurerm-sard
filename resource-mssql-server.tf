@@ -254,6 +254,9 @@ module "sql_server_this" {
     kind = "CanNotDelete"
   } : null
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  depends_on = [
+    module.environment_resource_group.resource
+  ]
 }
 */
 
@@ -279,6 +282,9 @@ resource "azurerm_mssql_server" "this" {
   connection_policy = "Default"
 
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  depends_on = [
+    module.environment_resource_group.resource
+  ]
 }
 
 ## https://learn.microsoft.com/en-us/azure/azure-sql/database/dns-alias-overview?view=azuresql

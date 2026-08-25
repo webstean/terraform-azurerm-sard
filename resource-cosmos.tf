@@ -71,6 +71,9 @@ module "cosmos" {
     kind = "CanNotDelete"
   } : null
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  depends_on = [
+    module.environment_resource_group
+  ]
 }
 
 ## 'Cosmos DB Built-in Data Contributor' is an Azure Cosmos DB data-plane role (Microsoft.DocumentDB)

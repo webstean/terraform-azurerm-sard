@@ -68,6 +68,10 @@ module "containerregistry" {
     kind = "CanNotDelete"
   } : null
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  depends_on = [
+    module.environment_resource_group
+  ]
+
 }
 
 // Cache will only occur after at least one image pull is complete on the available container image.

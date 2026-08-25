@@ -140,7 +140,8 @@ resource "azapi_update_resource" "aca_env_otel" {
   depends_on = [
     azurerm_container_app_environment.this,
     module.application_insights,
-    module.log_analytics_workspace
+    module.log_analytics_workspace,
+    module.environment_resource_group
   ]
 }
 
