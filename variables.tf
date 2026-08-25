@@ -112,7 +112,7 @@ variable "bastion_sku" {
     condition = (
       contains(["Developer", "Basic", "Standard", "Premium"], var.bastion_sku)
     )
-    error_message = "The variable 'bastion_sku' must be one of: Developer, Basic, Standard, Premium."
+    error_message = "The variable 'bastion_sku' must be one of: 'Developer', 'Basic', 'Standard', 'Premium'."
   }
 }
 
