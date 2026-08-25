@@ -42,6 +42,10 @@ It can be though of as a poor-person's Azure Landing Zone, since it only does no
 
 | Name | Type |
 |------|------|
+| [azapi_resource.default_project](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
+| [azapi_resource.embedding_gpt4o](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
+| [azapi_resource.embedding_small](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
+| [azapi_resource.foundry](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource.free_sql_database](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource_action.sql_server_automatic_tuning](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource_action) | resource |
 | [azurerm_application_gateway.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_gateway) | resource |
@@ -126,6 +130,7 @@ It can be though of as a poor-person's Azure Landing Zone, since it only does no
 | [azurerm_role_assignment.github_storage_diag_owner_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.github_storage_owner_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.mssql-db-restore](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.project_storage_blob_data_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.search_blob_reader](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.sku_finder_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.sql_db_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
@@ -271,6 +276,9 @@ It can be though of as a poor-person's Azure Landing Zone, since it only does no
 | <a name="output_environment_resource_group"></a> [environment\_resource\_group](#output\_environment\_resource\_group) | The Azure Resource Group that contains this environment |
 | <a name="output_environment_storage_account_name"></a> [environment\_storage\_account\_name](#output\_environment\_storage\_account\_name) | The name of the main storage account for this environment. |
 | <a name="output_environment_storage_file_connection_script_ps1"></a> [environment\_storage\_file\_connection\_script\_ps1](#output\_environment\_storage\_file\_connection\_script\_ps1) | A PowerShell script to connect dirve Z: to the azure files created as part of this environment. |
+| <a name="output_foundry_endpoint"></a> [foundry\_endpoint](#output\_foundry\_endpoint) | The endpoint of the Foundry resource. |
+| <a name="output_foundry_name"></a> [foundry\_name](#output\_foundry\_name) | The name of the Foundry resource. |
+| <a name="output_foundry_principal_id"></a> [foundry\_principal\_id](#output\_foundry\_principal\_id) | The principal ID of the Foundry resource, used for role assignments. |
 | <a name="output_logs_otel_configuration_access_endpoint"></a> [logs\_otel\_configuration\_access\_endpoint](#output\_logs\_otel\_configuration\_access\_endpoint) | The configuration access endpoint of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_dce_id"></a> [logs\_otel\_dce\_id](#output\_logs\_otel\_dce\_id) | The ID of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_logs_ingestion_endpoint"></a> [logs\_otel\_logs\_ingestion\_endpoint](#output\_logs\_otel\_logs\_ingestion\_endpoint) | The OTEL logs ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
@@ -314,6 +322,7 @@ It can be though of as a poor-person's Azure Landing Zone, since it only does no
 | <a name="module_containerregistry"></a> [containerregistry](#module\_containerregistry) | Azure/avm-res-containerregistry-registry/azurerm | ~>0.0, < 1.0 |
 | <a name="module_cosmos"></a> [cosmos](#module\_cosmos) | Azure/avm-res-documentdb-databaseaccount/azurerm | ~>0.0, < 1.0 |
 | <a name="module_environment_resource_group"></a> [environment\_resource\_group](#module\_environment\_resource\_group) | Azure/avm-res-resources-resourcegroup/azurerm | ~>0.0, < 1.0 |
+| <a name="module_foundry_keyvault"></a> [foundry\_keyvault](#module\_foundry\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
 | <a name="module_log_analytics_workspace"></a> [log\_analytics\_workspace](#module\_log\_analytics\_workspace) | Azure/avm-res-operationalinsights-workspace/azurerm | ~>0.0, < 1.0 |
 | <a name="module_private_endpoint_sqlserver"></a> [private\_endpoint\_sqlserver](#module\_private\_endpoint\_sqlserver) | Azure/avm-res-network-privateendpoint/azurerm | ~>0.0, < 1.0 |
 | <a name="module_search_keyvault"></a> [search\_keyvault](#module\_search\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
