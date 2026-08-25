@@ -101,6 +101,7 @@ module "ai_search_service" {
     }
   }
 
+  /*
   diagnostic_settings = {
     diag_setting_1 = {
       name              = "Logs-Metrics-And-Audit to Azure Monitor ${module.log_analytics_workspace.resource.name}"
@@ -111,6 +112,7 @@ module "ai_search_service" {
       workspace_resource_id          = module.log_analytics_workspace.resource_id
     }
   }
+*/
   lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
     kind = "CanNotDelete"
   } : null
