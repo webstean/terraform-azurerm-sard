@@ -158,6 +158,8 @@ provider "azapi" {
   enable_preflight          = true
 }
 
+/*
+// import only allow in root modules
 resource "azurerm_resource_provider_feature_registration" "encryption_at_host" {
   provider_name = "Microsoft.Compute"
   name          = "EncryptionAtHost"
