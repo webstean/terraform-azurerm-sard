@@ -272,17 +272,17 @@ resource "azapi_resource" "embedding_gpt4o" {
 output "foundry_name" {
   description = "The name of the Foundry resource."
   sensitive   = false
-  value       = azapi_resource.foundry.name
+  value       = try(azapi_resource.foundry.name, null)
 }
 
 output "foundry_principal_id" {
   description = "The principal ID of the Foundry resource, used for role assignments."
   sensitive   = false
-  value       = local.foundry_principal_id
+  value       = try(local.foundry_principal_id, null)
 }
 
 output "foundry_endpoint" {
   description = "The endpoint of the Foundry resource."
   sensitive   = false
-  value       = local.foundry_endpoint
+  value       = try(local.foundry_endpoint, null)
 }
