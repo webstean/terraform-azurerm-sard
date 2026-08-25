@@ -111,7 +111,11 @@ resource "azurerm_bastion_host" "this" {
   timeouts {
     create = "90m"
   }
-
+  depends_on = [
+    azurerm_subnet.bastion,
+    azurerm_public_ip.bastion,
+    module.environment_resource_group.resource.name
+  ]
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
@@ -322,7 +326,9 @@ resource "azurerm_network_security_group" "bastion" {
     destination_address_prefix = "*"
     description                = "Deny ALL Outbound as part of Zero Trust Networking"
   }
-
+  lifecycle {
+    create_before_destroy = true
+  }
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 

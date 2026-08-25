@@ -162,6 +162,11 @@ resource "azurerm_key_vault_secret" "primary-connection" {
   key_vault_id = module.comms_keyvault.resource_id
   name         = "COMMS-PRIMARY-CONNECTION-STRING"
   value        = azurerm_communication_service.this.primary_connection_string
+  depends_on = [
+    module.comms_keyvault,
+    azurerm_role_assignment.comms_service_owner1,
+    azurerm_role_assignment.comms_service_owner2
+  ]
 }
 resource "azurerm_key_vault_secret" "primary-key" {
   key_vault_id = module.comms_keyvault.resource_id
@@ -169,6 +174,8 @@ resource "azurerm_key_vault_secret" "primary-key" {
   value        = azurerm_communication_service.this.primary_key
   depends_on = [
     module.comms_keyvault,
+    azurerm_role_assignment.comms_service_owner1,
+    azurerm_role_assignment.comms_service_owner2
   ]
 }
 resource "azurerm_key_vault_secret" "secondary-connection" {
@@ -177,6 +184,8 @@ resource "azurerm_key_vault_secret" "secondary-connection" {
   value        = azurerm_communication_service.this.secondary_connection_string
   depends_on = [
     module.comms_keyvault,
+    azurerm_role_assignment.comms_service_owner1,
+    azurerm_role_assignment.comms_service_owner2
   ]
 }
 resource "azurerm_key_vault_secret" "secondary-key" {
@@ -185,6 +194,8 @@ resource "azurerm_key_vault_secret" "secondary-key" {
   value        = azurerm_communication_service.this.secondary_key
   depends_on = [
     module.comms_keyvault,
+    azurerm_role_assignment.comms_service_owner1,
+    azurerm_role_assignment.comms_service_owner2
   ]
 }
 
