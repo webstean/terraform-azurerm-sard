@@ -79,3 +79,4 @@ output "relay_public_ip" {
   sensitive   = false
   value       = try(azurerm_public_ip.relay[0].ip_address, null)
 }
+

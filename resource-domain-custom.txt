@@ -284,6 +284,17 @@ resource "azurerm_dns_cname_record" "storage2" {
   tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
+resource "azurerm_dns_cname_record" "mssql_prviate_relay" {
+  count = tobool(var.deploy_private_endpoints) ? 1 : 0
+
+  name                = "mssql"
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
+  ttl                 = 300
+  record              = try(azurerm_public_ip.relay[0].ip_address, "0.0.0.0")
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
+
 resource "azurerm_dns_cname_record" "ingress_frontdoor" {
   for_each = var.inbound_access == "FrontDoor" ? local.ingress_aliases_frontdoor : toset([])
 
