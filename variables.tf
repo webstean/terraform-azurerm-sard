@@ -436,7 +436,7 @@ variable "vmss_autoscale_cooldown" {
 variable "vmss_autoscale_business_hours_start" {
   description = "Virtual Machine Scale Set: hour (0-23) each weekday when the CPU-based business-hours autoscale profile activates."
   type        = number
-  default     = 16
+  default     = 16 ## 4pm
 }
 
 variable "vmss_otel_counter_specifiers" {
@@ -476,7 +476,7 @@ variable "pls_nat_ip_configurations" {
   }
 }
 
-variable "proxy_protocol_enabled" {
+variable "pls_proxy_protocol_enabled" {
   type        = bool
   description = "Whether the Private Link Service should support Proxy Protocol (to preserve source IP to the backend)."
   default     = false
