@@ -59,6 +59,33 @@ resource "azurerm_api_connection" "connections" {
   }
 }
 
+/*
+resource "azapi_resource" "connections" {
+  for_each = local.api_connections
+
+  type      = "Microsoft.Web/connections@2016-06-01"
+  name      = lower(each.value.name)
+  location  = module.environment_resource_group.resource.location
+  parent_id = module.environment_resource_group.resource_id
+
+  body = {
+    properties = {
+      displayName = local.api_display_name
+      api = {
+        id = "/subscriptions/${var.subscription_id}/providers/Microsoft.Web/locations/${var.location}/managedApis/sharepointonline"
+      }
+      parameterValues = {}
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      body.properties.parameterValues
+    ]
+  }
+}
+*/
+
 # servicebus	Azure Service Bus
 # azureblob	Azure Blob Storage
 # azuretables	Azure Table Storage
