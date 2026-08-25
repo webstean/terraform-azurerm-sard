@@ -83,7 +83,7 @@ module "avm-res-cognitiveservices-account" {
 
 resource "azapi_resource" "foundry" {
   type      = "Microsoft.CognitiveServices/accounts@2026-05-15-preview"
-  name      = local.foundry_name_location
+  name      = local.foundry_name_hostname
   parent_id = module.environment_resource_group.resource_id
   location  = module.environment_resource_group.resource.location
 
