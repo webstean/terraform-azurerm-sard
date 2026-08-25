@@ -194,7 +194,7 @@ resource "azurerm_app_configuration_key" "comms_primary_string" {
   label                  = "basic"
   value                  = azurerm_communication_service.this.primary_connection_string
   depends_on = [
-    azurerm_role_assignment.runner_appconfig_owner
+    module.appconfiguration
   ]
 }
 resource "azurerm_app_configuration_key" "comms_secondary_string" {
@@ -203,7 +203,7 @@ resource "azurerm_app_configuration_key" "comms_secondary_string" {
   label                  = "basic"
   value                  = azurerm_communication_service.this.secondary_connection_string
   depends_on = [
-    azurerm_role_assignment.runner_appconfig_owner
+    module.appconfiguration
   ]
 }
 
@@ -213,7 +213,7 @@ resource "azurerm_app_configuration_key" "comms_api_key_primary" {
   label                  = "basic"
   value                  = azurerm_communication_service.this.primary_key
   depends_on = [
-    azurerm_role_assignment.runner_appconfig_owner
+    module.appconfiguration
   ]
 }
 
@@ -223,7 +223,7 @@ resource "azurerm_app_configuration_key" "comms_api_key_secondary" {
   label                  = "basic"
   value                  = azurerm_communication_service.this.secondary_key
   depends_on = [
-    azurerm_role_assignment.runner_appconfig_owner
+    module.appconfiguration
   ]
 }
 
