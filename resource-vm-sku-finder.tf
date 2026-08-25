@@ -48,12 +48,6 @@ module "vm_x64_skus" {
   ]
 }
 
-output "virtual_machine_x64_sku_list" {
-  description = "List of x64 virtual machine SKUs"
-  sensitive   = false
-  value       = module.vm_x64_skus.sku_list
-}
-
 resource "random_integer" "vm_x64_sku_pick" {
   min = 0
   max = length(module.vm_x64_skus.sku_list) - 1
@@ -66,5 +60,11 @@ output "virtual_machine_x64_sku_random" {
   description = "Randomly selected x64 virtual machine SKU"
   sensitive   = false
   value       = local.virtual_machine_x64_sku_random
+}
+
+output "virtual_machine_x64_sku_list" {
+  description = "List of x64 virtual machine SKUs"
+  sensitive   = false
+  value       = module.vm_x64_skus.sku_list
 }
 
