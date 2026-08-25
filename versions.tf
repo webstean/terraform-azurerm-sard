@@ -92,11 +92,11 @@ provider "azurerm" {
     }
     app_configuration {
       purge_soft_delete_on_destroy = true
-      recover_soft_deleted         = true
+      recover_soft_deleted         = false
     }
     api_management {
-      purge_soft_delete_on_destroy = true # Keep soft-deleted API Management resources for recovery.
-      recover_soft_deleted         = true # Automatically recover soft-deleted API Management resources.
+      purge_soft_delete_on_destroy = true  # Keep soft-deleted API Management resources for recovery.
+      recover_soft_deleted         = false # Automatically recover soft-deleted API Management resources.
     }
     cognitive_account {
       purge_soft_delete_on_destroy = false
@@ -105,8 +105,8 @@ provider "azurerm" {
       prevent_deletion_if_contains_resources = false # Allow deletion of resource groups even if they contain resources.
     }
     key_vault {
-      purge_soft_delete_on_destroy    = true # Retain soft-deleted Key Vaults for potential recovery.
-      recover_soft_deleted_key_vaults = true # Automatically recover soft-deleted Key Vaults.
+      purge_soft_delete_on_destroy    = true  # Retain soft-deleted Key Vaults for potential recovery.
+      recover_soft_deleted_key_vaults = false # Automatically recover soft-deleted Key Vaults.
     }
     log_analytics_workspace {
       permanently_delete_on_destroy = true # Ensure Log Analytics Workspaces are permanently deleted on destroy.
@@ -116,6 +116,11 @@ provider "azurerm" {
     }
     virtual_machine {
       delete_os_disk_on_deletion = true # Automatically delete OS disks when deleting VMs.
+    }
+    virtual_machine_scale_set {
+      force_delete                  = true
+      roll_instances_when_required  = true
+      scale_to_zero_before_deletion = true
     }
     template_deployment {
       delete_nested_items_during_deletion = false # Do not delete nested items during template deployment deletion.

@@ -125,6 +125,9 @@ resource "azurerm_network_security_group" "inbound_sqlserver" {
     description                = "Deny ALL Outbound as part of Zero Trust Networking"
   }
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "azurerm_role_assignment" "sqlstorage1" {
@@ -159,7 +162,7 @@ resource "azurerm_key_vault" "sql_kv" {
   location                   = module.environment_resource_group.resource.location
   sku_name                   = "standard"
   tenant_id                  = data.azurerm_client_config.current.tenant_id
-  purge_protection_enabled   = true
+  purge_protection_enabled   = false
   rbac_authorization_enabled = true
   soft_delete_retention_days = 7
   tags                       = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
