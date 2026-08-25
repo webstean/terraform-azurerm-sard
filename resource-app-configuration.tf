@@ -10,19 +10,6 @@ locals {
 #  display_name = "f3c21649-0979-4721-ac85-b0216b2cf413" ## "Microsoft.Azure.CertificateRegistration"
 #}
 
-resource "azurerm_role_assignment" "environment_appconfig_reader" {
-  scope                = module.environment_resource_group.resource_id
-  role_definition_name = "App Configuration Data Reader"
-  principal_id         = azurerm_user_assigned_identity.environment.principal_id
-  description          = local.iac_message
-}
-resource "azurerm_role_assignment" "runner_appconfig_owner" {
-  scope                = module.environment_resource_group.resource_id
-  role_definition_name = "App Configuration Data Owner"
-  principal_id         = data.azurerm_client_config.current.object_id
-  description          = local.iac_message
-}
-
 module "appconfiguration" {
   source           = "Azure/avm-res-appconfiguration-configurationstore/azure"
   version          = "~>0.0, < 1.0"
@@ -93,20 +80,33 @@ module "appconfiguration" {
   }
 
   role_assignments = {
-    role_assignment_1 = {
-      role_definition_id_or_name = "App Configuration Data Reader"
-      principal_id               = azurerm_user_assigned_identity.environment.principal_id
-      description                = local.iac_message
+    role_assignment_1a = {
+      role_definition_id_or_name       = "App Configuration Data Reader"
+      principal_id                     = azurerm_user_assigned_identity.environment.principal_id
+      skip_service_principal_aad_check = true
+      principal_type                   = "ServicePrincipal"
+      description                      = local.iac_message
     }
-    role_assignment_2 = {
-      role_definition_id_or_name = "App Configuration Reader"
-      principal_id               = azurerm_user_assigned_identity.environment.principal_id
-      description                = local.iac_message
+    role_assignment_2a = {
+      role_definition_id_or_name       = "App Configuration Reader"
+      principal_id                     = azurerm_user_assigned_identity.environment.principal_id
+      skip_service_principal_aad_check = true
+      principal_type                   = "ServicePrincipal"
+      description                      = local.iac_message
     }
-    role_assignment_3 = {
-      role_definition_id_or_name = "Owner"
-      principal_id               = data.azurerm_client_config.current.object_id
-      description                = local.iac_message
+    role_assignment_3a = {
+      role_definition_id_or_name       = "App Configuration Data Owner"
+      principal_id                     = data.azurerm_client_config.current.object_id
+      skip_service_principal_aad_check = true
+      principal_type                   = "ServicePrincipal"
+      description                      = local.iac_message
+    }
+    role_assignment_4a = {
+      role_definition_id_or_name       = "Owner"
+      principal_id                     = data.azurerm_client_config.current.object_id
+      skip_service_principal_aad_check = true
+      principal_type                   = "ServicePrincipal"
+      description                      = local.iac_message
     }
   }
 
