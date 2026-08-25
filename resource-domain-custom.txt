@@ -284,7 +284,7 @@ resource "azurerm_dns_cname_record" "storage2" {
   tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
-resource "azurerm_dns_cname_record" "mssql_prviate_relay" {
+resource "azurerm_dns_cname_record" "mssql_private_relay" {
   count = tobool(var.deploy_private_endpoints) ? 1 : 0
 
   name                = "mssql"
@@ -525,6 +525,7 @@ resource "azurerm_dns_srv_record" "m365_sipfederationtls_tcp" {
 
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   ## Resolve-DnsName -Name "_sipfederationtls._tcp.${azurerm_dns_zone.environment.name}" -Type SRV
+  ## Resolve-DnsName -Name "_sipfederationtls._tcp.${azurerm_dns_zone.environment.name}" -Type SRV -DnssecOk
 }
 
 resource "azurerm_dns_srv_record" "m365_sip_tls" {

@@ -108,7 +108,7 @@ resource "azapi_resource" "foundry" {
       dynamicThrottlingEnabled      = true
       publicNetworkAccess           = "Enabled"
       restrictOutboundNetworkAccess = false
-      restore                       = true
+      #restore                       = true
     }
   }
 
