@@ -426,6 +426,7 @@ resource "azurerm_mssql_server_security_alert_policy" "this" {
 }
 */
 
+/*
 resource "azurerm_role_definition" "mssql-db-reader" {
   name        = "Database-MSSQL-Server-Reader"
   description = "Just enough SQL Database access to read a MS SQL Server and its Databases configuration (but not its data)"
@@ -486,6 +487,7 @@ resource "azurerm_role_assignment" "mssql-db-restore" {
   description          = local.iac_message
   depends_on           = [azurerm_role_definition.mssql-db-restore, azurerm_role_definition.mssql-db-reader]
 }
+*/
 
 /*
 resource "azurerm_monitor_diagnostic_setting" "mssql_server_metrics" {
@@ -562,7 +564,6 @@ output "sql_server_name" {
   sensitive   = false
   description = "The name of the SQL Server."
 }
-
 
 output "sql_server_id" {
   value       = azurerm_mssql_server.this.id
