@@ -560,19 +560,19 @@ output "sql_server_elastic_pool_id" {
 */
 
 output "sql_server_name" {
-  value       = azurerm_mssql_server.this.name
+  value       = try(azurerm_mssql_server.this.name, null)
   sensitive   = false
   description = "The name of the SQL Server."
 }
 
 output "sql_server_id" {
-  value       = azurerm_mssql_server.this.id
+  value       = try(azurerm_mssql_server.this.id, null)
   sensitive   = false
   description = "The ID of the SQL Server."
 }
 
 output "sql_server_hostname" {
-  value       = azurerm_mssql_server.this.fully_qualified_domain_name
+  value       = try(azurerm_mssql_server.this.fully_qualified_domain_name, null)
   sensitive   = false
   description = "The fully qualified domain name (FQDN) of the SQL Server instance."
 }
@@ -602,13 +602,13 @@ output "sql_server_failover_dns_alias" {
 }
 
 output "sql_server_user_assigned_identity_id" {
-  value       = azurerm_user_assigned_identity.sqlserver.id
+  value       = try(azurerm_user_assigned_identity.sqlserver.id, null)
   sensitive   = false
   description = "The Azure ID of the SQL Server instance primary user-assigned identity."
 }
 
 output "sql_server_user_assigned_identity_principal_id" {
-  value       = azurerm_user_assigned_identity.sqlserver.principal_id
+  value       = try(azurerm_user_assigned_identity.sqlserver.principal_id, null)
   sensitive   = false
   description = "The Entra ID principal ID (or Object_id) of the SQL Server instance primary user-assigned identity."
 }
