@@ -28,7 +28,7 @@ module "comms_keyvault" {
     virtual_network_subnet_ids = [for subnets in azurerm_virtual_network.this.subnet : subnets.id if contains(subnets.service_endpoints, "Microsoft.KeyVault")]
   }
 
-/*
+  /*
   diagnostic_settings = {
     diag_setting_1 = {
       name                           = "Logs-Metrics-And-Audit to Azure Monitor ${module.log_analytics_workspace.resource.name}"
