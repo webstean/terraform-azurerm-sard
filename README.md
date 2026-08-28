@@ -175,6 +175,8 @@ Next steps here
 | [azurerm_role_assignment.umi_storage_table_data_reader_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.user_appconfig_reader](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.web_pubsub_owner1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_definition.mssql-db-reader](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
+| [azurerm_role_definition.mssql-db-restore](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
 | [azurerm_route_table.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/route_table) | resource |
 | [azurerm_static_web_app.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/static_web_app) | resource |
 | [azurerm_storage_account.diag](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
@@ -225,8 +227,6 @@ Next steps here
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_alert_email"></a> [alert\_email](#input\_alert\_email) | Email address for receiving operational alerts and notifications from deployed services | `string` | n/a | yes |
-| <a name="input_alert_sms_number"></a> [alert\_sms\_number](#input\_alert\_sms\_number) | Phone number (E.164 format, e.g., +61412345678) for receiving SMS alerts and notifications. | `string` | n/a | yes |
 | <a name="input_customer"></a> [customer](#input\_customer) | The name of the customer (free-text) | `string` | n/a | yes |
 | <a name="input_owner_email"></a> [owner\_email](#input\_owner\_email) | Email address of the resource owner, used for contact and billing notifications | `string` | n/a | yes |
 | <a name="input_owner_entra_display_name"></a> [owner\_entra\_display\_name](#input\_owner\_entra\_display\_name) | Display name of the owner in Entra ID for RBAC role assignment and resource access control. | `string` | n/a | yes |
@@ -240,7 +240,6 @@ Next steps here
 | <a name="input_aca_consumption_gpu_min_count"></a> [aca\_consumption\_gpu\_min\_count](#input\_aca\_consumption\_gpu\_min\_count) | Minimum replica count for the ACA Consumption GPU workload profile. | `number` | `0` | no |
 | <a name="input_aca_consumption_gpu_profile_type"></a> [aca\_consumption\_gpu\_profile\_type](#input\_aca\_consumption\_gpu\_profile\_type) | Consumption GPU workload profile type for Azure Container Apps (e.g., Consumption-GPU-NC8as-T4 for NVIDIA T4 GPUs). | `string` | `"Consumption-GPU-NC8as-T4"` | no |
 | <a name="input_aca_enable_dapr"></a> [aca\_enable\_dapr](#input\_aca\_enable\_dapr) | If true, enables Dapr for the Azure Container Apps environment. If false, does not enable Dapr. | `bool` | `false` | no |
-| <a name="input_alert_sms_country"></a> [alert\_sms\_country](#input\_alert\_sms\_country) | Country code prefix (e.g., +61 for Australia, +1 for USA) used for SMS alert delivery. | `string` | `"+61"` | no |
 | <a name="input_bastion_premium_private_deployment"></a> [bastion\_premium\_private\_deployment](#input\_bastion\_premium\_private\_deployment) | If true, deploys a Premium Bastion with private deployment (no public IP). If false, deploys a Premium Bastion with public deployment. | `bool` | `false` | no |
 | <a name="input_bastion_sku"></a> [bastion\_sku](#input\_bastion\_sku) | Azure Bastion SKU tier that determines features and pricing. See https://learn.microsoft.com/en-us/azure/bastion/bastion-sku-comparison | `string` | `"Developer"` | no |
 | <a name="input_custom_dns_zone_name"></a> [custom\_dns\_zone\_name](#input\_custom\_dns\_zone\_name) | An active DNS zone name (e.g., example.com) already purchased and configured in the Azure subscription for custom domain configuration. | `string` | `"webstean.com"` | no |
