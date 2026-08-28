@@ -102,7 +102,8 @@
         "terraform.languageServer": {
           "enabled": true
         },
-        "security.workspace.trust.enabled": false
+        "security.workspace.trust.enabled": false,
+        "redhat.telemetry.enabled": false
       },
       "extensions": [
         "GitHub.copilot",
@@ -128,7 +129,7 @@
   },
 
   // Verify tool versions and install Az PowerShell module
-  "postCreateCommand": "terraform --version && terraform-docs --version && azd version && pwsh -Command 'Install-Module Az -Scope CurrentUser -Force -AcceptLicense *> $null && Write-Host \"Az PowerShell module installed\"'",
+  "postCreateCommand": "terraform --version && terraform-docs --version && azd version",
 
   // Safe: fetch only, no destructive reset
   "postStartCommand": "git fetch origin"
