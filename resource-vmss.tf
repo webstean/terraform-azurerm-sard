@@ -10,7 +10,7 @@ locals {
   vmss_spot_instances                 = false
   vmss_ultra_ssd_support              = false
   vmss_hibernate_enabled              = var.vmss_hibernation_enabled
-  vmss_enable_standby_pool            = false
+  vmss_enable_standby_pool            = true
   vmss_patching_mode                  = "Manual" ## "Automatic"
   vmss_subnet_id                      = azurerm_subnet.outbound.id
 }
@@ -445,7 +445,8 @@ module "virtualmachinescaleset" {
   }
   proxy_agent_settings = {
     enabled = true
-    #add_proxy_agent_extension = true ## this happens automatically on Windows
+    ##add_proxy_agent_extension = true ## this happens automatically on Windows
+    ## https://learn.microsoft.com/en-us/azure/virtual-machines/metadata-security-protocol/other-examples/audit-logs-to-rules#convert-logs-to-rules
     imds = {
       mode = "Audit"
     }
@@ -458,16 +459,19 @@ module "virtualmachinescaleset" {
     role_assignment_1 = {
       role_definition_id_or_name = "Windows Admin Center Administrator Login"
       principal_id               = var.owner_entra_object_id
+      principal_type             = "User"
       description                = local.iac_message
     }
     role_assignment_2 = {
       role_definition_id_or_name = "Virtual Machine Administrator Login"
       principal_id               = var.owner_entra_object_id
+      principal_type             = "User"
       description                = local.iac_message
     }
     role_assignment_3 = {
       role_definition_id_or_name = "Essential Machine Management Administrator"
       principal_id               = var.owner_entra_object_id
+      principal_type             = "User"
       description                = local.iac_message
     }
   }
