@@ -21,16 +21,6 @@ variable "subscription_id" {
   }
 }
 
-variable "alert_email" {
-  type        = string
-  description = "Email address for receiving operational alerts and notifications from deployed services"
-
-  validation {
-    condition     = can(regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", trimspace(var.alert_email)))
-    error_message = "The variable 'alert_email' must be a valid email address."
-  }
-}
-
 variable "owner_email" {
   type        = string
   description = "Email address of the resource owner, used for contact and billing notifications"
@@ -67,12 +57,6 @@ variable "sql_administrator_group_object_id" {
 variable "sql_administrator_group_display_name" {
   type        = string
   description = "Entra ID display name for the user or group that will have SQL Server administrator permissions."
-}
-
-
-variable "alert_sms_number" {
-  type        = string
-  description = "Phone number (E.164 format, e.g., +61412345678) for receiving SMS alerts and notifications."
 }
 
 // +===========================================================================================================+
@@ -114,12 +98,6 @@ variable "bastion_sku" {
     )
     error_message = "The variable 'bastion_sku' must be one of: 'Developer', 'Basic', 'Standard', 'Premium'."
   }
-}
-
-variable "alert_sms_country" {
-  type        = string
-  description = "Country code prefix (e.g., +61 for Australia, +1 for USA) used for SMS alert delivery."
-  default     = "+61"
 }
 
 variable "location" {
