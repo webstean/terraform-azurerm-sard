@@ -101,7 +101,8 @@
         "markdown.updateLinksOnFileMove.enabled": "always",
         "terraform.languageServer": {
           "enabled": true
-        }
+        },
+        "security.workspace.trust.enabled": false
       },
       "extensions": [
         "GitHub.copilot",
