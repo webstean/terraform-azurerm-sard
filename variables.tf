@@ -54,7 +54,7 @@ variable "owner_entra_display_name" {
   type        = string
   description = <<DESC
 Display name of the owner in Entra ID for RBAC role assignment and resource access control.
-DESC  
+DESC
 }
 
 variable "sql_administrator_group_object_id" {
@@ -370,7 +370,7 @@ variable "vwan_hub_id" {
   description = <<DESC
 The ID of the Azure Virtual WAN hub to which the route table will be associated.
 DESC
-  default     = null ## azurerm_virtual_hub.example.id 
+  default     = null ## azurerm_virtual_hub.example.id
   validation {
     condition = (
       (try(trimspace(var.vwan_hub_id), "") == "" && try(trimspace(var.vwan_hub_firewall_id), "") == "") ||
