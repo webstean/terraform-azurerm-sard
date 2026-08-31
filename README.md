@@ -113,6 +113,7 @@ Next steps here
 | [azurerm_email_communication_service.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/email_communication_service) | resource |
 | [azurerm_email_communication_service_domain.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/email_communication_service_domain) | resource |
 | [azurerm_email_communication_service_domain_sender_username.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/email_communication_service_domain_sender_username) | resource |
+| [azurerm_fluid_relay_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/fluid_relay_server) | resource |
 | [azurerm_key_vault.sql_kv](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault) | resource |
 | [azurerm_key_vault_key.tde](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_key) | resource |
 | [azurerm_key_vault_secret.primary-connection](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
@@ -312,6 +313,10 @@ Next steps here
 | <a name="output_environment_resource_group"></a> [environment\_resource\_group](#output\_environment\_resource\_group) | The Azure Resource Group that contains this environment |
 | <a name="output_environment_storage_account_name"></a> [environment\_storage\_account\_name](#output\_environment\_storage\_account\_name) | The name of the main storage account for this environment. |
 | <a name="output_environment_storage_file_connection_script_ps1"></a> [environment\_storage\_file\_connection\_script\_ps1](#output\_environment\_storage\_file\_connection\_script\_ps1) | A PowerShell script to connect dirve Z: to the azure files created as part of this environment. |
+| <a name="output_fluid_relay_server_primary_key"></a> [fluid\_relay\_server\_primary\_key](#output\_fluid\_relay\_server\_primary\_key) | The primary key of the Fluid Relay service. |
+| <a name="output_fluid_relay_server_secondary_key"></a> [fluid\_relay\_server\_secondary\_key](#output\_fluid\_relay\_server\_secondary\_key) | The secondary key of the Fluid Relay service. |
+| <a name="output_fluid_relay_service_endpoints"></a> [fluid\_relay\_service\_endpoints](#output\_fluid\_relay\_service\_endpoints) | The service endpoints of the Fluid Relay service. |
+| <a name="output_fluid_relay_service_id"></a> [fluid\_relay\_service\_id](#output\_fluid\_relay\_service\_id) | The ID of the Fluid Relay service. |
 | <a name="output_logs_otel_configuration_access_endpoint"></a> [logs\_otel\_configuration\_access\_endpoint](#output\_logs\_otel\_configuration\_access\_endpoint) | The configuration access endpoint of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_dce_id"></a> [logs\_otel\_dce\_id](#output\_logs\_otel\_dce\_id) | The ID of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_logs_ingestion_endpoint"></a> [logs\_otel\_logs\_ingestion\_endpoint](#output\_logs\_otel\_logs\_ingestion\_endpoint) | The OTEL logs ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
