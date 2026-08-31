@@ -23,7 +23,9 @@ variable "subscription_id" {
 
 variable "owner_email" {
   type        = string
-  description = "Email address of the resource owner, used for contact and billing notifications"
+  description = <<DESC
+Email address of the resource owner, used for contact and billing notifications
+DESC
 
   validation {
     condition     = can(regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", trimspace(var.owner_email)))
@@ -47,8 +49,9 @@ variable "owner_entra_display_name" {
 
 variable "sql_administrator_group_object_id" {
   type        = string
-  description = "The Entra ID object ID for the SQL administrator group (can be a user or a group)"
-
+  description = <<DESC
+The Entra ID object ID for the SQL administrator group (can be a user or a group)
+DESC
   validation {
     condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.sql_administrator_group_object_id)))
     error_message = "The variable 'sql_administrator_group_object_id' must be a valid GUID."
@@ -56,7 +59,9 @@ variable "sql_administrator_group_object_id" {
 }
 variable "sql_administrator_group_display_name" {
   type        = string
-  description = "Entra ID display name for the user or group that will have SQL Server administrator permissions."
+  description = <<DESC
+Entra ID display name for the user or group that will have SQL Server administrator permissions.
+DESC
 }
 
 // +===========================================================================================================+
@@ -64,31 +69,41 @@ variable "sql_administrator_group_display_name" {
 
 variable "security_perimeter_inbound_public_ips" {
   type        = list(string)
-  description = "Allowed inbound addresses for the Azure Security Perimeter."
+  description = <<DESC
+Allowed inbound addresses for the Azure Security Perimeter.
+DESC
   default     = ["0.0.0.0/0"]
 }
 
 variable "security_perimeter_outbound_fqdns" {
   type        = list(string)
-  description = "Allowed outbound FQDNs for the Azure Security Perimeter."
+  description = <<DESC
+Allowed outbound FQDNs for the Azure Security Perimeter.
+DESC
   default     = ["*"]
 }
 
 variable "vmss_number_of_instances" {
   type        = number
-  description = "The number of instances in the Virtual Machine Scale Set."
+  description = <<DESC
+The number of instances in the Virtual Machine Scale Set.
+DESC
   default     = 0 ## Anything but zero, cost money :-)
 }
 
 variable "vmss_autoscale_enabled" {
-  description = "Whether autoscale is enabled for the Virtual Machine Scale Set."
+  description = <<DESC
+Whether autoscale is enabled for the Virtual Machine Scale Set.
+DESC
   type        = bool
   default     = true
 }
 
 variable "bastion_sku" {
   type        = string
-  description = "Azure Bastion SKU tier that determines features and pricing. See https://learn.microsoft.com/en-us/azure/bastion/bastion-sku-comparison"
+  description = <<DESC
+Azure Bastion SKU tier that determines features and pricing. See https://learn.microsoft.com/en-us/azure/bastion/bastion-sku-comparison
+DESC
   default     = "Developer"
 
   ## https://learn.microsoft.com/en-us/azure/bastion/bastion-sku-comparison
@@ -112,35 +127,43 @@ variable "location" {
 
 variable "enable_telemetry" {
   type        = bool
-  description = <<DESCRIPTION
+  description = <<DESC
 This variable controls whether or not the AVM (Azure Verified Modules) telemetry is enabled for the module.
 For more information see <https://aka.ms/avm/telemetryinfo>.
 If it is set to false, then no telemetry will be collected.
-DESCRIPTION  
+DESC
   default     = false
 }
 
 variable "data_pii" {
   type        = bool
-  description = "If true, this environment contains PII (Personally Identifiable Information) so deploy additional security controls. If false, deploys a non-PII environment."
+  description = <<DESC
+If true, this environment contains PII (Personally Identifiable Information) so deploy additional security controls. If false, deploys a non-PII environment.
+DESC
   default     = false
 }
 
 variable "data_phi" {
   type        = bool
-  description = "If true, this environment contains PHI (Protected Health Information) so deploy additional security controls. If false, deploys a non-PHI environment."
+  description = <<DESC
+If true, this environment contains PHI (Protected Health Information) so deploy additional security controls. If false, deploys a non-PHI environment.
+DESC
   default     = false
 }
 
 variable "deploy_sql_failover" {
   type        = bool
-  description = "If true, deploys a Microsoft SQL failover environment in the linked region. If false, deploys a single SQL instance."
+  description = <<DESC
+If true, deploys a Microsoft SQL failover environment in the linked region. If false, deploys a single SQL instance.
+DESC
   default     = false
 }
 
 variable "support_free_sql_database" {
   type        = bool
-  description = "If true, support the totally Free SQL Server. Failover must be disabled and the SQL Server cannot have an alias."
+  description = <<DESC
+If true, support the totally Free SQL Server. Failover must be disabled and the SQL Server cannot have an alias.
+DESC
   default     = true
   validation {
     condition     = !var.support_free_sql_database || !var.deploy_sql_failover
@@ -151,7 +174,9 @@ variable "support_free_sql_database" {
 ## not implemented - yet
 variable "sql_connectivity_type" {
   type        = string
-  description = "Connectivity mode for the SQL Server endpoint: 'PRIVATE' (VNet via Private Endpoint), or 'PUBLIC' (internet-facing)."
+  description = <<DESC
+Connectivity mode for the SQL Server endpoint: 'PRIVATE' (VNet via Private Endpoint), or 'PUBLIC' (internet-facing).
+DESC
   default     = "PRIVATE"
 
   validation {
@@ -162,13 +187,17 @@ variable "sql_connectivity_type" {
 
 variable "deploy_private_endpoints" {
   type        = bool
-  description = "If true, deploys private endpoints for secure access to Azure services. If false, does not deploy private endpoints."
+  description = <<DESC
+If true, deploys private endpoints for secure access to Azure services. If false, does not deploy private endpoints.
+DESC
   default     = false
 }
 
 variable "inbound_access" {
   type        = string
-  description = "Specifies the type of inbound access to the environment via the Internet. Options are: 'None' (free), 'App-Gateway' ($$), 'FrontDoor' ($$)."
+  description = <<DESC
+Specifies the type of inbound access to the environment via the Internet. Options are: 'None' (free), 'App-Gateway' ($$), 'FrontDoor' ($$).
+DESC
   default     = "None"
 
   validation {
