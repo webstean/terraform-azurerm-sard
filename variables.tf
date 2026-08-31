@@ -102,10 +102,10 @@ DESC
 }
 
 variable "vmss_autoscale_enabled" {
+  type        = bool
   description = <<DESC
 Whether autoscale is enabled for the Virtual Machine Scale Set.
 DESC
-  type        = bool
   default     = true
 }
 
@@ -289,7 +289,6 @@ DESC
 variable "deploy_ai_embeddings" {
   type        = bool
   description = <<DESC
-  description = <<DESC
 If true, deploys AI embeddings for the environment. If false, does not deploy AI embeddings.
 DESC
   default     = false
@@ -297,7 +296,6 @@ DESC
 
 variable "aca_enable_dapr" {
   type        = bool
-  description = <<DESC
   description = <<DESC
 If true, enables Dapr for the Azure Container Apps environment. If false, does not enable Dapr.
 DESC
