@@ -3,17 +3,23 @@
 
 variable "customer" {
   type        = string
-  description = "The name of the customer (free-text)"
+  description = <<DESC
+The name of the customer (free-text)
+DESC
 }
 
 variable "prefix" {
   type        = string
-  description = "A short name (typically 3-8 characters, lowercase) for the customer, used as a prefix for all Azure resource names to ensure global uniqueness."
+  description = <<DESC
+A short name (typically 3-8 characters, lowercase) for the customer, used as a prefix for all Azure resource names to ensure global uniqueness.
+DESC
 }
 
 variable "subscription_id" {
   type        = string
-  description = "The Azure subscription ID in which the resources will be deployed."
+  description = <<DESC
+The Azure subscription ID in which the resources will be deployed.
+DESC
 
   validation {
     condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.subscription_id)))
@@ -35,7 +41,9 @@ DESC
 
 variable "owner_entra_object_id" {
   type        = string
-  description = "The Entra ID object ID for the owner of this environment"
+  description = <<DESC
+The Entra ID object ID for the owner of this environment
+DESC
 
   validation {
     condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.owner_entra_object_id)))
@@ -44,7 +52,9 @@ variable "owner_entra_object_id" {
 }
 variable "owner_entra_display_name" {
   type        = string
-  description = "Display name of the owner in Entra ID for RBAC role assignment and resource access control."
+  description = <<DESC
+Display name of the owner in Entra ID for RBAC role assignment and resource access control.
+DESC  
 }
 
 variable "sql_administrator_group_object_id" {
@@ -117,7 +127,9 @@ DESC
 
 variable "location" {
   type        = string
-  description = "The Azure region where resources will be deployed."
+  description = <<DESC
+The Azure region where resources will be deployed.
+DESC
   default     = "australiaeast"
   validation {
     condition     = contains(["australiasoutheast", "australiaeast", "australiacentral", "australiacentral2", "perth", "centralindia", "westus3"], lower(trimspace(var.location)))
@@ -226,7 +238,9 @@ DESC
 
 variable "frontdoor_sku" {
   type        = string
-  description = "Specifies the SKU for Azure Front Door. Options are: 'Standard' or 'Premium'."
+  description = <<DESC
+Specifies the SKU for Azure Front Door. Options are: 'Standard' or 'Premium'.
+DESC
   default     = "Standard"
 
   validation {
@@ -240,7 +254,9 @@ variable "frontdoor_sku" {
 /*
 variable "container_app_fqdn" {
   type        = string
-  description = "The Azure Container App ingress FQDN that Application Gateway routes traffic to (for example: myapp.orangecliff-123456.australiaeast.azurecontainerapps.io)."
+  description = <<DESC
+The Azure Container App ingress FQDN that Application Gateway routes traffic to (for example: myapp.orangecliff-123456.australiaeast.azurecontainerapps.io).
+DESC
   default     = "myapp.orangecliff-123456.australiaeast.azurecontainerapps.io"
   validation {
     condition     = length(trimspace(var.container_app_fqdn)) > 0
@@ -255,7 +271,10 @@ variable "container_app_fqdn" {
 
 variable "bastion_premium_private_deployment" {
   type        = bool
-  description = "If true, deploys a Premium Bastion with private deployment (no public IP). If false, deploys a Premium Bastion with public deployment."
+  description = <<DESC
+  description = <<DESC
+If true, deploys a Premium Bastion with private deployment (no public IP). If false, deploys a Premium Bastion with public deployment.
+DESC
   default     = false
 
   ## https://learn.microsoft.com/en-us/azure/bastion/bastion-sku-comparison
@@ -269,25 +288,35 @@ variable "bastion_premium_private_deployment" {
 
 variable "deploy_ai_embeddings" {
   type        = bool
-  description = "If true, deploys AI embeddings for the environment. If false, does not deploy AI embeddings."
+  description = <<DESC
+  description = <<DESC
+If true, deploys AI embeddings for the environment. If false, does not deploy AI embeddings.
+DESC
   default     = false
 }
 
 variable "aca_enable_dapr" {
   type        = bool
-  description = "If true, enables Dapr for the Azure Container Apps environment. If false, does not enable Dapr."
+  description = <<DESC
+  description = <<DESC
+If true, enables Dapr for the Azure Container Apps environment. If false, does not enable Dapr.
+DESC
   default     = false
 }
 
 variable "aca_consumption_gpu_enabled" {
   type        = bool
-  description = "If true, adds a Consumption GPU workload profile to the Azure Container Apps environment."
+  description = <<DESC
+If true, adds a Consumption GPU workload profile to the Azure Container Apps environment.
+DESC
   default     = false
 }
 
 variable "aca_consumption_gpu_profile_type" {
   type        = string
-  description = "Consumption GPU workload profile type for Azure Container Apps (e.g., Consumption-GPU-NC8as-T4 for NVIDIA T4 GPUs)."
+  description = <<DESC
+Consumption GPU workload profile type for Azure Container Apps (e.g., Consumption-GPU-NC8as-T4 for NVIDIA T4 GPUs).
+DESC
   default     = "Consumption-GPU-NC8as-T4"
 
   validation {
@@ -298,7 +327,9 @@ variable "aca_consumption_gpu_profile_type" {
 
 variable "aca_consumption_gpu_min_count" {
   type        = number
-  description = "Minimum replica count for the ACA Consumption GPU workload profile."
+  description = <<DESC
+Minimum replica count for the ACA Consumption GPU workload profile.
+DESC
   default     = 0
 
   validation {
@@ -309,7 +340,9 @@ variable "aca_consumption_gpu_min_count" {
 
 variable "aca_consumption_gpu_max_count" {
   type        = number
-  description = "Maximum replica count for the ACA Consumption GPU workload profile."
+  description = <<DESC
+Maximum replica count for the ACA Consumption GPU workload profile.
+DESC
   default     = 1
 
   validation {
@@ -320,7 +353,9 @@ variable "aca_consumption_gpu_max_count" {
 
 variable "custom_dns_zone_name" {
   type        = string
-  description = "An active DNS zone name (e.g., example.com) already purchased and configured in the Azure subscription for custom domain configuration."
+  description = <<DESC
+An active DNS zone name (e.g., example.com) already purchased and configured in the Azure subscription for custom domain configuration.
+DESC
   default     = "webstean.com" ## "sard.webstean.com"
   validation {
     condition     = !can(regex("^(www|app)", lower(try(trimspace(var.custom_dns_zone_name), ""))))
@@ -334,7 +369,9 @@ variable "custom_dns_zone_name" {
 
 variable "vwan_hub_id" {
   type        = string
-  description = "The ID of the Azure Virtual WAN hub to which the route table will be associated."
+  description = <<DESC
+The ID of the Azure Virtual WAN hub to which the route table will be associated.
+DESC
   default     = null ## azurerm_virtual_hub.example.id 
   validation {
     condition = (
@@ -347,20 +384,26 @@ variable "vwan_hub_id" {
 
 variable "vwan_hub_firewall_id" {
   type        = string
-  description = "The ID of the Azure Firewall deployed in the Virtual WAN hub for filtering and routing traffic."
+  description = <<DESC
+The ID of the Azure Firewall deployed in the Virtual WAN hub for filtering and routing traffic.
+DESC
   default     = null ## azurerm_firewall.hub.id
 }
 
 variable "vmss_disk_controller_type" {
   type        = string
-  description = "Disk controller type for the Virtual Machine Scale Set. Use 'SCSI' for hibernation support; 'NVMe' is faster but does not support hibernation."
+  description = <<DESC
+Disk controller type for the Virtual Machine Scale Set. Use 'SCSI' for hibernation support; 'NVMe' is faster but does not support hibernation.
+DESC
   ## Make currently be set to 'SCSI', NVMe does not support hibernation, which we need.
   default = "SCSI" ## Possible values are 'SCSI' and 'NVMe'. Defaults to 'SCSI'.
 }
 
 variable "vmss_hibernation_enabled" {
   type        = bool
-  description = "Whether hibernation is enabled for the Virtual Machine Scale Set. Requires 'vmss_disk_controller_type' to be 'SCSI'."
+  description = <<DESC
+Whether hibernation is enabled for the Virtual Machine Scale Set. Requires 'vmss_disk_controller_type' to be 'SCSI'.
+DESC
   default     = true
 
   validation {
@@ -371,36 +414,48 @@ variable "vmss_hibernation_enabled" {
 
 variable "vmss_sku_name" {
   type        = string
-  description = "Azure Virtual Machine SKU for the scale set (e.g., Standard_D2s_v5). Determines vCPU, memory, and pricing."
+  description = <<DESC
+Azure Virtual Machine SKU for the scale set (e.g., Standard_D2s_v5). Determines vCPU, memory, and pricing.
+DESC
   default     = "Standard_D2s_v5" ## Standard_D2s_v5
 }
 
 variable "vmss_autoscale_min_capacity" {
-  description = "Virtual Machine Scale Set: minimum number of instances to maintain at all times."
+  description = <<DESC
+Virtual Machine Scale Set: minimum number of instances to maintain at all times.
+DESC
   type        = number
   default     = 1
 }
 
 variable "vmss_autoscale_weekend_capacity" {
-  description = "Virtual Machine Scale Set: fixed instance count to run during the weekend low-usage window."
+  description = <<DESC
+Virtual Machine Scale Set: fixed instance count to run during the weekend low-usage window.
+DESC
   type        = number
   default     = 0
 }
 
 variable "vmss_autoscale_default_capacity" {
-  description = "Virtual Machine Scale Set: default instance count used during normal business hours."
+  description = <<DESC
+Virtual Machine Scale Set: default instance count used during normal business hours.
+DESC
   type        = number
   default     = 1
 }
 
 variable "vmss_autoscale_max_capacity" {
-  description = "Virtual Machine Scale Set: maximum number of instances to scale up to."
+  description = <<DESC
+Virtual Machine Scale Set: maximum number of instances to scale up to.
+DESC
   type        = number
   default     = 1
 }
 
 variable "vmss_autoscale_scale_out_cpu_threshold" {
-  description = "Virtual Machine Scale Set: average CPU percentage threshold that triggers a scale-out (add instances)."
+  description = <<DESC
+Virtual Machine Scale Set: average CPU percentage threshold that triggers a scale-out (add instances).
+DESC
   type        = number
   default     = 70
 
@@ -411,44 +466,58 @@ variable "vmss_autoscale_scale_out_cpu_threshold" {
 }
 
 variable "vmss_autoscale_scale_out_increase_count" {
-  description = "Virtual Machine Scale Set: number of instances to add per scale-out event."
+  description = <<DESC
+Virtual Machine Scale Set: number of instances to add per scale-out event.
+DESC
   type        = number
   default     = 1
 }
 
 variable "vmss_autoscale_time_window" {
-  description = "Virtual Machine Scale Set: look-back window for the average CPU calculation in ISO 8601 format (e.g., PT10M for 10 minutes)."
+  description = <<DESC
+Virtual Machine Scale Set: look-back window for the average CPU calculation in ISO 8601 format (e.g., PT10M for 10 minutes).
+DESC
   type        = string
   default     = "PT10M"
 }
 
 variable "vmss_autoscale_time_grain" {
-  description = "Virtual Machine Scale Set: granularity/frequency of metric data points collected in ISO 8601 format (e.g., PT1M for 1 minute intervals)."
+  description = <<DESC
+Virtual Machine Scale Set: granularity/frequency of metric data points collected in ISO 8601 format (e.g., PT1M for 1 minute intervals).
+DESC
   type        = string
   default     = "PT1M"
 }
 
 variable "vmss_autoscale_predictive_look_ahead_time" {
-  description = "Virtual Machine Scale Set: how far ahead predictive autoscale forecasts demand in ISO 8601 format (e.g., PT5M for 5 minutes ahead)."
+  description = <<DESC
+Virtual Machine Scale Set: how far ahead predictive autoscale forecasts demand in ISO 8601 format (e.g., PT5M for 5 minutes ahead).
+DESC
   type        = string
   default     = "PT5M"
 }
 
 variable "vmss_autoscale_cooldown" {
-  description = "Virtual Machine Scale Set: time to wait after a scale action before scaling again in ISO 8601 format (e.g., PT30M for 30 minutes)."
+  description = <<DESC
+Virtual Machine Scale Set: time to wait after a scale action before scaling again in ISO 8601 format (e.g., PT30M for 30 minutes).
+DESC
   type        = string
   default     = "PT30M"
 }
 
 variable "vmss_autoscale_business_hours_start" {
-  description = "Virtual Machine Scale Set: hour (0-23) each weekday when the CPU-based business-hours autoscale profile activates."
+  description = <<DESC
+Virtual Machine Scale Set: hour (0-23) each weekday when the CPU-based business-hours autoscale profile activates.
+DESC
   type        = number
   default     = 16 ## 4pm
 }
 
 variable "vmss_otel_counter_specifiers" {
   type        = list(string)
-  description = "Virtual Machine Scale Set: OpenTelemetry system metrics to collect from instances. Defaults to the standard free metrics set."
+  description = <<DESC
+Virtual Machine Scale Set: OpenTelemetry system metrics to collect from instances. Defaults to the standard free metrics set.
+DESC
   default = [
     "system.filesystem.usage",
     "system.disk.io",
@@ -469,7 +538,9 @@ variable "pls_nat_ip_configurations" {
     primary            = bool
     private_ip_address = optional(string)
   }))
-  description = "One or more (max 8) NAT IP configurations for the Private Link Service. Exactly one must have primary = true."
+  description = <<DESC
+One or more (max 8) NAT IP configurations for the Private Link Service. Exactly one must have primary = true.
+DESC
   default = [
     {
       name    = "primary"
@@ -485,12 +556,16 @@ variable "pls_nat_ip_configurations" {
 
 variable "pls_proxy_protocol_enabled" {
   type        = bool
-  description = "Whether the Private Link Service should support Proxy Protocol (to preserve source IP to the backend)."
+  description = <<DESC
+Whether the Private Link Service should support Proxy Protocol (to preserve source IP to the backend).
+DESC
   default     = false
 }
 
 variable "pls_allowed_fqdns" {
   type        = list(string)
-  description = "FQDNs allowed for the Private Link Service."
+  description = <<DESC
+FQDNs allowed for the Private Link Service.
+DESC
   default     = []
 }
