@@ -1,5 +1,6 @@
 locals {
   swa_friendly_name      = "Static Web App"
+  swa_docs               = "https://learn.microsoft.com/en-us/azure/static-web-apps/"
   swa_name               = "sswa-${var.prefix}"
   swa_name_location      = "${local.swa_name}-${lower(var.location)}"
   swa_name_random_suffix = substr(md5(local.swa_name_location), 0, 6)

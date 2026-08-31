@@ -88,7 +88,9 @@ provider "azurerm" {
   ]
   features {
     enhanced_validation {
-      preflight_enabled = true
+      preflight_enabled  = true
+      locations          = true # Re-enable location validation at plan time
+      resource_providers = true # Re-enable resource provider validation at plan time
     }
     app_configuration {
       purge_soft_delete_on_destroy = true
