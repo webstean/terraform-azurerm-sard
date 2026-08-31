@@ -220,6 +220,14 @@ DESC
   }
 }
 
+variable "automation_account_id" {
+  type        = string
+  description = <<DESC
+The ID of the Azure Automation Account to be used.
+DESC
+  default     = null
+}
+
 variable "containerregistry_id" {
   type        = string
   description = <<DESC
