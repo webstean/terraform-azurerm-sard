@@ -18,10 +18,12 @@ resource "azurerm_databox_edge_device" "gateway" {
 
 output "databox_gateway_id" {
   description = "The ID of the Databox Edge Gateway device."
+  sensitive   = false
   value       = azurerm_databox_edge_device.gateway.id
 }
 
 output "databox_gateway_properties" {
   description = "The properties of the Databox Edge Gateway device."
+  sensitive   = false
   value       = azurerm_databox_edge_device.gateway.device_properties
 }
