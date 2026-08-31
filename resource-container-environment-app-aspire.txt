@@ -35,7 +35,7 @@ resource "azurerm_container_app" "aspire" {
     #cooldown_period_in_seconds = 120
     container {
       name   = "aspire"
-      image  = "${module.containerregistry.resource_id}:latest"
+      image  = "${var.containerregistry_id}:latest"
       cpu    = 0.5
       memory = "1Gi"
       env {
@@ -180,43 +180,10 @@ resource "azapi_resource" "aca_to_blob_linker" {
 }
 */
 
-/*
-// managed certificate
-resource "azurerm_container_app_custom_dns_zone" "this" {
-  name             = var.custom_dns_zone
-  container_app_id = azurerm_container_app.aspire.id
-
-validation_type = "CNAME"
-
-  # This tells Azure to issue/use a managed certificate.
-
-  certificate_binding_type = "SniEnabled"
-
-  depends_on
-
-  lifecycle {
-    ignore_changes = [certificate_binding_type, container_app_environment_certificate_id]
-  }
-}
-
-output "aca_app_aspire_dns_cname_record" {
-  value = {
-     name  = split(".", var.custom_hostname)[0]
-    value = azurerm_container_app.app.ingress[0].fqdn
-  }
-}
-
-output "aca_app_app_aspire_dns_txt_record" {
-  value = {
-    name  = "asuid.${split(".", var.custom_hostname)[0]}"
-    value = azurerm_container_app.app.custom_dns_zone_verification_id
-  }
-}
-*/
 
 ## Examples:-
 ## (state stores): state.azure.cosmosdb, state.azure.blobstorage, state.sqlserver
-## (bindings)    : bindings.azure.servicebusqueues, 
+## (bindings)    : bindings.azure.servicebusqueues,
 ## (configuration): configuration.azure.appconfig
-## 
+##
 

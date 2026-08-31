@@ -186,7 +186,7 @@ output "aca_app_app_helloworld_dns_txt_record" {
 
 ## Examples:-
 ## (state stores): state.azure.cosmosdb, state.azure.blobstorage, state.sqlserver
-## (bindings)    : bindings.azure.servicebusqueues, 
+## (bindings)    : bindings.azure.servicebusqueues,
 ## (configuration): configuration.azure.appconfig
-## 
+##
 

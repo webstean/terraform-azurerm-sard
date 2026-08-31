@@ -220,6 +220,14 @@ DESC
   }
 }
 
+variable "containerregistry_id" {
+  type        = string
+  description = <<DESC
+The ID of the Azure Container Registry to be used.
+DESC
+  default     = null
+}
+
 variable "outbound_access" {
   type        = string
   description = <<DESC
