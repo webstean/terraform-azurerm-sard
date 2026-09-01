@@ -27,24 +27,24 @@ resource "azurerm_fluid_relay_server" "this" {
 output "fluid_relay_service_id" {
   description = "The ID of the Fluid Relay service."
   sensitive   = false
-  value       = azurerm_fluid_relay_server.this.id
+  value       = try(azurerm_fluid_relay_server.this.id), null)
 }
 
 output "fluid_relay_service_endpoints" {
   description = "The service endpoints of the Fluid Relay service."
   sensitive   = false
-  value       = azurerm_fluid_relay_server.this.service_endpoints
+  value       = try(azurerm_fluid_relay_server.this.service_endpoints, null)
 }
 
 output "fluid_relay_server_primary_key" {
   description = "The primary key of the Fluid Relay service."
   sensitive   = false
-  value       = azurerm_fluid_relay_server.this.primary_key
+  value       = try(azurerm_fluid_relay_server.this.primary_key, null)
 }
 
 output "fluid_relay_server_secondary_key" {
   description = "The secondary key of the Fluid Relay service."
   sensitive   = false
-  value       = azurerm_fluid_relay_server.this.secondary_key
+  value       = try(azurerm_fluid_relay_server.this.secondary_key, null)
 }
 

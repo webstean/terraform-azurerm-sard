@@ -124,17 +124,6 @@ module "environment_resource_group" {
   })
 }
 
-/*
-resource "azurerm_resource_group" "environment" {
-  name     = "rg-${local.environment_name_location}"
-  location = var.location
-  tags     = local.temporary_tags
-  lifecycle {
-    ignore_changes = [tags.created]
-  }
-}
-*/
-
 # Wait 10 seconds for the network watcher to be created as a byproduct of the VNet creation
 resource "time_sleep" "wait_10_seconds_for_network_watcher_creation" {
   create_duration = "10s"
@@ -371,12 +360,12 @@ EOF
 output "subscription_display_name" {
   description = "The subscription display name of the current Azure subscription."
   sensitive   = false
-  value       = data.azurerm_subscription.current.display_name
+  value       = try(data.azurerm_subscription.current.display_name, null)
 }
 
 output "subscription_id" {
   description = "The subscription ID of the current Azure subscription."
   sensitive   = false
-  value       = data.azurerm_subscription.current.subscription_id
+  value       = try(data.azurerm_subscription.current.subscription_id, null)
 }
 
