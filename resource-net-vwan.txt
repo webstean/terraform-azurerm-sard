@@ -1,12 +1,13 @@
 
 locals {
-  vwan_friendly_name = "Virtual WAN"
-  vwan_name          = "vwan-${var.prefix}"
-  vwan_name_location = lower("${local.vwan_name}-${lower(var.location)}")
-  vwan_random_suffix = substr(md5(local.vwan_name_location), 0, 6)
-  vwan_name_hostname = lower(substr(replace("l${local.vwan_random_suffix}${local.vwan_name_location}", "-", ""), 0, 24))
-  vwan_sku           = "Basic" ## Possible Values include: Basic and Standard. Defaults to Standard.
-  vwan_hub_sku       = "Basic" ## Possible Values include: Basic and Standard. Defaults to Standard.
+  vwan_friendly_name          = "Virtual WAN"
+  vwan_name                   = "vwan-${var.prefix}"
+  vwan_name_location          = lower("${local.vwan_name}-${lower(var.location)}")
+  vwan_random_suffix          = substr(md5(local.vwan_name_location), 0, 6)
+  vwan_name_hostname          = lower(substr(replace("l${local.vwan_random_suffix}${local.vwan_name_location}", "-", ""), 0, 24))
+  vwan_sku                    = "Basic"      ## Possible values include: Basic and Standard. Defaults to Standard.
+  vwan_hub_sku                = "Basic"      ## Possible values include: Basic and Standard. Defaults to Standard.
+  vwan_hub_routing_preference = "VpnGateway" ## Possible values include: ExpressRoute, ASPath and VpnGateway.
 }
 
 resource "azurerm_virtual_wan" "this" {
@@ -39,12 +40,19 @@ resource "azurerm_virtual_hub" "this" {
   address_prefix = "10.99.${local.regions[module.environment_resource_group.resource.location].location_number}.0/24"
   sku            = local.vwan_hub_sku ## Possible values are Basic and Standard.
 
-  hub_routing_preference = "ASPath" ## Possible values are ExpressRoute, ASPath and VpnGateway.
+  hub_routing_preference = local.vwan_hub_routing_preference
 
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
-resource "azurerm_vpn_gateway" "main" {
+resource "azurerm_virtual_hub_connection" "vnet" {
+  name                      = "link-VNET:${azurerm_virtual_network.this.name}-to-HUB:${azurerm_virtual_hub.this.name}"
+  virtual_hub_id            = try(azurerm_virtual_hub.this.id, var.vwan_hub_id)
+  remote_virtual_network_id = azurerm_virtual_network.this.id
+}
+
+/*
+resource "azurerm_vpn_gateway" "this" {
   count = local.vwan_hub_sku == "Standard" ? 1 : 0
 
   ## we only need one, since the Hubs are peered together (with Standard SKU, not Basic!)
@@ -55,12 +63,8 @@ resource "azurerm_vpn_gateway" "main" {
   virtual_hub_id                        = try(azurerm_virtual_hub.this.id, var.vwan_hub_id)
   bgp_route_translation_for_nat_enabled = false
   routing_preference                    = "Microsoft Network"
+  scale_unit                            = 1
 
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
-
-resource "azurerm_virtual_hub_connection" "vnet" {
-  name                      = "link-VNET:${azurerm_virtual_network.this.name}-to-HUB:${azurerm_virtual_hub.this.name}"
-  virtual_hub_id            = try(azurerm_virtual_hub.this.id, var.vwan_hub_id)
-  remote_virtual_network_id = azurerm_virtual_network.this.id
-}
+*/

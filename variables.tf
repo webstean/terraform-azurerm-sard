@@ -582,9 +582,9 @@ DESC
 
 variable "pls_nat_ip_configurations" {
   type = list(object({
-    name               = string
-    primary            = bool
-    private_ip_address = optional(string)
+    name                       = string
+    primary                    = bool
+    private_ip_address         = optional(string)
     private_ip_address_version = optional(string)
   }))
   sensitive   = false
@@ -593,16 +593,16 @@ One or more (max 8) NAT IP configurations for the Private Link Service. Exactly 
 DESC
   default = [
     {
-      name    = "primary"
-      private_ip_address = null
+      name                       = "primary"
+      private_ip_address         = null
       private_ip_address_version = "IPv4"
-      primary = true
+      primary                    = true
     },
     {
-      name    = "secondary"
-      private_ip_address = null
+      name                       = "secondary"
+      private_ip_address         = null
       private_ip_address_version = "IPv4"
-      primary = false
+      primary                    = false
     }
   ]
 
@@ -653,6 +653,28 @@ variable "container_registry_id" {
   sensitive   = false
   description = <<DESC
 The ID of the Azure Container Registry to be used.
+DESC
+  default     = null
+}
+
+variable "vpn_access_group_object_id" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The Entra ID object ID for the VPN access group (can be a user or a group)
+DESC
+  validation {
+    condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.vpn_access_group_object_id)))
+    error_message = "The variable 'vpn_access_group_object_id' must be a valid GUID."
+  }
+  default = null
+}
+
+variable "vpn_access_group_display_name" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+Entra ID display name for the user or group that will have VPN access.
 DESC
   default     = null
 }

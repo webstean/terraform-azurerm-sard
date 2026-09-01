@@ -8,7 +8,7 @@ locals {
 
 ## https://learn.microsoft.com/en-us/azure/private-link/network-security-perimeter-concepts
 ## Today, the supported resources are:
-## Azure Monitor	
+## Azure Monitor
 ## Azure AI Search
 ## Cosmos DB
 ## Event Hubs
@@ -136,7 +136,7 @@ locals {
   }
 }
 
-output "security_perimeter_id" {
+output "network_security_perimeter_id" {
   description = "Azure Network Security Perimeter ID for this environment"
   sensitive   = false
   value       = azurerm_network_security_perimeter.this.id
@@ -148,7 +148,7 @@ output "network_security_perimeter_profile_id" {
   value       = azurerm_network_security_perimeter_profile.this.id
 }
 
-output "security_perimeter_resources" {
+output "network_security_perimeter_resources" {
   description = "Resources that need to be added to the Azure Network Security Perimeter"
   sensitive   = false
   value       = local.perimeter_candidate_resources

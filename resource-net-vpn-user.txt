@@ -74,3 +74,31 @@ EOF
   }
 }
 
+resource "azurerm_vpn_server_configuration" "this" {
+  name = "${var.project_name}vpn${local.regions[each.key].short_name}server01"
+  resource_group_name = module.environment_resource_group.resource.name
+  location            = module.environment_resource_group.resource.location
+  vpn_authentication_types = ["AAD"]
+  vpn_protocols            = ["IkeV2", "OpenVPN"]
+
+  azure_active_directory_authentication {
+    ## Azure VPN application
+    audience = data.azurerm_client_config.current.tenant_id
+    issuer   = "https://sts.windows.net/${data.azurerm_client_config.current.tenant_id}/"
+    tenant   = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}"
+  }
+
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_vpn_server_configuration_policy_group" "default" {
+  name                        = "AAD-Access-for-VPN-server"
+  vpn_server_configuration_id = azurerm_vpn_server_configuration.this.id
+  is_default                  = true
+
+  policy {
+    name  = var.vpn_access_group_display_name
+    type  = "AADGroupId"
+    value = var.vpn_access_group_object_id
+  }
+}
