@@ -1,5 +1,6 @@
 locals {
   pls_friendly_name      = "Private Link Service"
+  pls_docs               = "https://learn.microsoft.com/en-us/azure/private-link/"
   pls_name               = "pls-${var.prefix}"
   pls_name_location      = lower("${local.pls_name}-${lower(var.location)}")
   pls_random_suffix      = substr(md5(local.pls_name_location), 0, 6)
@@ -93,17 +94,17 @@ resource "azurerm_private_link_service" "this" {
 output "pls_id" {
   description = "The Private Link Service ID."
   sensitive   = false
-  value       = try(azurerm_private_link_service.this.id,null)
+  value       = try(azurerm_private_link_service.this.id, null)
 }
 
 output "pls_name" {
   description = "The Private Link Service name."
   sensitive   = false
-  value       = try(azurerm_private_link_service.this.name,null)
+  value       = try(azurerm_private_link_service.this.name, null)
 }
 
 output "pls_alias" {
   description = "The Private Link Service global alias."
   sensitive   = false
-  value       = try(azurerm_private_link_service.this.alias,null)
+  value       = try(azurerm_private_link_service.this.alias, null)
 }
