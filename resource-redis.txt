@@ -26,7 +26,7 @@ module "redis" {
   sku_name          = local.redis_sku_name
   clustering_policy = local.redis_clustering_policy
   eviction_policy   = "AllKeysLRU"
-  zones             = null
+  zones             = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? local.regions[module.environment_resource_group.resource.location] : null
   high_availability = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? "Enabled" : "Disabled"
 
   managed_identities = {

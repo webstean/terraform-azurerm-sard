@@ -201,6 +201,7 @@ resource "azurerm_key_vault_secret" "secondary-key" {
   ]
 }
 
+/*
 resource "azurerm_app_configuration_key" "comms_primary_string" {
   configuration_store_id = module.appconfiguration.resource_id
   key                    = "COMMS-PRIMARY-CONNECTION-STRING"
@@ -239,6 +240,7 @@ resource "azurerm_app_configuration_key" "comms_api_key_secondary" {
     module.appconfiguration
   ]
 }
+*/
 
 /*
 resource "azurerm_key_vault_key" "comms_app_configuration" {

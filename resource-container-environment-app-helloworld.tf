@@ -1,83 +1,81 @@
-resource "azurerm_container_app" "helloworld" {
-  name                         = "helloworld"
-  resource_group_name          = module.environment_resource_group.resource.name
-  container_app_environment_id = azurerm_container_app_environment.this.id
-  revision_mode                = "Single"
+module "helloworld_container_app" {
+  source           = "Azure/avm-res-app-containerapp/azurerm"
+  version          = "~> 0.9, < 1.0"
+  enable_telemetry = var.enable_telemetry
 
-  identity {
-    type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.environment.id]
+  name                                  = "helloworld"
+  resource_group_name                   = module.environment_resource_group.resource.name
+  container_app_environment_resource_id = azurerm_container_app_environment.this.id
+  revision_mode                         = "Single"
+
+  managed_identities = {
+    user_assigned_resource_ids = [azurerm_user_assigned_identity.environment.id]
   }
 
-  ingress {
+  ingress = {
     external_enabled = true
     target_port      = 80
-
-    traffic_weight {
+    traffic_weight = [{
       percentage      = 100
       latest_revision = true
-    }
+    }]
   }
 
-  template {
-    volume {
-      name         = azurerm_storage_share.containerappenv_logs.name
-      storage_name = azurerm_container_app_environment_storage.logs.name
-      storage_type = "AzureFile" ## NfsAzureFile
-      #mount_options = local.cifs_mount_options
-    }
-    volume {
-      name         = azurerm_storage_share.containerappenv_shared.name
-      storage_name = azurerm_container_app_environment_storage.shared.name
-      storage_type = "AzureFile" ## NfsAzureFile
-      #mount_options = local.cifs_mount_options
-    }
-    #cooldown_period_in_seconds = 120
-    container {
+  template = {
+    volumes = [
+      {
+        name         = azurerm_storage_share.containerappenv_logs.name
+        storage_name = azurerm_container_app_environment_storage.logs.name
+        storage_type = "AzureFile"
+      },
+      {
+        name         = azurerm_storage_share.containerappenv_shared.name
+        storage_name = azurerm_container_app_environment_storage.shared.name
+        storage_type = "AzureFile"
+      }
+    ]
+    containers = [{
       name   = "helloworld"
       image  = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
       cpu    = 0.5
       memory = "1Gi"
-      env { // authentication
-        name  = "ENTRA_ID_CLIENT_ID"
-        value = azurerm_user_assigned_identity.environment.client_id
-      }
-      env { // authentication
-        name  = "ENTRA_ID_CLIENT_SECRET"
-        value = azurerm_user_assigned_identity.environment.client_id
-      }
-      env { // authentication
-        name  = "ENTRA_ID_ISSUER_URL"
-        value = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/v2.0"
-      }
-      env { // configuration information
-        name  = "AZURE_APP_CONFIGURATION_ENDPOINT"
-        value = module.appconfiguration.endpoint
-      }
-      env { // ACA environment information -name
-        name  = "AZURE_ACA_ENVIRONMENT_NAME"
-        value = azurerm_container_app_environment.this.name
-      }
-      env { // ACA environment information -resource group name
-        name  = "AZURE_ACA_ENVIRONMENT_RESOURCE_GROUP_NAME"
-        value = azurerm_container_app_environment.this.resource_group_name
-      }
-      env {
-        name  = "ASPNETCORE_ENVIRONMENT"
-        value = "Production"
-      }
-      #volume_mounts {
-      #  name = azurerm_storage_share.containerappenv_logs.name
-      #  path = "/mnt/logs"
-      #}
-      #volume_mounts {
-      #  name = azurerm_storage_share.containerappenv_shared.name
-      #  storage_type = "AzureFile"
-      #  path = "/mnt/shared"
-      # }
-    }
+      env = [
+        {
+          name  = "ENTRA_ID_CLIENT_ID"
+          value = azurerm_user_assigned_identity.environment.client_id
+        },
+        {
+          name  = "ENTRA_ID_CLIENT_SECRET"
+          value = azurerm_user_assigned_identity.environment.client_id
+        },
+        {
+          name  = "ENTRA_ID_ISSUER_URL"
+          value = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/v2.0"
+        },
+        /*
+        {
+          name  = "AZURE_APP_CONFIGURATION_ENDPOINT"
+          value = module.appconfiguration.endpoint
+        },
+*/
+        {
+          name  = "AZURE_ACA_ENVIRONMENT_NAME"
+          value = azurerm_container_app_environment.this.name
+        },
+        {
+          name  = "AZURE_ACA_ENVIRONMENT_RESOURCE_GROUP_NAME"
+          value = azurerm_container_app_environment.this.resource_group_name
+        },
+        {
+          name  = "ASPNETCORE_ENVIRONMENT"
+          value = "Production"
+        }
+      ]
+    }]
   }
+
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+
   depends_on = [
     azurerm_container_app_environment.this,
     azurerm_container_app_environment_storage.logs,
@@ -205,28 +203,28 @@ validation_type = "CNAME"
 output "aca_app_helloworld_dns_cname_record" {
   value = {
      name  = split(".", var.custom_hostname)[0]
-    value = azurerm_container_app.app.ingress[0].fqdn
+    value = try(azurerm_container_app.app.ingress[0].fqdn, "")
   }
 }
 
 output "aca_app_app_helloworld_dns_txt_record" {
   value = {
     name  = "asuid.${split(".", var.custom_hostname)[0]}"
-    value = azurerm_container_app.app.custom_dns_zone_verification_id
+    value = try(azurerm_container_app.app.custom_dns_zone_verification_id, "")
   }
 }
 */
 
 ## Examples:-
 ## (state stores): state.azure.cosmosdb, state.azure.blobstorage, state.sqlserver
-## (bindings)    : bindings.azure.servicebusqueues, 
+## (bindings)    : bindings.azure.servicebusqueues,
 ## (configuration): configuration.azure.appconfig
-## 
+##
 
 resource "azapi_resource" "helloworld_resiliency_policy" {
   type      = "Microsoft.App/containerApps/resiliencyPolicies@2025-10-02-preview"
   name      = "default"
-  parent_id = azurerm_container_app.helloworld.id
+  parent_id = module.helloworld_container_app.resource_id
 
   # Preview API: avoid strict schema mismatches during provider updates.
   schema_validation_enabled = false
