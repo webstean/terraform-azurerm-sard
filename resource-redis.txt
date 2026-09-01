@@ -1,24 +1,31 @@
 locals {
   redis_friendly_name = "Azure Cache for Redis"
+  redis_docs = "https://learn.microsoft.com/en-us/azure/redis/"
   redis_name          = "redis-${var.prefix}"
   redis_name_location = lower("${local.redis_name}-${lower(var.location)}")
   redis_random_suffix = substr(md5(local.redis_name_location), 0, 6)
   redis_name_hostname = lower(substr(replace("l${local.redis_random_suffix}${local.redis_name_location}", "-", ""), 0, 24))
+  redis_sku_name = "Balanced_B0"                ## Memory-Optimized : Memory-Optimized_M10, Memory-Optimized_M20
+                                                ## Balanced         : Balanced_B0, Balanced_B1, Balanced_B3, Balanced_B5
+                                                ## Compute-Optimized: Compute-Optimized_X5, Compute-Optimized_X10
+  redis_clustering_policy = "EnterpriseCluster" ## Single endpoint, automatic sharding (default) : "OSSCluster"
+                                                ## Redis Cluster API protocol, best performance  : "NoEviction"
+                                                ## Non-clustered mode, maximum 25GB Default      : "EnterpriseCluster"
 }
 
 module "redis" {
   source  = "Azure/avm-res-cache-redisenterprise/azurerm"
   version = "~>0.0, < 1.0"
-  enable_telemetry  = var.enable_telemetry ## see variables.tf
+  enable_telemetry  = var.enable_telemetry
 
   name              = local.redis_name_location
   parent_id         = module.environment_resource_group.resource_id
   location          = module.environment_resource_group.resource.location
-  sku_name          = "Balanced_B0"
-  clustering_policy = "EnterpriseCluster"
+  sku_name          = local.redis_sku_name
+  clustering_policy = local.redis_clustering_policy
   eviction_policy   = "AllKeysLRU"
   zones             = null
-  high_availability = "Disabled"
+  high_availability = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? "Enabled" : "Disabled"
 
   managed_identities = {
     system_assigned = false
