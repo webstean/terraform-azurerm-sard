@@ -173,13 +173,7 @@ output "appconfiguration_endpoint" {
 }
 
 output "appconfiguration_replica_resource_ids" {
-  description = "The resource IDs of the environment's Azure App Configuration store replicas."
+  description = "The resource IDs of the environment's Azure App Configuration replicas."
   sensitive   = false
   value       = module.appconfiguration.replica_resource_ids
-}
-
-output "appconfiguration_sku" {
-  description = "The SKU of the environment's Azure App Configuration store."
-  sensitive   = false
-  value       = module.appconfiguration.resource.sku
 }

@@ -22,9 +22,9 @@ resource "azurerm_storage_account" "this" {
   allow_nested_items_to_be_public = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
   public_network_access_enabled   = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
 
-  blob_properties {
-    versioning_enabled = true
-  }
+  #blob_properties {
+  #  versioning_enabled = true
+  #}
 
   network_rules {
     default_action             = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? "Deny" : "Allow"
@@ -48,6 +48,15 @@ resource "azurerm_storage_account" "this" {
   ## authentication_types = ["Kerberos", "NTLMv2"] ## NTLMv2 is needed for ACA
   ## }
   ##  }
+
+  share_properties {
+    smb {
+      versions                        = ["SMB2.1", "SMB3.0", "SMB3.1.1"]
+      kerberos_ticket_encryption_type = ["AES-256"]            ## AES-256, RC4-HMAC
+      channel_encryption_type         = ["AES-256-GCM"]        ## AES-128-CCM, AES-128-GCM, AES-256-GCM
+      authentication_types            = ["Kerberos", "NTLMv2"] ## NTLMv2 is needed for ACA
+    }
+  }
 
   identity {
     type         = "UserAssigned"
