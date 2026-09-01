@@ -1,6 +1,6 @@
 locals {
   appconfiguration_sku               = "free" ## "standard" is the default/null,  options are: free, developer, standard, and premium
-  appconfiguration_env_name          = "app-configuration-f${local.appconfiguration_sku}-${var.prefix}"
+  appconfiguration_env_name          = "app-configuration-${local.appconfiguration_sku}-${var.prefix}"
   appconfiguration_env_name_location = lower("${local.appconfiguration_env_name}-${lower(var.location)}")
   appconfiguration_env_random_suffix = substr(md5(local.appconfiguration_env_name_location), 0, 6)
   appconfiguration_env_name_hostname = lower(substr(replace("f${local.appconfiguration_env_random_suffix}${local.appconfiguration_env_name_location}", "-", ""), 0, 24))
