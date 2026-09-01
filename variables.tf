@@ -639,7 +639,7 @@ DESC
   default     = null
 }
 
-variable "containerregistry_id" {
+variable "container_registry_id" {
   type        = string
   sensitive   = false
   description = <<DESC
