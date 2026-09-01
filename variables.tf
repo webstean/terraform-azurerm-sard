@@ -21,7 +21,7 @@ variable "subscription_id" {
   type        = string
   sensitive   = false
   description = <<DESC
-The Azure subscription ID in which the resources will be deployed.
+The single Azure subscription ID in which the resources will be deployed.
 DESC
 
   validation {
