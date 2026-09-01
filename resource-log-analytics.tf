@@ -180,11 +180,13 @@ resource "azurerm_application_insights_smart_detection_rule" "rules" {
   //additional_email_recipients        = [azurerm_application_insights.this.tags.owner_email]
 }
 
+/*
 resource "azurerm_log_analytics_linked_service" "this" {
   resource_group_name = module.environment_resource_group.resource.name
   workspace_id        = module.log_analytics_workspace.resource_id
   read_access_id      = azurerm_automation_account.this.id
 }
+*/
 
 /*
 resource "azurerm_log_analytics_datasource_windows_performance_counter" "example" {

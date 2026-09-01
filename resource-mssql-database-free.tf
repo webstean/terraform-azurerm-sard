@@ -49,7 +49,7 @@ resource "azapi_resource" "free_sql_database" {
       ## autoPauseDelay                   = 15 ## -1 auto pause is disabled (not applicable to free tier)
       zoneRedundant                    = false
       isLedgerOn                       = false
-      isIPv6Enabled                    = "Disabled" ## "Enabled"            
+      isIPv6Enabled                    = "Disabled" ## "Enabled"
       useFreeLimit                     = true
       preferredEnclaveType             = "VBS"
       freeLimitExhaustionBehavior      = "AutoPause" ## Other option: BillOverUsage
@@ -141,6 +141,7 @@ resource "azurerm_key_vault_secret" "sql_database_connection_free_unencrypted" {
   ]
 }
 
+/*
 resource "azurerm_automation_variable_string" "sql_database_connection_free_encrypted" {
   name                    = "SQL-DATABASE-CONNECTION-STRING-FREE-ENCRYPTED"
   resource_group_name     = module.environment_resource_group.resource.name
@@ -164,6 +165,7 @@ resource "azurerm_automation_variable_string" "sql_database_connection_free_unen
   Connection String (Entra ID Integrated) to the Free SQL Server database (unencrypted)
 DESC
 }
+*/
 
 /*
 resource "terraform_data" "grant_sql_database_access" {
@@ -204,7 +206,7 @@ BEGIN
 END;
 "@
 
-## The SQL Server has to be publically accessible for this to work, or have a 
+## The SQL Server has to be publically accessible for this to work, or have a
 ## private endpoint configured and the local-exec provisioner must run from a machine that can access the private endpoint.
 Invoke-Sqlcmd `
   -ServerInstance "${azurerm_mssql_server.this.fully_qualified_domain_name}" `

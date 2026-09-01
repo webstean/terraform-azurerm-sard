@@ -3,6 +3,7 @@
 
 variable "customer" {
   type        = string
+  sensitive   = false
   description = <<DESC
 The name of the customer (free-text)
 DESC
@@ -10,6 +11,7 @@ DESC
 
 variable "prefix" {
   type        = string
+  sensitive   = false
   description = <<DESC
 A short name (typically 3-8 characters, lowercase) for the customer, used as a prefix for all Azure resource names to ensure global uniqueness.
 DESC
@@ -17,6 +19,7 @@ DESC
 
 variable "subscription_id" {
   type        = string
+  sensitive   = false
   description = <<DESC
 The Azure subscription ID in which the resources will be deployed.
 DESC
@@ -29,6 +32,7 @@ DESC
 
 variable "owner_email" {
   type        = string
+  sensitive   = false
   description = <<DESC
 Email address of the resource owner, used for contact and billing notifications
 DESC
@@ -41,6 +45,7 @@ DESC
 
 variable "owner_entra_object_id" {
   type        = string
+  sensitive   = false
   description = <<DESC
 The Entra ID object ID for the owner of this environment
 DESC
@@ -52,6 +57,7 @@ DESC
 }
 variable "owner_entra_display_name" {
   type        = string
+  sensitive   = false
   description = <<DESC
 Display name of the owner in Entra ID for RBAC role assignment and resource access control.
 DESC
@@ -59,6 +65,7 @@ DESC
 
 variable "sql_administrator_group_object_id" {
   type        = string
+  sensitive   = false
   description = <<DESC
 The Entra ID object ID for the SQL administrator group (can be a user or a group)
 DESC
@@ -67,8 +74,10 @@ DESC
     error_message = "The variable 'sql_administrator_group_object_id' must be a valid GUID."
   }
 }
+
 variable "sql_administrator_group_display_name" {
   type        = string
+  sensitive   = false
   description = <<DESC
 Entra ID display name for the user or group that will have SQL Server administrator permissions.
 DESC
@@ -79,6 +88,7 @@ DESC
 
 variable "security_perimeter_inbound_public_ips" {
   type        = list(string)
+  sensitive   = false
   description = <<DESC
 Allowed inbound addresses for the Azure Security Perimeter.
 DESC
@@ -87,6 +97,7 @@ DESC
 
 variable "security_perimeter_outbound_fqdns" {
   type        = list(string)
+  sensitive   = false
   description = <<DESC
 Allowed outbound FQDNs for the Azure Security Perimeter.
 DESC
@@ -95,6 +106,7 @@ DESC
 
 variable "vmss_number_of_instances" {
   type        = number
+  sensitive   = false
   description = <<DESC
 The number of instances in the Virtual Machine Scale Set.
 DESC
@@ -103,6 +115,7 @@ DESC
 
 variable "vmss_autoscale_enabled" {
   type        = bool
+  sensitive   = false
   description = <<DESC
 Whether autoscale is enabled for the Virtual Machine Scale Set.
 DESC
@@ -111,6 +124,7 @@ DESC
 
 variable "bastion_sku" {
   type        = string
+  sensitive   = false
   description = <<DESC
 Azure Bastion SKU tier that determines features and pricing. See https://learn.microsoft.com/en-us/azure/bastion/bastion-sku-comparison
 DESC
@@ -127,6 +141,7 @@ DESC
 
 variable "location" {
   type        = string
+  sensitive   = false
   description = <<DESC
 The Azure region where resources will be deployed.
 DESC
@@ -139,6 +154,7 @@ DESC
 
 variable "enable_telemetry" {
   type        = bool
+  sensitive   = false
   description = <<DESC
 This variable controls whether or not the AVM (Azure Verified Modules) telemetry is enabled for the module.
 For more information see <https://aka.ms/avm/telemetryinfo>.
@@ -149,6 +165,7 @@ DESC
 
 variable "data_pii" {
   type        = bool
+  sensitive   = false
   description = <<DESC
 If true, this environment contains PII (Personally Identifiable Information) so deploy additional security controls. If false, deploys a non-PII environment.
 DESC
@@ -157,6 +174,7 @@ DESC
 
 variable "data_phi" {
   type        = bool
+  sensitive   = false
   description = <<DESC
 If true, this environment contains PHI (Protected Health Information) so deploy additional security controls. If false, deploys a non-PHI environment.
 DESC
@@ -165,6 +183,7 @@ DESC
 
 variable "deploy_sql_failover" {
   type        = bool
+  sensitive   = false
   description = <<DESC
 If true, deploys a Microsoft SQL failover environment in the linked region. If false, deploys a single SQL instance.
 DESC
@@ -173,6 +192,7 @@ DESC
 
 variable "support_free_sql_database" {
   type        = bool
+  sensitive   = false
   description = <<DESC
 If true, support the totally Free SQL Server. Failover must be disabled and the SQL Server cannot have an alias.
 DESC
@@ -186,6 +206,7 @@ DESC
 ## not implemented - yet
 variable "sql_connectivity_type" {
   type        = string
+  sensitive   = false
   description = <<DESC
 Connectivity mode for the SQL Server endpoint: 'PRIVATE' (VNet via Private Endpoint), or 'PUBLIC' (internet-facing).
 DESC
@@ -199,6 +220,7 @@ DESC
 
 variable "deploy_private_endpoints" {
   type        = bool
+  sensitive   = false
   description = <<DESC
 If true, deploys private endpoints for secure access to Azure services. If false, does not deploy private endpoints.
 DESC
@@ -207,6 +229,7 @@ DESC
 
 variable "inbound_access" {
   type        = string
+  sensitive   = false
   description = <<DESC
 Specifies the type of inbound access to the environment via the Internet. Options are: 'None' (free), 'App-Gateway' ($$), 'FrontDoor' ($$).
 DESC
@@ -222,6 +245,7 @@ DESC
 
 variable "automation_account_id" {
   type        = string
+  sensitive   = false
   description = <<DESC
 The ID of the Azure Automation Account to be used.
 DESC
@@ -230,6 +254,7 @@ DESC
 
 variable "containerregistry_id" {
   type        = string
+  sensitive   = false
   description = <<DESC
 The ID of the Azure Container Registry to be used.
 DESC
@@ -238,6 +263,7 @@ DESC
 
 variable "outbound_access" {
   type        = string
+  sensitive   = false
   description = <<DESC
 Specifies the type of outbound access to the environment via the Internet. Options are: 'Direct' (free), 'Nat-Gateway' ($$), 'Hub-and-Spoke-with-Nat-Gateway' ($$$).
 Note: that 'Direct' does not allowed Virtual Machine Scale Sets to have any OutBound Internet access, you need to use a Nat-Gateway or Hub-and-Spoke
@@ -254,6 +280,7 @@ DESC
 
 variable "frontdoor_sku" {
   type        = string
+  sensitive   = false
   description = <<DESC
 Specifies the SKU for Azure Front Door. Options are: 'Standard' or 'Premium'.
 DESC
@@ -270,6 +297,7 @@ DESC
 /*
 variable "container_app_fqdn" {
   type        = string
+  sensitive   = false
   description = <<DESC
 The Azure Container App ingress FQDN that Application Gateway routes traffic to (for example: myapp.orangecliff-123456.australiaeast.azurecontainerapps.io).
 DESC
@@ -287,7 +315,7 @@ DESC
 
 variable "bastion_premium_private_deployment" {
   type        = bool
-  description = <<DESC
+  sensitive   = false
   description = <<DESC
 If true, deploys a Premium Bastion with private deployment (no public IP). If false, deploys a Premium Bastion with public deployment.
 DESC
@@ -304,6 +332,7 @@ DESC
 
 variable "deploy_ai_embeddings" {
   type        = bool
+  sensitive   = false
   description = <<DESC
 If true, deploys AI embeddings for the environment. If false, does not deploy AI embeddings.
 DESC
@@ -312,6 +341,7 @@ DESC
 
 variable "aca_enable_dapr" {
   type        = bool
+  sensitive   = false
   description = <<DESC
 If true, enables Dapr for the Azure Container Apps environment. If false, does not enable Dapr.
 DESC
@@ -320,6 +350,7 @@ DESC
 
 variable "aca_consumption_gpu_enabled" {
   type        = bool
+  sensitive   = false
   description = <<DESC
 If true, adds a Consumption GPU workload profile to the Azure Container Apps environment.
 DESC
@@ -328,6 +359,7 @@ DESC
 
 variable "aca_consumption_gpu_profile_type" {
   type        = string
+  sensitive   = false
   description = <<DESC
 Consumption GPU workload profile type for Azure Container Apps (e.g., Consumption-GPU-NC8as-T4 for NVIDIA T4 GPUs).
 DESC
@@ -341,6 +373,7 @@ DESC
 
 variable "aca_consumption_gpu_min_count" {
   type        = number
+  sensitive   = false
   description = <<DESC
 Minimum replica count for the ACA Consumption GPU workload profile.
 DESC
@@ -354,6 +387,7 @@ DESC
 
 variable "aca_consumption_gpu_max_count" {
   type        = number
+  sensitive   = false
   description = <<DESC
 Maximum replica count for the ACA Consumption GPU workload profile.
 DESC
@@ -367,6 +401,7 @@ DESC
 
 variable "custom_dns_zone_name" {
   type        = string
+  sensitive   = false
   description = <<DESC
 An active DNS zone name (e.g., example.com) already purchased and configured in the Azure subscription for custom domain configuration.
 DESC
@@ -383,6 +418,7 @@ DESC
 
 variable "vwan_hub_id" {
   type        = string
+  sensitive   = false
   description = <<DESC
 The ID of the Azure Virtual WAN hub to which the route table will be associated.
 DESC
@@ -398,6 +434,7 @@ DESC
 
 variable "vwan_hub_firewall_id" {
   type        = string
+  sensitive   = false
   description = <<DESC
 The ID of the Azure Firewall deployed in the Virtual WAN hub for filtering and routing traffic.
 DESC
@@ -406,6 +443,7 @@ DESC
 
 variable "vmss_disk_controller_type" {
   type        = string
+  sensitive   = false
   description = <<DESC
 Disk controller type for the Virtual Machine Scale Set. Use 'SCSI' for hibernation support; 'NVMe' is faster but does not support hibernation.
 DESC
@@ -415,6 +453,7 @@ DESC
 
 variable "vmss_hibernation_enabled" {
   type        = bool
+  sensitive   = false
   description = <<DESC
 Whether hibernation is enabled for the Virtual Machine Scale Set. Requires 'vmss_disk_controller_type' to be 'SCSI'.
 DESC
@@ -428,6 +467,7 @@ DESC
 
 variable "vmss_sku_name" {
   type        = string
+  sensitive   = false
   description = <<DESC
 Azure Virtual Machine SKU for the scale set (e.g., Standard_D2s_v5). Determines vCPU, memory, and pricing.
 DESC
@@ -435,42 +475,47 @@ DESC
 }
 
 variable "vmss_autoscale_min_capacity" {
+  type        = number
+  sensitive   = false
   description = <<DESC
 Virtual Machine Scale Set: minimum number of instances to maintain at all times.
 DESC
-  type        = number
   default     = 1
 }
 
 variable "vmss_autoscale_weekend_capacity" {
+  type        = number
+  sensitive   = false
   description = <<DESC
 Virtual Machine Scale Set: fixed instance count to run during the weekend low-usage window.
 DESC
-  type        = number
   default     = 0
 }
 
 variable "vmss_autoscale_default_capacity" {
+  type        = number
+  sensitive   = false
   description = <<DESC
 Virtual Machine Scale Set: default instance count used during normal business hours.
 DESC
-  type        = number
   default     = 1
 }
 
 variable "vmss_autoscale_max_capacity" {
+  type        = number
+  sensitive   = false
   description = <<DESC
 Virtual Machine Scale Set: maximum number of instances to scale up to.
 DESC
-  type        = number
   default     = 1
 }
 
 variable "vmss_autoscale_scale_out_cpu_threshold" {
+  type        = number
+  sensitive   = false
   description = <<DESC
 Virtual Machine Scale Set: average CPU percentage threshold that triggers a scale-out (add instances).
 DESC
-  type        = number
   default     = 70
 
   validation {
@@ -480,55 +525,62 @@ DESC
 }
 
 variable "vmss_autoscale_scale_out_increase_count" {
+  type        = number
+  sensitive   = false
   description = <<DESC
 Virtual Machine Scale Set: number of instances to add per scale-out event.
 DESC
-  type        = number
   default     = 1
 }
 
 variable "vmss_autoscale_time_window" {
+  type        = string
+  sensitive   = false
   description = <<DESC
 Virtual Machine Scale Set: look-back window for the average CPU calculation in ISO 8601 format (e.g., PT10M for 10 minutes).
 DESC
-  type        = string
   default     = "PT10M"
 }
 
 variable "vmss_autoscale_time_grain" {
+  type        = string
+  sensitive   = false
   description = <<DESC
 Virtual Machine Scale Set: granularity/frequency of metric data points collected in ISO 8601 format (e.g., PT1M for 1 minute intervals).
 DESC
-  type        = string
   default     = "PT1M"
 }
 
 variable "vmss_autoscale_predictive_look_ahead_time" {
+  type        = string
+  sensitive   = false
   description = <<DESC
 Virtual Machine Scale Set: how far ahead predictive autoscale forecasts demand in ISO 8601 format (e.g., PT5M for 5 minutes ahead).
 DESC
-  type        = string
   default     = "PT5M"
 }
 
 variable "vmss_autoscale_cooldown" {
+  type        = string
+  sensitive   = false
   description = <<DESC
 Virtual Machine Scale Set: time to wait after a scale action before scaling again in ISO 8601 format (e.g., PT30M for 30 minutes).
 DESC
-  type        = string
   default     = "PT30M"
 }
 
 variable "vmss_autoscale_business_hours_start" {
+  type        = number
+  sensitive   = false
   description = <<DESC
 Virtual Machine Scale Set: hour (0-23) each weekday when the CPU-based business-hours autoscale profile activates.
 DESC
-  type        = number
   default     = 16 ## 4pm
 }
 
 variable "vmss_otel_counter_specifiers" {
   type        = list(string)
+  sensitive   = false
   description = <<DESC
 Virtual Machine Scale Set: OpenTelemetry system metrics to collect from instances. Defaults to the standard free metrics set.
 DESC
@@ -552,6 +604,7 @@ variable "pls_nat_ip_configurations" {
     primary            = bool
     private_ip_address = optional(string)
   }))
+  sensitive   = false
   description = <<DESC
 One or more (max 8) NAT IP configurations for the Private Link Service. Exactly one must have primary = true.
 DESC
@@ -570,6 +623,7 @@ DESC
 
 variable "pls_proxy_protocol_enabled" {
   type        = bool
+  sensitive   = false
   description = <<DESC
 Whether the Private Link Service should support Proxy Protocol (to preserve source IP to the backend).
 DESC
@@ -578,8 +632,18 @@ DESC
 
 variable "pls_allowed_fqdns" {
   type        = list(string)
+  sensitive   = false
   description = <<DESC
 FQDNs allowed for the Private Link Service.
 DESC
   default     = []
+}
+
+
+variable "automation_account_name" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+Name of the Azure Automation Account.
+DESC
 }
