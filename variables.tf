@@ -585,6 +585,7 @@ variable "pls_nat_ip_configurations" {
     name               = string
     primary            = bool
     private_ip_address = optional(string)
+    private_ip_address_version = optional(string)
   }))
   sensitive   = false
   description = <<DESC
@@ -593,7 +594,15 @@ DESC
   default = [
     {
       name    = "primary"
+      private_ip_address = null
+      private_ip_address_version = "IPv4"
       primary = true
+    },
+    {
+      name    = "secondary"
+      private_ip_address = null
+      private_ip_address_version = "IPv4"
+      primary = false
     }
   ]
 
