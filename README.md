@@ -252,6 +252,7 @@ Next steps here
 | <a name="output_appconfiguration_id"></a> [appconfiguration\_id](#output\_appconfiguration\_id) | The resource ID of the environment's Azure App Configuration store. |
 | <a name="output_appconfiguration_name"></a> [appconfiguration\_name](#output\_appconfiguration\_name) | The name of the environment's Azure App Configuration store. |
 | <a name="output_appconfiguration_replica_resource_ids"></a> [appconfiguration\_replica\_resource\_ids](#output\_appconfiguration\_replica\_resource\_ids) | The resource IDs of the environment's Azure App Configuration store replicas. |
+| <a name="output_appconfiguration_sku"></a> [appconfiguration\_sku](#output\_appconfiguration\_sku) | The SKU of the environment's Azure App Configuration store. |
 | <a name="output_azure_monitor_workspace_id"></a> [azure\_monitor\_workspace\_id](#output\_azure\_monitor\_workspace\_id) | The ID of the Azure Monitor workspace. |
 | <a name="output_azure_monitor_workspace_location"></a> [azure\_monitor\_workspace\_location](#output\_azure\_monitor\_workspace\_location) | The location of the Azure Monitor workspace. |
 | <a name="output_azure_monitor_workspace_name"></a> [azure\_monitor\_workspace\_name](#output\_azure\_monitor\_workspace\_name) | The name of the Azure Monitor workspace. |
