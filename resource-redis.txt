@@ -51,20 +51,32 @@ module "redis" {
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
+action "azurerm_managed_redis_databases_flush" "this" {
+  config {
+    managed_redis_database_id = module.redis.resource.default_database[0].id
+  }
+}
+
 output "redis_id" {
   description = "The ID of the Redis instance."
   sensitive   = false
-  value       = module.redis.resource_id
+  value       = try(module.redis.resource_id, null)
 }
 
 output "redis_name" {
   description = "The Name of the Redis instance."
   sensitive   = false
-  value       = module.redis.name
+  value       = try(module.redis.name, null)
 }
 
 output "redis_resource" {
-  description = "The details of Redis resource"
-  sensitive   = true
-  value       = module.redis.resource
+  description = "Details of Redis resource"
+  sensitive   = false
+  value       = try(module.redis.resource, null)
+}
+
+output "redis_default_database" {
+  description = "The details of the Redis default database"
+  sensitive   = false
+  value       = try(module.redis.resource.default_database[0].id, null)
 }
