@@ -135,7 +135,7 @@ DESC
     condition = (
       contains(["Developer", "Basic", "Standard", "Premium"], var.bastion_sku)
     )
-    error_message = "The variable 'bastion_sku' must be one of: 'Developer', 'Basic', 'Standard', 'Premium'."
+    error_message = "The variable 'bastion_sku' must be one of: 'Developer', 'Basic', 'Standard' or 'Premium'."
   }
 }
 
@@ -148,7 +148,7 @@ DESC
   default     = "australiaeast"
   validation {
     condition     = contains(["australiasoutheast", "australiaeast", "australiacentral", "australiacentral2", "perth", "centralindia", "westus3"], lower(trimspace(var.location)))
-    error_message = "location must be one of the currently known Azure regions defined in locals.regions."
+    error_message = "location must be one of the currently defined regions in the locals.tf (regions)."
   }
 }
 
