@@ -60,8 +60,6 @@ Next steps here
 | [azurerm_application_gateway.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_gateway) | resource |
 | [azurerm_application_insights_smart_detection_rule.rules](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_smart_detection_rule) | resource |
 | [azurerm_application_insights_workbook.workbook1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_workbook) | resource |
-| [azurerm_automation_variable_string.sql_database_connection_free_encrypted](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_string) | resource |
-| [azurerm_automation_variable_string.sql_database_connection_free_unencrypted](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_string) | resource |
 | [azurerm_bastion_host.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/bastion_host) | resource |
 | [azurerm_communication_service.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/communication_service) | resource |
 | [azurerm_communication_service_email_domain_association.comms](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/communication_service_email_domain_association) | resource |
@@ -88,7 +86,6 @@ Next steps here
 | [azurerm_lb_backend_address_pool_address.target](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_backend_address_pool_address) | resource |
 | [azurerm_lb_probe.tcp](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_probe) | resource |
 | [azurerm_lb_rule.relay](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_rule) | resource |
-| [azurerm_log_analytics_linked_service.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_linked_service) | resource |
 | [azurerm_log_analytics_query_pack.platform](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_query_pack) | resource |
 | [azurerm_monitor_data_collection_endpoint.otel](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_data_collection_endpoint) | resource |
 | [azurerm_monitor_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_workspace) | resource |
@@ -186,6 +183,7 @@ Next steps here
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_automation_account_name"></a> [automation\_account\_name](#input\_automation\_account\_name) | Name of the Azure Automation Account. | `string` | n/a | yes |
 | <a name="input_customer"></a> [customer](#input\_customer) | The name of the customer (free-text) | `string` | n/a | yes |
 | <a name="input_owner_email"></a> [owner\_email](#input\_owner\_email) | Email address of the resource owner, used for contact and billing notifications | `string` | n/a | yes |
 | <a name="input_owner_entra_display_name"></a> [owner\_entra\_display\_name](#input\_owner\_entra\_display\_name) | Display name of the owner in Entra ID for RBAC role assignment and resource access control. | `string` | n/a | yes |
@@ -200,7 +198,7 @@ Next steps here
 | <a name="input_aca_consumption_gpu_profile_type"></a> [aca\_consumption\_gpu\_profile\_type](#input\_aca\_consumption\_gpu\_profile\_type) | Consumption GPU workload profile type for Azure Container Apps (e.g., Consumption-GPU-NC8as-T4 for NVIDIA T4 GPUs). | `string` | `"Consumption-GPU-NC8as-T4"` | no |
 | <a name="input_aca_enable_dapr"></a> [aca\_enable\_dapr](#input\_aca\_enable\_dapr) | If true, enables Dapr for the Azure Container Apps environment. If false, does not enable Dapr. | `bool` | `false` | no |
 | <a name="input_automation_account_id"></a> [automation\_account\_id](#input\_automation\_account\_id) | The ID of the Azure Automation Account to be used. | `string` | `null` | no |
-| <a name="input_bastion_premium_private_deployment"></a> [bastion\_premium\_private\_deployment](#input\_bastion\_premium\_private\_deployment) | description = <<DESC<br/>If true, deploys a Premium Bastion with private deployment (no public IP). If false, deploys a Premium Bastion with public deployment. | `bool` | `false` | no |
+| <a name="input_bastion_premium_private_deployment"></a> [bastion\_premium\_private\_deployment](#input\_bastion\_premium\_private\_deployment) | If true, deploys a Premium Bastion with private deployment (no public IP). If false, deploys a Premium Bastion with public deployment. | `bool` | `false` | no |
 | <a name="input_bastion_sku"></a> [bastion\_sku](#input\_bastion\_sku) | Azure Bastion SKU tier that determines features and pricing. See https://learn.microsoft.com/en-us/azure/bastion/bastion-sku-comparison | `string` | `"Developer"` | no |
 | <a name="input_containerregistry_id"></a> [containerregistry\_id](#input\_containerregistry\_id) | The ID of the Azure Container Registry to be used. | `string` | `null` | no |
 | <a name="input_custom_dns_zone_name"></a> [custom\_dns\_zone\_name](#input\_custom\_dns\_zone\_name) | An active DNS zone name (e.g., example.com) already purchased and configured in the Azure subscription for custom domain configuration. | `string` | `"webstean.com"` | no |
