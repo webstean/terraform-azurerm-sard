@@ -71,7 +71,6 @@ Next steps here
 | [azurerm_email_communication_service.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/email_communication_service) | resource |
 | [azurerm_email_communication_service_domain.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/email_communication_service_domain) | resource |
 | [azurerm_email_communication_service_domain_sender_username.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/email_communication_service_domain_sender_username) | resource |
-| [azurerm_fluid_relay_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/fluid_relay_server) | resource |
 | [azurerm_key_vault.sql_kv](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault) | resource |
 | [azurerm_key_vault_key.tde](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_key) | resource |
 | [azurerm_key_vault_secret.primary-connection](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
@@ -183,7 +182,6 @@ Next steps here
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_automation_account_name"></a> [automation\_account\_name](#input\_automation\_account\_name) | Name of the Azure Automation Account. | `string` | n/a | yes |
 | <a name="input_customer"></a> [customer](#input\_customer) | The name of the customer (free-text) | `string` | n/a | yes |
 | <a name="input_owner_email"></a> [owner\_email](#input\_owner\_email) | Email address of the resource owner, used for contact and billing notifications | `string` | n/a | yes |
 | <a name="input_owner_entra_display_name"></a> [owner\_entra\_display\_name](#input\_owner\_entra\_display\_name) | Display name of the owner in Entra ID for RBAC role assignment and resource access control. | `string` | n/a | yes |
@@ -198,6 +196,7 @@ Next steps here
 | <a name="input_aca_consumption_gpu_profile_type"></a> [aca\_consumption\_gpu\_profile\_type](#input\_aca\_consumption\_gpu\_profile\_type) | Consumption GPU workload profile type for Azure Container Apps (e.g., Consumption-GPU-NC8as-T4 for NVIDIA T4 GPUs). | `string` | `"Consumption-GPU-NC8as-T4"` | no |
 | <a name="input_aca_enable_dapr"></a> [aca\_enable\_dapr](#input\_aca\_enable\_dapr) | If true, enables Dapr for the Azure Container Apps environment. If false, does not enable Dapr. | `bool` | `false` | no |
 | <a name="input_automation_account_id"></a> [automation\_account\_id](#input\_automation\_account\_id) | The ID of the Azure Automation Account to be used. | `string` | `null` | no |
+| <a name="input_automation_account_name"></a> [automation\_account\_name](#input\_automation\_account\_name) | Name of the Azure Automation Account. | `string` | `null` | no |
 | <a name="input_bastion_premium_private_deployment"></a> [bastion\_premium\_private\_deployment](#input\_bastion\_premium\_private\_deployment) | If true, deploys a Premium Bastion with private deployment (no public IP). If false, deploys a Premium Bastion with public deployment. | `bool` | `false` | no |
 | <a name="input_bastion_sku"></a> [bastion\_sku](#input\_bastion\_sku) | Azure Bastion SKU tier that determines features and pricing. See https://learn.microsoft.com/en-us/azure/bastion/bastion-sku-comparison | `string` | `"Developer"` | no |
 | <a name="input_containerregistry_id"></a> [containerregistry\_id](#input\_containerregistry\_id) | The ID of the Azure Container Registry to be used. | `string` | `null` | no |
@@ -269,10 +268,6 @@ Next steps here
 | <a name="output_environment_resource_group"></a> [environment\_resource\_group](#output\_environment\_resource\_group) | The Azure Resource Group that contains this environment |
 | <a name="output_environment_storage_account_name"></a> [environment\_storage\_account\_name](#output\_environment\_storage\_account\_name) | The name of the main storage account for this environment. |
 | <a name="output_environment_storage_file_connection_script_ps1"></a> [environment\_storage\_file\_connection\_script\_ps1](#output\_environment\_storage\_file\_connection\_script\_ps1) | A PowerShell script to connect dirve Z: to the azure files created as part of this environment. |
-| <a name="output_fluid_relay_server_primary_key"></a> [fluid\_relay\_server\_primary\_key](#output\_fluid\_relay\_server\_primary\_key) | The primary key of the Fluid Relay service. |
-| <a name="output_fluid_relay_server_secondary_key"></a> [fluid\_relay\_server\_secondary\_key](#output\_fluid\_relay\_server\_secondary\_key) | The secondary key of the Fluid Relay service. |
-| <a name="output_fluid_relay_service_endpoints"></a> [fluid\_relay\_service\_endpoints](#output\_fluid\_relay\_service\_endpoints) | The service endpoints of the Fluid Relay service. |
-| <a name="output_fluid_relay_service_id"></a> [fluid\_relay\_service\_id](#output\_fluid\_relay\_service\_id) | The ID of the Fluid Relay service. |
 | <a name="output_logs_otel_configuration_access_endpoint"></a> [logs\_otel\_configuration\_access\_endpoint](#output\_logs\_otel\_configuration\_access\_endpoint) | The configuration access endpoint of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_dce_id"></a> [logs\_otel\_dce\_id](#output\_logs\_otel\_dce\_id) | The ID of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_logs_ingestion_endpoint"></a> [logs\_otel\_logs\_ingestion\_endpoint](#output\_logs\_otel\_logs\_ingestion\_endpoint) | The OTEL logs ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
