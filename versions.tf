@@ -59,6 +59,7 @@ provider "azurerm" {
     "Microsoft.EdgeZones",
     "Microsoft.EventGrid",
     "Microsoft.ExtendedLocation",
+    "Microsoft.FluidRelay",
     "Microsoft.GuestConfiguration",
     "Microsoft.HorizonDB",
     "Microsoft.Insights",

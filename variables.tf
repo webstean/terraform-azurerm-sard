@@ -243,24 +243,6 @@ DESC
   }
 }
 
-variable "automation_account_id" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-The ID of the Azure Automation Account to be used.
-DESC
-  default     = null
-}
-
-variable "containerregistry_id" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-The ID of the Azure Container Registry to be used.
-DESC
-  default     = null
-}
-
 variable "outbound_access" {
   type        = string
   sensitive   = false
@@ -639,11 +621,29 @@ DESC
   default     = []
 }
 
-
 variable "automation_account_name" {
   type        = string
   sensitive   = false
   description = <<DESC
 Name of the Azure Automation Account.
 DESC
+  default     = null
+}
+
+variable "automation_account_id" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The ID of the Azure Automation Account to be used.
+DESC
+  default     = null
+}
+
+variable "containerregistry_id" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The ID of the Azure Container Registry to be used.
+DESC
+  default     = null
 }
