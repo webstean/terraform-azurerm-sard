@@ -178,10 +178,8 @@ output "appconfiguration_replica_resource_ids" {
   value       = module.appconfiguration.replica_resource_ids
 }
 
-/*
 output "appconfiguration_sku" {
   description = "The SKU of the environment's Azure App Configuration store."
   sensitive   = false
-  value       = module.appconfiguration.sku
+  value       = module.appconfiguration.resource.sku
 }
-*/

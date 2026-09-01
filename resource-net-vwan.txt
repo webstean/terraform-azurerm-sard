@@ -10,13 +10,15 @@ locals {
 }
 
 resource "azurerm_virtual_wan" "this" {
+  count = var.vwan_hub_id == null ? 1 : 0
+
   name                = local.vwan_name
   resource_group_name = module.environment_resource_group.resource.name
   location            = module.environment_resource_group.resource.location
 
   disable_vpn_encryption            = false
   allow_branch_to_branch_traffic    = false
-  office365_local_breakout_category = "All" ## Possible values include: Optimize, OptimizeAndAllow, All, None. Defaults to None.
+  office365_local_breakout_category = "Optimize" ## Possible values include: Optimize, OptimizeAndAllow, All, None. Defaults to None.
   ## With Basic, the hubs are free!
   type = local.vwan_sku
 
@@ -25,6 +27,8 @@ resource "azurerm_virtual_wan" "this" {
 
 ## $$ (unles vWAN is basic SKU) We need 1x vWAN Hub in each region (take a long time to deploy - 30+ minutes)
 resource "azurerm_virtual_hub" "this" {
+  count = var.vwan_hub_id == null ? 1 : 0
+
   name                = local.vwan_name
   resource_group_name = module.environment_resource_group.resource.name
   location            = module.environment_resource_group.resource.location
@@ -33,7 +37,7 @@ resource "azurerm_virtual_hub" "this" {
 
   ## address space
   address_prefix = "10.99.${local.regions[module.environment_resource_group.resource.location].location_number}.0/24"
-  sku            = local.vwan_hub_sku ## Possible values are Basic and Standard. 
+  sku            = local.vwan_hub_sku ## Possible values are Basic and Standard.
 
   hub_routing_preference = "ASPath" ## Possible values are ExpressRoute, ASPath and VpnGateway.
 
@@ -41,14 +45,14 @@ resource "azurerm_virtual_hub" "this" {
 }
 
 resource "azurerm_vpn_gateway" "main" {
-  count = local.local.vwan_hub_sku == "Standard" ? 1 : 0
+  count = local.vwan_hub_sku == "Standard" ? 1 : 0
 
   ## we only need one, since the Hubs are peered together (with Standard SKU, not Basic!)
 
-  name                                  = "vpn-gateway-${var.environment}-${title(each.value.short_name)}"
-  resource_group_name = module.environment_resource_group.resource.name
-  location            = module.environment_resource_group.resource.location
-  virtual_hub_id                        = azurerm_virtual_hub.this.id
+  name                                  = "vpn-gateway-${var.prefix}-${title(each.value.short_name)}"
+  resource_group_name                   = module.environment_resource_group.resource.name
+  location                              = module.environment_resource_group.resource.location
+  virtual_hub_id                        = try(azurerm_virtual_hub.this.id, var.vwan_hub_id)
   bgp_route_translation_for_nat_enabled = false
   routing_preference                    = "Microsoft Network"
 
@@ -57,6 +61,6 @@ resource "azurerm_vpn_gateway" "main" {
 
 resource "azurerm_virtual_hub_connection" "vnet" {
   name                      = "link-VNET:${azurerm_virtual_network.this.name}-to-HUB:${azurerm_virtual_hub.this.name}"
-  virtual_hub_id            = azurerm_virtual_hub.this.id
+  virtual_hub_id            = try(azurerm_virtual_hub.this.id, var.vwan_hub_id)
   remote_virtual_network_id = azurerm_virtual_network.this.id
 }

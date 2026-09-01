@@ -135,16 +135,13 @@ output "bastion_command_native_rdp" {
   description = "Bastion RDP command to access a Windows VM (via native client) - only works with Standard or Premium Bastion SKUs"
   sensitive   = false
   ## Remote RDP connections to VMs that are joined to Microsoft Entra ID is allowed only from Windows 10 or later PCs that are either Microsoft Entra registered, Microsoft Entra joined, or Microsoft Entra hybrid joined to the same directory as the VM.
-  value = "az network bastion rdp --name ${azurerm_bastion_host.this.name} --resource-group ${azurerm_bastion_host.this.resource_group_name} --target-resource-id <vm-name>"
+  value = "az network bastion rdp --name ${azurerm_bastion_host.this.name} --resource-group ${azurerm_bastion_host.this.resource_group_name} --target-resource-id vm-name"
 }
-
-
 
 output "bastion_command_native_ssh" {
   description = "Bastion SSH command to access a Linux VM (via native client) - only works with Standard or Premium Bastion SKUs"
   sensitive   = false
-  ## Remote SSH connections to VMs that are joined to Microsoft Entra ID is allowed only from Windows 10 or later PCs that are either Microsoft Entra registered, Microsoft Entra joined, or Microsoft Entra hybrid joined to the same directory as the VM.
-  value = "az network bastion ssh --name ${azurerm_bastion_host.this.name} --resource-group ${azurerm_bastion_host.this.resource_group_name} --target-resource-id <vm-name>"
+  value       = "az network bastion ssh --name ${azurerm_bastion_host.this.name} --resource-group ${azurerm_bastion_host.this.resource_group_name} --target-resource-id vm-name"
 }
 
 /*
@@ -266,10 +263,10 @@ resource "azurerm_network_security_group" "bastion" {
   }
   ## Ingress Traffic from Azure Bastion:
   ## Azure Bastion will reach to the target VM over private IP.
-  ## RDP/SSH ports (ports 3389/22 respectively, or custom port values if you are using the custom 
+  ## RDP/SSH ports (ports 3389/22 respectively, or custom port values if you are using the custom
   ## port feature as a part of Standard SKU) need to be opened on the target VM side
   ##  over private IP. As a best practice, you can add the Azure Bastion Subnet IP address
-  ##  range in this rule to allow only Bastion to be able to open these ports on the target VMs 
+  ##  range in this rule to allow only Bastion to be able to open these ports on the target VMs
   ## in your target VM subnet.
   security_rule {
     name                       = "Outbound-AllowSshRdpWAC-to-Vnet"
