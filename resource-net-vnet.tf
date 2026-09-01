@@ -332,7 +332,7 @@ resource "azurerm_network_security_group" "general" { ## designed to be associat
     destination_port_ranges    = ["22", "3389"]
     source_address_prefix      = "168.63.129.16"
     destination_address_prefix = "VirtualNetwork"
-    description                = "Allow Azure Bastian Developer access to both SSH amd RDP"
+    description                = "Allow Azure Bastian Developer access to both SSH and RDP"
   }
 
   ## HTTPS - Outbound (VirtualNetworks)
