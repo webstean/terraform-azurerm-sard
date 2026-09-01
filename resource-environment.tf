@@ -170,6 +170,18 @@ resource "time_sleep" "environment_identity_create_wait" {
 }
 ## https://learn.microsoft.com/en-us/azure/operations/configuration-enrollment#managed-identity
 
+/*
+resource "azurerm_automation_variable_string" "user_assigned_identity" {
+  name                    = "USER_ASSIGNED_IDENTITY_PRINCIPAL_ID"
+  resource_group_name     = azurerm_resource_group.global.name
+  automation_account_name = azurerm_automation_account.this.name
+  encrypted               = (tobool(var.data_pii) == true || tobool(var.data_phi) == true) ? true : false
+
+  value       = azurerm_user_assigned_identity.environment.principal_id
+  description = "User Assigned Identity"
+}
+*/
+
 output "subscription_display_name" {
   description = "The subscription display name of the current Azure subscription."
   sensitive   = false
