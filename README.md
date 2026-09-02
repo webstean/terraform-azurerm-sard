@@ -103,7 +103,6 @@ Next steps here
 | [azurerm_role_assignment.comms_service_owner2](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.github_storage_diag_owner_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.github_storage_owner_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.search_blob_reader](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.sql_db_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.sql_kv_admin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.sql_kv_crypto](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
@@ -118,7 +117,6 @@ Next steps here
 | [azurerm_static_web_app.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/static_web_app) | resource |
 | [azurerm_storage_account.diag](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
 | [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
-| [azurerm_storage_container.rag_documents](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_container.sqldiag](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_share.containerappenv_logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) | resource |
 | [azurerm_storage_share.containerappenv_shared](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) | resource |
@@ -223,9 +221,6 @@ Next steps here
 | <a name="output_aca_env_default_domain"></a> [aca\_env\_default\_domain](#output\_aca\_env\_default\_domain) | The default domain of the Container App Environment. |
 | <a name="output_aca_env_id"></a> [aca\_env\_id](#output\_aca\_env\_id) | The ID of the Container App Environment. |
 | <a name="output_aca_env_static_ip_address"></a> [aca\_env\_static\_ip\_address](#output\_aca\_env\_static\_ip\_address) | The static IP address of the Container App Environment. |
-| <a name="output_ai_search_endpoint"></a> [ai\_search\_endpoint](#output\_ai\_search\_endpoint) | The endpoint of the AI search service |
-| <a name="output_ai_search_primary_key"></a> [ai\_search\_primary\_key](#output\_ai\_search\_primary\_key) | The primary key of the AI search service |
-| <a name="output_ai_search_secondary_key"></a> [ai\_search\_secondary\_key](#output\_ai\_search\_secondary\_key) | The secondary key of the AI search service |
 | <a name="output_azure_monitor_workspace_id"></a> [azure\_monitor\_workspace\_id](#output\_azure\_monitor\_workspace\_id) | The ID of the Azure Monitor workspace. |
 | <a name="output_azure_monitor_workspace_location"></a> [azure\_monitor\_workspace\_location](#output\_azure\_monitor\_workspace\_location) | The location of the Azure Monitor workspace. |
 | <a name="output_azure_monitor_workspace_name"></a> [azure\_monitor\_workspace\_name](#output\_azure\_monitor\_workspace\_name) | The name of the Azure Monitor workspace. |
@@ -275,7 +270,6 @@ Next steps here
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_ai_search_service"></a> [ai\_search\_service](#module\_ai\_search\_service) | Azure/avm-res-search-searchservice/azurerm | ~>0.0, < 1.0 |
 | <a name="module_application_insights"></a> [application\_insights](#module\_application\_insights) | Azure/avm-res-insights-component/azurerm | ~>0.0, < 1.0 |
 | <a name="module_comms_keyvault"></a> [comms\_keyvault](#module\_comms\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
 | <a name="module_cosmos"></a> [cosmos](#module\_cosmos) | Azure/avm-res-documentdb-databaseaccount/azurerm | ~>0.0, < 1.0 |
@@ -283,7 +277,6 @@ Next steps here
 | <a name="module_helloworld_container_app"></a> [helloworld\_container\_app](#module\_helloworld\_container\_app) | Azure/avm-res-app-containerapp/azurerm | ~> 0.9, < 1.0 |
 | <a name="module_log_analytics_workspace"></a> [log\_analytics\_workspace](#module\_log\_analytics\_workspace) | Azure/avm-res-operationalinsights-workspace/azurerm | ~>0.0, < 1.0 |
 | <a name="module_private_endpoint_sqlserver"></a> [private\_endpoint\_sqlserver](#module\_private\_endpoint\_sqlserver) | Azure/avm-res-network-privateendpoint/azurerm | ~>0.0, < 1.0 |
-| <a name="module_search_keyvault"></a> [search\_keyvault](#module\_search\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
 
 # Footer goes here
 
