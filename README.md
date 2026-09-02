@@ -114,7 +114,6 @@ Next steps here
 | [azurerm_role_assignment.umi_storage_diag_contributor_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.umi_storage_diag_table_data_reader_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.umi_storage_table_data_reader_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.web_pubsub_owner1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_route_table.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/route_table) | resource |
 | [azurerm_static_web_app.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/static_web_app) | resource |
 | [azurerm_storage_account.diag](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
@@ -138,7 +137,6 @@ Next steps here
 | [azurerm_virtual_hub_routing_intent.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_hub_routing_intent) | resource |
 | [azurerm_virtual_network.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
 | [azurerm_web_application_firewall_policy.gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/web_application_firewall_policy) | resource |
-| [azurerm_web_pubsub.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/web_pubsub) | resource |
 | [local_file.homepage](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
 | [terraform_data.deploy_site](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) | resource |
 | [time_sleep.environment_identity_create_wait](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
@@ -274,8 +272,6 @@ Next steps here
 | <a name="output_swa_repository_url"></a> [swa\_repository\_url](#output\_swa\_repository\_url) | The repository URL of the Static Web App. |
 | <a name="output_swa_url"></a> [swa\_url](#output\_swa\_url) | The URL for the Static Web App site. |
 | <a name="output_vnet_subnet_details"></a> [vnet\_subnet\_details](#output\_vnet\_subnet\_details) | The details of the subnets within the virtual network. |
-| <a name="output_web_pubsub_hostname"></a> [web\_pubsub\_hostname](#output\_web\_pubsub\_hostname) | The hostname of the Web Pub Sub. |
-| <a name="output_web_pubsub_id"></a> [web\_pubsub\_id](#output\_web\_pubsub\_id) | The ID of the Web Pub Sub. |
 
 ## Modules
 
