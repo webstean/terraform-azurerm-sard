@@ -46,12 +46,18 @@ Next steps here
 
 | Name | Type |
 |------|------|
+| [azapi_resource.default_project](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
+| [azapi_resource.embedding_gpt4o](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
+| [azapi_resource.embedding_small](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
+| [azapi_resource.foundry](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource.free_sql_database](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource.helloworld_resiliency_policy](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource_action.comms-link-notification-hub](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource_action) | resource |
 | [azapi_resource_action.sql_server_automatic_tuning](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource_action) | resource |
 | [azapi_update_resource.aca_env_otel](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/update_resource) | resource |
 | [azapi_update_resource.comms-identity](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/update_resource) | resource |
+| [azapi_update_resource.configurationStore_telemetry](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/update_resource) | resource |
+| [azurerm_app_configuration_feature.test_feature](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/app_configuration_feature) | resource |
 | [azurerm_application_gateway.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_gateway) | resource |
 | [azurerm_application_insights_smart_detection_rule.rules](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_smart_detection_rule) | resource |
 | [azurerm_application_insights_workbook.workbook1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_workbook) | resource |
@@ -61,7 +67,6 @@ Next steps here
 | [azurerm_container_app_environment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment) | resource |
 | [azurerm_container_app_environment_storage.logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_storage) | resource |
 | [azurerm_container_app_environment_storage.shared](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_storage) | resource |
-| [azurerm_cosmosdb_sql_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cosmosdb_sql_role_assignment) | resource |
 | [azurerm_databox_edge_device.gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/databox_edge_device) | resource |
 | [azurerm_email_communication_service.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/email_communication_service) | resource |
 | [azurerm_email_communication_service_domain.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/email_communication_service_domain) | resource |
@@ -103,6 +108,7 @@ Next steps here
 | [azurerm_role_assignment.comms_service_owner2](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.github_storage_diag_owner_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.github_storage_owner_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.project_storage_blob_data_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.sql_db_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.sql_kv_admin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.sql_kv_crypto](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
@@ -117,6 +123,7 @@ Next steps here
 | [azurerm_static_web_app.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/static_web_app) | resource |
 | [azurerm_storage_account.diag](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
 | [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
+| [azurerm_storage_container.ai_containers](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_container.rag_documents](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_container.sqldiag](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_share.containerappenv_logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) | resource |
@@ -168,6 +175,7 @@ Next steps here
 | <a name="input_aca_consumption_gpu_min_count"></a> [aca\_consumption\_gpu\_min\_count](#input\_aca\_consumption\_gpu\_min\_count) | Minimum replica count for the ACA Consumption GPU workload profile. | `number` | `0` | no |
 | <a name="input_aca_consumption_gpu_profile_type"></a> [aca\_consumption\_gpu\_profile\_type](#input\_aca\_consumption\_gpu\_profile\_type) | Consumption GPU workload profile type for Azure Container Apps (e.g., Consumption-GPU-NC8as-T4 for NVIDIA T4 GPUs). | `string` | `"Consumption-GPU-NC8as-T4"` | no |
 | <a name="input_aca_enable_dapr"></a> [aca\_enable\_dapr](#input\_aca\_enable\_dapr) | If true, enables Dapr for the Azure Container Apps environment. If false, does not enable Dapr. | `bool` | `false` | no |
+| <a name="input_ai_search_principal_id"></a> [ai\_search\_principal\_id](#input\_ai\_search\_principal\_id) | The principal ID of the Azure AI Search service to be used. | `string` | `null` | no |
 | <a name="input_automation_account_id"></a> [automation\_account\_id](#input\_automation\_account\_id) | The ID of the Azure Automation Account to be used. | `string` | `null` | no |
 | <a name="input_automation_account_name"></a> [automation\_account\_name](#input\_automation\_account\_name) | Name of the Azure Automation Account. | `string` | `null` | no |
 | <a name="input_bastion_premium_private_deployment"></a> [bastion\_premium\_private\_deployment](#input\_bastion\_premium\_private\_deployment) | If true, deploys a Premium Bastion with private deployment (no public IP). If false, deploys a Premium Bastion with public deployment. | `bool` | `false` | no |
@@ -222,6 +230,10 @@ Next steps here
 | <a name="output_aca_env_default_domain"></a> [aca\_env\_default\_domain](#output\_aca\_env\_default\_domain) | The default domain of the Container App Environment. |
 | <a name="output_aca_env_id"></a> [aca\_env\_id](#output\_aca\_env\_id) | The ID of the Container App Environment. |
 | <a name="output_aca_env_static_ip_address"></a> [aca\_env\_static\_ip\_address](#output\_aca\_env\_static\_ip\_address) | The static IP address of the Container App Environment. |
+| <a name="output_appconfiguration_endpoint"></a> [appconfiguration\_endpoint](#output\_appconfiguration\_endpoint) | The endpoint of the environment's Azure App Configuration store. |
+| <a name="output_appconfiguration_id"></a> [appconfiguration\_id](#output\_appconfiguration\_id) | The resource ID of the environment's Azure App Configuration store. |
+| <a name="output_appconfiguration_name"></a> [appconfiguration\_name](#output\_appconfiguration\_name) | The name of the environment's Azure App Configuration store. |
+| <a name="output_appconfiguration_replica_resource_ids"></a> [appconfiguration\_replica\_resource\_ids](#output\_appconfiguration\_replica\_resource\_ids) | The resource IDs of the environment's Azure App Configuration replicas. |
 | <a name="output_azure_monitor_workspace_id"></a> [azure\_monitor\_workspace\_id](#output\_azure\_monitor\_workspace\_id) | The ID of the Azure Monitor workspace. |
 | <a name="output_azure_monitor_workspace_location"></a> [azure\_monitor\_workspace\_location](#output\_azure\_monitor\_workspace\_location) | The location of the Azure Monitor workspace. |
 | <a name="output_azure_monitor_workspace_name"></a> [azure\_monitor\_workspace\_name](#output\_azure\_monitor\_workspace\_name) | The name of the Azure Monitor workspace. |
@@ -238,6 +250,9 @@ Next steps here
 | <a name="output_environment_resource_group_name"></a> [environment\_resource\_group\_name](#output\_environment\_resource\_group\_name) | The Azure Resource Group that contains this environment |
 | <a name="output_environment_storage_account_name"></a> [environment\_storage\_account\_name](#output\_environment\_storage\_account\_name) | The name of the main storage account for this environment. |
 | <a name="output_environment_storage_file_connection_script_ps1"></a> [environment\_storage\_file\_connection\_script\_ps1](#output\_environment\_storage\_file\_connection\_script\_ps1) | A PowerShell script to connect dirve Z: to the azure files created as part of this environment. |
+| <a name="output_foundry_endpoint"></a> [foundry\_endpoint](#output\_foundry\_endpoint) | The endpoint of the Foundry resource. |
+| <a name="output_foundry_name"></a> [foundry\_name](#output\_foundry\_name) | The name of the Foundry resource. |
+| <a name="output_foundry_principal_id"></a> [foundry\_principal\_id](#output\_foundry\_principal\_id) | The principal ID of the Foundry resource, used for role assignments. |
 | <a name="output_logs_otel_configuration_access_endpoint"></a> [logs\_otel\_configuration\_access\_endpoint](#output\_logs\_otel\_configuration\_access\_endpoint) | The configuration access endpoint of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_dce_id"></a> [logs\_otel\_dce\_id](#output\_logs\_otel\_dce\_id) | The ID of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_logs_ingestion_endpoint"></a> [logs\_otel\_logs\_ingestion\_endpoint](#output\_logs\_otel\_logs\_ingestion\_endpoint) | The OTEL logs ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
@@ -271,10 +286,12 @@ Next steps here
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_ai-services"></a> [ai-services](#module\_ai-services) | Azure/avm-res-cognitiveservices-account/azurerm | ~>0.0, < 1.0 |
+| <a name="module_appconfiguration"></a> [appconfiguration](#module\_appconfiguration) | Azure/avm-res-appconfiguration-configurationstore/azure | ~>0.0, < 1.0 |
 | <a name="module_application_insights"></a> [application\_insights](#module\_application\_insights) | Azure/avm-res-insights-component/azurerm | ~>0.0, < 1.0 |
 | <a name="module_comms_keyvault"></a> [comms\_keyvault](#module\_comms\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
-| <a name="module_cosmos"></a> [cosmos](#module\_cosmos) | Azure/avm-res-documentdb-databaseaccount/azurerm | ~>0.0, < 1.0 |
 | <a name="module_environment_resource_group"></a> [environment\_resource\_group](#module\_environment\_resource\_group) | Azure/avm-res-resources-resourcegroup/azurerm | ~>0.0, < 1.0 |
+| <a name="module_foundry_keyvault"></a> [foundry\_keyvault](#module\_foundry\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
 | <a name="module_helloworld_container_app"></a> [helloworld\_container\_app](#module\_helloworld\_container\_app) | Azure/avm-res-app-containerapp/azurerm | ~> 0.9, < 1.0 |
 | <a name="module_log_analytics_workspace"></a> [log\_analytics\_workspace](#module\_log\_analytics\_workspace) | Azure/avm-res-operationalinsights-workspace/azurerm | ~>0.0, < 1.0 |
 | <a name="module_private_endpoint_sqlserver"></a> [private\_endpoint\_sqlserver](#module\_private\_endpoint\_sqlserver) | Azure/avm-res-network-privateendpoint/azurerm | ~>0.0, < 1.0 |
