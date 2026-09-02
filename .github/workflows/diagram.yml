@@ -1,0 +1,27 @@
+name: Diagram
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write # needed if it commits the diagram back
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create & comment diagram on PR
+        uses: erzz/inframap-action@v1
+        with:
+          plan-files: initial/ # dir with your .tf files, or a state.json
+          pr-comment: true
+          output-filename: docs/plan.png
