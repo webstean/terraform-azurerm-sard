@@ -4,7 +4,7 @@ locals {
   environment_random_suffix = substr(md5(local.environment_name_location), 0, 6)
   environment_name_hostname = lower(substr(replace("c${local.environment_random_suffix}${local.environment_name_location}", "-", ""), 0, 24))
   environment_home_page     = "www.webstean.com"
-  portal_link               = "https://portal.azure.com/#@${data.azurerm_client_config.current.tenant_id}/resource/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourceGroups/rg-${local.environment_name_location}/overview"
+  portal_link               = "https://portal.azure.com/#@${data.azurerm_client_config.current.tenant_id}/resource/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourceGroups/${module.environment_resource_group.name}/overview"
 }
 
 module "environment_resource_group" {
@@ -122,21 +122,6 @@ module "environment_resource_group" {
   tags = merge(local.temporary_tags, {
     type = "permanent"
   })
-}
-
-# Wait 10 seconds for the network watcher to be created as a byproduct of the VNet creation
-resource "time_sleep" "wait_10_seconds_for_network_watcher_creation" {
-  create_duration = "10s"
-
-  depends_on = [azurerm_virtual_network.this]
-}
-
-# Network Watcher — one per region per subscription is the norm; Azure will reject a
-# duplicate if one already exists in this region, so remove/import this resource if so.
-data "azurerm_network_watcher" "this" {
-  name                = "NetworkWatcher_${lower(var.location)}"
-  resource_group_name = "NetworkWatcherRG"
-  depends_on          = [azurerm_virtual_network.this]
 }
 
 output "environment_resource_group_name" {
