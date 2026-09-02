@@ -11,7 +11,7 @@ resource "azurerm_automation_variable_string" "user_assigned_identity" {
 }
 
 resource "azurerm_automation_runbook" "demo_powershell_script1" {
-  name = "Get-ResourceGroupInfo"
+  name = "Get-AzResourceGroupInfo for prefix: ${var.prefix}"
 
   resource_group_name      = module.environment_resource_group.resource.name
   automation_account_name  = var.automation_account_name
@@ -19,7 +19,7 @@ resource "azurerm_automation_runbook" "demo_powershell_script1" {
   runtime_environment_name = "PowerShell-7.2" ## azurerm_automation_runtime_environment.pwsh76.name
 
   job_schedule {
-    schedule_name = azurerm_automation_schedule.sunday.name
+    schedule_name = "Every-Sunday-2AM"
     # Note: The parameter keys/names must strictly be in lowercase, even if this is not the case
     # in the runbook.
     # This is due to a limitation in Azure Automation where the parameter names are normalized.
@@ -32,7 +32,7 @@ resource "azurerm_automation_runbook" "demo_powershell_script1" {
 
   log_verbose  = "true"
   log_progress = "true"
-  description  = "Example scheduled runbook -  maintained in Terraform"
+  description  = "Example scheduled runbook for prefix: ${var.prefix} - maintained in Terraform"
   runbook_type = "PowerShell"
 
   content = <<-EOF

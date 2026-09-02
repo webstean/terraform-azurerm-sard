@@ -83,7 +83,7 @@ module "application_insights" {
   local_authentication_disabled = false
 
   role_assignments = {
-    role_assignment_1 = {
+    role_assignment_1a = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Monitoring Reader/${azurerm_user_assigned_identity.environment.principal_id}")
       role_definition_id_or_name       = "Monitoring Reader"
       principal_id                     = azurerm_user_assigned_identity.environment.principal_id
@@ -91,7 +91,7 @@ module "application_insights" {
       principal_type                   = "ServicePrincipal"
       description                      = local.iac_message
     }
-    role_assignment_2 = {
+    role_assignment_2a = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Reader/${azurerm_user_assigned_identity.environment.principal_id}")
       role_definition_id_or_name       = "Reader"
       principal_id                     = azurerm_user_assigned_identity.environment.principal_id
