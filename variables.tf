@@ -696,3 +696,12 @@ The principal ID of the Azure AI Search service to be used.
 DESC
   default     = null
 }
+
+variable "cosmos_db_free_account_resource_id" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The resource ID of the Cosmos DB free account to be used.
+DESC
+  default     = null
+}
