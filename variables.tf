@@ -398,6 +398,15 @@ DESC
   }
 }
 
+variable "vwan_id" {
+  type        = string
+  description = <<DESC
+  description = <<DESC
+The ID of the existing Virtual WAN. If not provided, a new Virtual WAN will be created.
+DESC
+  default     = null
+}
+
 variable "vwan_hub_id" {
   type        = string
   sensitive   = false
