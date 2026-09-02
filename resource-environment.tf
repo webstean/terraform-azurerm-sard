@@ -87,14 +87,8 @@ module "environment_resource_group" {
       principal_type                   = "User"
       description                      = local.iac_message
     }
+    /*
     "up_roleassignment3" = {
-      role_definition_id_or_name       = "Reader"
-      principal_id                     = var.owner_entra_object_id
-      skip_service_principal_aad_check = false
-      principal_type                   = "User"
-      description                      = local.iac_message
-    }
-    "up_roleassignment4" = {
       role_definition_id_or_name       = "Storage Blob Data Reader"
       principal_id                     = var.owner_entra_object_id
       skip_service_principal_aad_check = false
@@ -115,6 +109,7 @@ module "environment_resource_group" {
     )
   CONDITION
     },
+*/
   }
   lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
     kind = "CanNotDelete"
