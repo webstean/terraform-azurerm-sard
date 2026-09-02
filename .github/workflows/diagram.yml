@@ -22,6 +22,7 @@ jobs:
       - name: Create & comment diagram on PR
         uses: erzz/inframap-action@v1
         with:
-          plan-files: initial/ # dir with your .tf files, or a state.json
+          plan-files: . # dir with your .tf files, or a state.json
+          always-run: true # avoids the action's unsafe fetch into the checked-out branch
           pr-comment: true
           output-filename: docs/plan.png
