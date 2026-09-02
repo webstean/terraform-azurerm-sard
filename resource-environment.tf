@@ -76,7 +76,7 @@ module "environment_resource_group" {
     "up_roleassignment1" = {
       role_definition_id_or_name       = "Contributor"
       principal_id                     = var.owner_entra_object_id
-      skip_service_principal_aad_check = true
+      skip_service_principal_aad_check = false
       principal_type                   = "User"
       description                      = local.iac_message
     }
@@ -110,6 +110,11 @@ module "environment_resource_group" {
   CONDITION
     },
 */
+  }
+  retry = {
+    error_message_regex  = [".*"]
+    interval_seconds     = 5
+    max_interval_seconds = 60
   }
   lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
     kind = "CanNotDelete"
