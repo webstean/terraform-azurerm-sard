@@ -3,7 +3,7 @@ locals {
   pubsub_name          = substr("pubsub${var.prefix}", 0, 8) ## can only be 9 characters or less
   pubsub_name_location = lower("${local.pubsub_name}${lower(var.location)}")
   pubsub_random_suffix = substr(md5(local.pubsub_name_location), 0, 6)
-  pubsub_name_hostname = lower(substr(replace("cc${local.pubsub_random_suffix}${local.pubsub_name_location}", "-", ""), 0, 24))
+  pubsub_name_hostname = lower(substr(replace("${local.pubsub_random_suffix}${local.pubsub_name_location}", "-", ""), 0, 24))
 }
 
 resource "azurerm_web_pubsub" "this" {
