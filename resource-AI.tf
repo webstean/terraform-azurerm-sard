@@ -269,7 +269,7 @@ module "ai-services" {
   version          = "~>0.0, < 1.0"
   enable_telemetry = var.enable_telemetry
 
-  name                               = each.value.classic == true ? "classic-${local.cog_name}-${lower(each.value.kind)}" : "${local.cog_name}-${lower(each.value.kind)}"
+  name                               = each.value.classic == true ? "classic-${local.cog_name_hostname}-${lower(each.value.kind)}" : "${local.cog_name_hostname}-${lower(each.value.kind)}"
   parent_id                          = module.environment_resource_group.resource_id
   location                           = module.environment_resource_group.resource.location
   kind                               = each.value.kind
@@ -305,7 +305,7 @@ module "ai-services" {
 */
 
   role_assignments = {
-    role_assignment_1 = {
+    role_assignment_sp1 = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Cognitive Services OpenAI User/${azurerm_user_assigned_identity.environment.principal_id}")
       role_definition_id_or_name       = "Cognitive Services OpenAI User"
       principal_id                     = azurerm_user_assigned_identity.environment.principal_id
@@ -313,7 +313,7 @@ module "ai-services" {
       principal_type                   = "ServicePrincipal"
       description                      = local.iac_message
     }
-    role_assignment_2 = {
+    role_assignment_up1 = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Cognitive Services OpenAI User/${azurerm_user_assigned_identity.environment.principal_id}")
       role_definition_id_or_name       = "Cognitive Services OpenAI User"
       principal_id                     = var.owner_entra_object_id
