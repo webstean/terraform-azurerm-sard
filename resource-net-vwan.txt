@@ -1,36 +1,19 @@
 
 locals {
   vwan_friendly_name          = "Virtual WAN"
-  vwan_name                   = "vwan-${var.prefix}"
-  vwan_name_location          = lower("${local.vwan_name}-${lower(var.location)}")
-  vwan_random_suffix          = substr(md5(local.vwan_name_location), 0, 6)
-  vwan_name_hostname          = lower(substr(replace("l${local.vwan_random_suffix}${local.vwan_name_location}", "-", ""), 0, 24))
-  vwan_sku                    = "Basic"      ## Possible values include: Basic and Standard. Defaults to Standard.
+  vwan_hub_name               = "vwan-${var.prefix}"
+  vwan_hub_name_location      = lower("${local.vwan_hub_name}-${lower(var.location)}")
+  vwan_hub_random_suffix      = substr(md5(local.vwan_hub_name_location), 0, 6)
+  vwan_hub_name_hostname      = lower(substr(replace("l${local.vwan_hub_random_suffix}${local.vwan_hub_name_location}", "-", ""), 0, 24))
   vwan_hub_sku                = "Basic"      ## Possible values include: Basic and Standard. Defaults to Standard.
   vwan_hub_routing_preference = "VpnGateway" ## Possible values include: ExpressRoute, ASPath and VpnGateway.
-}
-
-resource "azurerm_virtual_wan" "this" {
-  count = var.vwan_hub_id == null ? 1 : 0
-
-  name                = local.vwan_name
-  resource_group_name = module.environment_resource_group.resource.name
-  location            = module.environment_resource_group.resource.location
-
-  disable_vpn_encryption            = false
-  allow_branch_to_branch_traffic    = false
-  office365_local_breakout_category = "Optimize" ## Possible values include: Optimize, OptimizeAndAllow, All, None. Defaults to None.
-  ## With Basic, the hubs are free!
-  type = local.vwan_sku
-
-  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 ## $$ (unles vWAN is basic SKU) We need 1x vWAN Hub in each region (take a long time to deploy - 30+ minutes)
 resource "azurerm_virtual_hub" "this" {
   count = var.vwan_hub_id == null ? 1 : 0
 
-  name                = local.vwan_name
+  name                = local.vwan_hub_name
   resource_group_name = module.environment_resource_group.resource.name
   location            = module.environment_resource_group.resource.location
 
