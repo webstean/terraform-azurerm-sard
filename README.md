@@ -217,6 +217,7 @@ Next steps here
 | <a name="input_vpn_access_group_object_id"></a> [vpn\_access\_group\_object\_id](#input\_vpn\_access\_group\_object\_id) | The Entra ID object ID for the VPN access group (can be a user or a group) | `string` | `null` | no |
 | <a name="input_vwan_hub_firewall_id"></a> [vwan\_hub\_firewall\_id](#input\_vwan\_hub\_firewall\_id) | The ID of the Azure Firewall deployed in the Virtual WAN hub for filtering and routing traffic. | `string` | `null` | no |
 | <a name="input_vwan_hub_id"></a> [vwan\_hub\_id](#input\_vwan\_hub\_id) | The ID of the Azure Virtual WAN hub to which the route table will be associated. | `string` | `null` | no |
+| <a name="input_vwan_id"></a> [vwan\_id](#input\_vwan\_id) | description = <<DESC<br/>The ID of the existing Virtual WAN. If not provided, a new Virtual WAN will be created. | `string` | `null` | no |
 
 ## Outputs
 
