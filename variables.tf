@@ -402,7 +402,7 @@ variable "vwan_id" {
   type        = string
   description = <<DESC
   description = <<DESC
-The ID of the existing Virtual WAN. If not provided, a new Virtual WAN will be created.
+The ID of the existing Virtual WAN. null if not created.
 DESC
   default     = null
 }
