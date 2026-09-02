@@ -56,8 +56,6 @@ Next steps here
 | [azapi_resource_action.sql_server_automatic_tuning](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource_action) | resource |
 | [azapi_update_resource.aca_env_otel](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/update_resource) | resource |
 | [azapi_update_resource.comms-identity](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/update_resource) | resource |
-| [azapi_update_resource.configurationStore_telemetry](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/update_resource) | resource |
-| [azurerm_app_configuration_feature.test_feature](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/app_configuration_feature) | resource |
 | [azurerm_application_gateway.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_gateway) | resource |
 | [azurerm_application_insights_smart_detection_rule.rules](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_smart_detection_rule) | resource |
 | [azurerm_application_insights_workbook.workbook1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_workbook) | resource |
@@ -231,10 +229,6 @@ Next steps here
 | <a name="output_aca_env_default_domain"></a> [aca\_env\_default\_domain](#output\_aca\_env\_default\_domain) | The default domain of the Container App Environment. |
 | <a name="output_aca_env_id"></a> [aca\_env\_id](#output\_aca\_env\_id) | The ID of the Container App Environment. |
 | <a name="output_aca_env_static_ip_address"></a> [aca\_env\_static\_ip\_address](#output\_aca\_env\_static\_ip\_address) | The static IP address of the Container App Environment. |
-| <a name="output_appconfiguration_endpoint"></a> [appconfiguration\_endpoint](#output\_appconfiguration\_endpoint) | The endpoint of the environment's Azure App Configuration store. |
-| <a name="output_appconfiguration_id"></a> [appconfiguration\_id](#output\_appconfiguration\_id) | The resource ID of the environment's Azure App Configuration store. |
-| <a name="output_appconfiguration_name"></a> [appconfiguration\_name](#output\_appconfiguration\_name) | The name of the environment's Azure App Configuration store. |
-| <a name="output_appconfiguration_replica_resource_ids"></a> [appconfiguration\_replica\_resource\_ids](#output\_appconfiguration\_replica\_resource\_ids) | The resource IDs of the environment's Azure App Configuration replicas. |
 | <a name="output_azure_monitor_workspace_id"></a> [azure\_monitor\_workspace\_id](#output\_azure\_monitor\_workspace\_id) | The ID of the Azure Monitor workspace. |
 | <a name="output_azure_monitor_workspace_location"></a> [azure\_monitor\_workspace\_location](#output\_azure\_monitor\_workspace\_location) | The location of the Azure Monitor workspace. |
 | <a name="output_azure_monitor_workspace_name"></a> [azure\_monitor\_workspace\_name](#output\_azure\_monitor\_workspace\_name) | The name of the Azure Monitor workspace. |
@@ -288,7 +282,6 @@ Next steps here
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_ai-services"></a> [ai-services](#module\_ai-services) | Azure/avm-res-cognitiveservices-account/azurerm | ~>0.0, < 1.0 |
-| <a name="module_appconfiguration"></a> [appconfiguration](#module\_appconfiguration) | Azure/avm-res-appconfiguration-configurationstore/azure | ~>0.0, < 1.0 |
 | <a name="module_application_insights"></a> [application\_insights](#module\_application\_insights) | Azure/avm-res-insights-component/azurerm | ~>0.0, < 1.0 |
 | <a name="module_comms_keyvault"></a> [comms\_keyvault](#module\_comms\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
 | <a name="module_environment_resource_group"></a> [environment\_resource\_group](#module\_environment\_resource\_group) | Azure/avm-res-resources-resourcegroup/azurerm | ~>0.0, < 1.0 |
