@@ -17,6 +17,7 @@ module "environment_resource_group" {
   role_assignments = {
     ## ==========================================================================================
     "sp_roleassignment1" = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Contributor/${azurerm_user_assigned_identity.environment.principal_id}")
       role_definition_id_or_name       = "Contributor"
       principal_id                     = azurerm_user_assigned_identity.environment.principal_id
       skip_service_principal_aad_check = true
@@ -24,6 +25,7 @@ module "environment_resource_group" {
       description                      = local.iac_message
     }
     "sp_roleassignment2" = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/User Access Administrator/${azurerm_user_assigned_identity.environment.principal_id}")
       role_definition_id_or_name       = "User Access Administrator"
       principal_id                     = azurerm_user_assigned_identity.environment.principal_id
       skip_service_principal_aad_check = true
@@ -31,6 +33,7 @@ module "environment_resource_group" {
       description                      = local.iac_message
     }
     "sp_roleassignment3" = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Key Vault Administrator/${data.azurerm_client_config.current.object_id}")
       role_definition_id_or_name       = "Key Vault Administrator"
       principal_id                     = data.azurerm_client_config.current.object_id
       skip_service_principal_aad_check = true
@@ -38,6 +41,7 @@ module "environment_resource_group" {
       description                      = local.iac_message
     }
     "sp_roleassignment4" = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Storage Blob Data Owner/${data.azurerm_client_config.current.object_id}")
       role_definition_id_or_name       = "Storage Blob Data Owner"
       principal_id                     = data.azurerm_client_config.current.object_id
       skip_service_principal_aad_check = true
@@ -45,6 +49,7 @@ module "environment_resource_group" {
       description                      = local.iac_message
     }
     "sp_roleassignment5" = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Storage Queue Data Contributor/${data.azurerm_client_config.current.object_id}")
       role_definition_id_or_name       = "Storage Queue Data Contributor"
       principal_id                     = data.azurerm_client_config.current.object_id
       skip_service_principal_aad_check = true
@@ -52,6 +57,7 @@ module "environment_resource_group" {
       description                      = local.iac_message
     }
     "sp_roleassignment6" = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Storage Table Data Contributor/${data.azurerm_client_config.current.object_id}")
       role_definition_id_or_name       = "Storage Table Data Contributor"
       principal_id                     = data.azurerm_client_config.current.object_id
       skip_service_principal_aad_check = true
@@ -59,6 +65,7 @@ module "environment_resource_group" {
       description                      = local.iac_message
     }
     "sp_roleassignment7" = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Storage File Data Privileged Contributor/${data.azurerm_client_config.current.object_id}")
       role_definition_id_or_name       = "Storage File Data Privileged Contributor"
       principal_id                     = data.azurerm_client_config.current.object_id
       skip_service_principal_aad_check = true
@@ -66,6 +73,7 @@ module "environment_resource_group" {
       description                      = local.iac_message
     }
     "sp_roleassignment8" = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/App Configuration Data Owner/${data.azurerm_client_config.current.object_id}")
       role_definition_id_or_name       = "App Configuration Data Owner"
       principal_id                     = data.azurerm_client_config.current.object_id
       skip_service_principal_aad_check = true
@@ -74,6 +82,7 @@ module "environment_resource_group" {
     }
     ## ==========================================================================================
     "up_roleassignment1" = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Contributor/${var.owner_entra_object_id}")
       role_definition_id_or_name       = "Contributor"
       principal_id                     = var.owner_entra_object_id
       skip_service_principal_aad_check = false
@@ -81,6 +90,7 @@ module "environment_resource_group" {
       description                      = local.iac_message
     }
     "up_roleassignment2" = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Reader and Data Access/${var.owner_entra_object_id}")
       role_definition_id_or_name       = "Reader and Data Access" ## Storage Only
       principal_id                     = var.owner_entra_object_id
       skip_service_principal_aad_check = false
