@@ -201,8 +201,7 @@ resource "azurerm_storage_container" "rag_documents" {
 resource "azurerm_role_assignment" "search_blob_reader" {
   scope                = azurerm_storage_container.rag_documents.id
   role_definition_name = "Storage Blob Data Reader"
-  principal_id         = module.ai_search_service.resource.identity[0].principal_id
-  #principal_id          = one(module.ai_search_service.resource.identity).principal_id
+  principal_id         = var.ai_search_principal_id
 }
 */
 

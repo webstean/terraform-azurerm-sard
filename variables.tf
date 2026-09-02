@@ -687,3 +687,12 @@ Entra ID display name for the user or group that will have VPN access.
 DESC
   default     = null
 }
+
+variable "ai_search_principal_id" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The principal ID of the Azure AI Search service to be used.
+DESC
+  default     = null
+}

@@ -482,7 +482,7 @@ resource "azurerm_dns_txt_record" "txt1" {
       ## SendGrid = include:sendgrid.net
       ## Microsoft 365 = include:spf.protection.outlook.com
       ## Google Workspace = include:_spf.google.com
-      ## Amazon SES = include:amazonses.com 
+      ## Amazon SES = include:amazonses.com
       ## Zoho Mail = include:zoho.com
       value = "v=spf1 include:spf.protection.outlook.com ~all"
     }
