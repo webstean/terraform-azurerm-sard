@@ -192,6 +192,21 @@ resource "azurerm_monitor_diagnostic_setting" "storage_metrics_diag" {
 }
 */
 
+resource "azurerm_storage_container" "rag_documents" {
+  name                  = "rag-documents"
+  storage_account_id    = azurerm_storage_account.this.id
+  container_access_type = "private"
+}
+/*
+resource "azurerm_role_assignment" "search_blob_reader" {
+  scope                = azurerm_storage_container.rag_documents.id
+  role_definition_name = "Storage Blob Data Reader"
+  principal_id         = module.ai_search_service.resource.identity[0].principal_id
+  #principal_id          = one(module.ai_search_service.resource.identity).principal_id
+}
+*/
+
+
 resource "azurerm_role_assignment" "github_storage_diag_owner_role" {
   scope                = azurerm_storage_account.diag.id
   role_definition_name = "Owner"
