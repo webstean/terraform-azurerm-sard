@@ -139,10 +139,29 @@ data "azurerm_network_watcher" "this" {
   depends_on          = [azurerm_virtual_network.this]
 }
 
-output "environment_resource_group" {
+output "environment_resource_group_name" {
   description = "The Azure Resource Group that contains this environment"
   sensitive   = false
   value       = module.environment_resource_group.resource.name
+}
+output "environment_resource_group_location" {
+  description = "The Azure Resource Group that contains this environment"
+  sensitive   = false
+  value       = var.location
+}
+
+output "security_perimeter_inbound_public_ips" {
+  type        = list(string)
+  description = "List of public IPs allowed for inbound traffic to the security perimeter"
+  sensitive   = false
+  value       = var.security_perimeter_inbound_public_ips
+}
+
+output "security_perimeter_outbound_fqdns" {
+  type        = list(string)
+  description = "List of FQDNs allowed for outbound traffic from the security perimeter"
+  sensitive   = false
+  value       = var.security_perimeter_outbound_fqdns
 }
 
 resource "azurerm_user_assigned_identity" "environment" {
