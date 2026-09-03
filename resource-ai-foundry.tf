@@ -83,16 +83,6 @@ module "foundry_keyvault" {
   ]
 }
 
-
-/*
-module "avm-res-cognitiveservices-account" {
-  source  = "Azure/avm-res-cognitiveservices-account/azurerm"
-  version = "0.11.1"
-
-  # insert the 5 required variables here
-}
-*/
-
 resource "azapi_resource" "foundry" {
   type      = "Microsoft.CognitiveServices/accounts@2026-05-15-preview"
   name      = local.foundry_name_hostname
