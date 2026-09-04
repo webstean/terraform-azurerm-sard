@@ -1,4 +1,4 @@
-name: Do A Module Release
+name: Module Release
 
 on:
   workflow_dispatch:
