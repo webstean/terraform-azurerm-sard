@@ -53,7 +53,7 @@ module "data_factory" {
     },
     {
       name  = "private"
-      type  = "Boolean"
+      type  = "Bool"
       value = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? true : false
     }
   ]
