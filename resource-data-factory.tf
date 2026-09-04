@@ -32,7 +32,7 @@ module "data_factory" {
   resource_group_name = module.environment_resource_group.resource.name
   location            = module.environment_resource_group.resource.location
 
-  managed_virtual_network_enabled = false
+  managed_virtual_network_enabled = true
   public_network_enabled          = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
 
   global_parameters = [
