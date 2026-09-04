@@ -34,7 +34,7 @@ module "private_endpoint_sqlserver" {
   private_connection_resource_id = azurerm_mssql_server.this.id
   subnet_resource_id             = azurerm_subnet.private_endpoints[0].id
   subresource_names              = ["sqlServer"]
-  lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
+  lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
     kind = "CanNotDelete"
   } : null
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
@@ -55,7 +55,7 @@ module "private_endpoint_keyvault" {
   private_connection_resource_id = azurerm_key_vault.this.id
   subnet_resource_id             = azurerm_subnet.private_endpoints[0].id
   subresource_names              = ["vault"]
-  lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
+  lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
     kind = "CanNotDelete"
   } : null
   tags                           = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
@@ -197,7 +197,7 @@ resource "azurerm_private_dns_zone" "privatelink-dns1" {
 ## Eg. "privatelink.australiaeast.kusto.windows.net",
 #resource "azurerm_private_dns_zone" "privatelink-dns5" {
 #  for_each = tobool(var.deploy_private_endpoints) ? toset(local.regions) : toset([])
-#  
+#
 #  name                = format("%s.%s.%s", "privatelink", each.value.location, "kusto.windows.net")
 #  resource_group_name = module.environment_resource_group.resource.name
 #  soa_record {

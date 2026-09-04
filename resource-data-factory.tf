@@ -7,6 +7,8 @@ locals {
   adf_ir_self_hosted_name = "ir-self-hosted-${local.adf_name_hostname}"
   adf_ls_blob_name        = "ls-adf-working-blob"
   adf_ls_file_name        = "ls-global-file"
+  adf_ls_sql_name         = "ls-free-sql-database"
+  adf_sql_connection      = "Server=tcp:${azurerm_mssql_server.this.fully_qualified_domain_name},${local.sql_port};Database=${azapi_resource.free_sql_database.name};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
 }
 
 resource "azurerm_storage_container" "adf_working" {
@@ -31,7 +33,7 @@ module "data_factory" {
   location            = module.environment_resource_group.resource.location
 
   managed_virtual_network_enabled = false
-  public_network_enabled          = true
+  public_network_enabled          = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
 
   global_parameters = [
     {
@@ -48,6 +50,11 @@ module "data_factory" {
       name  = "resourceGroupName"
       type  = "String"
       value = module.environment_resource_group.resource.name
+    },
+    {
+      name  = "private"
+      type  = "Boolean"
+      value = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? true : false
     }
   ]
 
@@ -83,6 +90,21 @@ module "data_factory" {
     }
   }
 
+  ## Note: managed identity SQL access may still need a database user/grant at runtime;
+  ## Terraform validation can’t prove that data-plane permission exists.
+  linked_service_azure_sql_database = {
+    free = {
+      name                 = local.adf_ls_sql_name
+      description          = "Linked service for the ${azapi_resource.free_sql_database.name} SQL database."
+      connection_string    = local.adf_sql_connection
+      use_managed_identity = true
+      parameters = {
+        databaseName = azapi_resource.free_sql_database.name
+        serverName   = azurerm_mssql_server.this.name
+      }
+    }
+  }
+
   managed_identities = {
     system_assigned = false
     user_assigned_resource_ids = [
@@ -108,7 +130,7 @@ module "data_factory" {
       description                      = local.iac_message
     }
   }
-  lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
+  lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
     kind = "CanNotDelete"
   } : null
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }

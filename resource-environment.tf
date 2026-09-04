@@ -126,7 +126,7 @@ module "environment_resource_group" {
     interval_seconds     = 5
     max_interval_seconds = 60
   }
-  lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
+  lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
     kind = "CanNotDelete"
   } : null
   tags = merge(local.temporary_tags, {

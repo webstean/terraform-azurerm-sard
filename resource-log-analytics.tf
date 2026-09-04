@@ -60,7 +60,7 @@ module "log_analytics_workspace" {
   #  }
   #}
 
-  lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
+  lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
     kind = "CanNotDelete"
   } : null
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
@@ -165,7 +165,7 @@ module "application_insights" {
     }
   }
 */
-  lock = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? {
+  lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
     kind = "CanNotDelete"
   } : null
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
