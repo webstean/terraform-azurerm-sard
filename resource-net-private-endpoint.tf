@@ -40,6 +40,46 @@ module "private_endpoint_sqlserver" {
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
+module "private_endpoint_datafactory" {
+  count = tobool(var.deploy_private_endpoints) ? 1 : 0
+
+  source           = "Azure/avm-res-network-privateendpoint/azurerm"
+  version          = "~>0.0, < 1.0"
+  enable_telemetry = var.enable_telemetry # see variables.tf
+
+  name                           = "${local.pep_name_location}-${module.data_factory.name}"
+  resource_group_name            = module.environment_resource_group.resource.name
+  location                       = module.environment_resource_group.resource.location
+  network_interface_name         = "pep-${module.data_factory.name}-datafactory"
+  private_connection_resource_id = module.data_factory.resource_id
+  subnet_resource_id             = azurerm_subnet.private_endpoints[0].id
+  subresource_names              = ["dataFactory"]
+  lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
+    kind = "CanNotDelete"
+  } : null
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
+
+module "private_endpoint_datafactory_portal" {
+  count = tobool(var.deploy_private_endpoints) ? 1 : 0
+
+  source           = "Azure/avm-res-network-privateendpoint/azurerm"
+  version          = "~>0.0, < 1.0"
+  enable_telemetry = var.enable_telemetry # see variables.tf
+
+  name                           = "${local.pep_name_location}-${module.data_factory.name}-portal"
+  resource_group_name            = module.environment_resource_group.resource.name
+  location                       = module.environment_resource_group.resource.location
+  network_interface_name         = "pep-${module.data_factory.name}-portal"
+  private_connection_resource_id = module.data_factory.resource_id
+  subnet_resource_id             = azurerm_subnet.private_endpoints[0].id
+  subresource_names              = ["portal"]
+  lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
+    kind = "CanNotDelete"
+  } : null
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
+
 /*
 module "private_endpoint_keyvault" {
   count = tobool(var.deploy_private_endpoints) ? 1 : 0
@@ -111,8 +151,8 @@ locals {
     #        "privatelink.applicationinsights.azure.com",
     #        "privatelink.cognitiveservices.azure.com",
     #        "privatelink.openai.azure.com",
-    #        "privatelink.datafactory.azure.net",
-    #        "privatelink.adf.azure.com",
+    "privatelink.datafactory.azure.net",
+    "privatelink.adf.azure.com",
     #        "privatelink.redis.cache.windows.net",
     #        "privatelink.redisenterprise.cache.azure.net",
     #        "privatelink.purview.azure.com",
