@@ -114,7 +114,7 @@ module "data_factory" {
 
   role_assignments = {
     role_assignment_1 = {
-      name                             = uuidv5("assignment1", "${module.environment_resource_group.resource.id}/Data Factory Contributor/${azurerm_user_assigned_identity.environment.principal_id}")
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Data Factory Contributor/${azurerm_user_assigned_identity.environment.principal_id}")
       role_definition_id_or_name       = "Data Factory Contributor"
       principal_id                     = azurerm_user_assigned_identity.environment.principal_id
       skip_service_principal_aad_check = true
@@ -122,7 +122,7 @@ module "data_factory" {
       description                      = local.iac_message
     }
     role_assignment_2 = {
-      name                             = uuidv5("assignment2", "${module.environment_resource_group.resource.id}/Data Factory Contributor/${azurerm_user_assigned_identity.environment.principal_id}")
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Data Factory Contributor/${azurerm_user_assigned_identity.environment.principal_id}")
       role_definition_id_or_name       = "Data Factory Contributor"
       principal_id                     = var.owner_entra_object_id
       skip_service_principal_aad_check = false

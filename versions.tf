@@ -165,15 +165,3 @@ provider "azapi" {
   use_cli                   = true
   enable_preflight          = true
 }
-
-/*
-// imports only allow in root modules
-resource "azurerm_resource_provider_feature_registration" "encryption_at_host" {
-  provider_name = "Microsoft.Compute"
-  name          = "EncryptionAtHost"
-}
-import {
-  to = azurerm_resource_provider_feature_registration.encryption_at_host
-  id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/providers/Microsoft.Features/providers/Microsoft.Compute/features/EncryptionAtHost"
-}
-*/
