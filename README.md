@@ -100,7 +100,6 @@ Next steps here
 | [azurerm_public_ip.bastion](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_public_ip.nat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_public_ip.relay](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
-| [azurerm_role_assignment.adf_working_blob_data_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.comms_service_owner1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.comms_service_owner2](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.compute_recommendations](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
@@ -128,7 +127,6 @@ Next steps here
 | [azurerm_static_web_app.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/static_web_app) | resource |
 | [azurerm_storage_account.diag](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
 | [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
-| [azurerm_storage_container.adf_working](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_container.rag_documents](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_container.sku_finder_cache](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_container.sqldiag](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
@@ -296,12 +294,9 @@ Next steps here
 |------|--------|---------|
 | <a name="module_application_insights"></a> [application\_insights](#module\_application\_insights) | Azure/avm-res-insights-component/azurerm | ~>0.0, < 1.0 |
 | <a name="module_comms_keyvault"></a> [comms\_keyvault](#module\_comms\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
-| <a name="module_data_factory"></a> [data\_factory](#module\_data\_factory) | Azure/avm-res-datafactory-factory/azurerm | ~>0.2, < 1.0 |
 | <a name="module_environment_resource_group"></a> [environment\_resource\_group](#module\_environment\_resource\_group) | Azure/avm-res-resources-resourcegroup/azurerm | ~>0.0, < 1.0 |
 | <a name="module_foundry_keyvault"></a> [foundry\_keyvault](#module\_foundry\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
 | <a name="module_log_analytics_workspace"></a> [log\_analytics\_workspace](#module\_log\_analytics\_workspace) | Azure/avm-res-operationalinsights-workspace/azurerm | ~>0.0, < 1.0 |
-| <a name="module_private_endpoint_datafactory"></a> [private\_endpoint\_datafactory](#module\_private\_endpoint\_datafactory) | Azure/avm-res-network-privateendpoint/azurerm | ~>0.0, < 1.0 |
-| <a name="module_private_endpoint_datafactory_portal"></a> [private\_endpoint\_datafactory\_portal](#module\_private\_endpoint\_datafactory\_portal) | Azure/avm-res-network-privateendpoint/azurerm | ~>0.0, < 1.0 |
 | <a name="module_private_endpoint_sqlserver"></a> [private\_endpoint\_sqlserver](#module\_private\_endpoint\_sqlserver) | Azure/avm-res-network-privateendpoint/azurerm | ~>0.0, < 1.0 |
 | <a name="module_virtualmachinescaleset"></a> [virtualmachinescaleset](#module\_virtualmachinescaleset) | Azure/avm-res-compute-virtualmachinescaleset/azurerm | ~>0.0, < 1.0 |
 | <a name="module_vm_x64_skus"></a> [vm\_x64\_skus](#module\_vm\_x64\_skus) | Azure/avm-utl-sku-finder/azapi | ~>0.0, < 1.0 |
