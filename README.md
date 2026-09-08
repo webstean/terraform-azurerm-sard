@@ -142,6 +142,8 @@ Next steps here
 | [azurerm_user_assigned_identity.environment](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_user_assigned_identity.free_sql_database](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_user_assigned_identity.sqlserver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
+| [azurerm_virtual_hub.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_hub) | resource |
+| [azurerm_virtual_hub_connection.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_hub_connection) | resource |
 | [azurerm_virtual_hub_routing_intent.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_hub_routing_intent) | resource |
 | [azurerm_virtual_machine_scale_set_standby_pool.hibernated](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_scale_set_standby_pool) | resource |
 | [azurerm_virtual_network.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
@@ -206,6 +208,9 @@ Next steps here
 | <a name="input_security_perimeter_outbound_fqdns"></a> [security\_perimeter\_outbound\_fqdns](#input\_security\_perimeter\_outbound\_fqdns) | Allowed outbound FQDNs for the Azure Security Perimeter. | `list(string)` | <pre>[<br/>  "*"<br/>]</pre> | no |
 | <a name="input_sql_connectivity_type"></a> [sql\_connectivity\_type](#input\_sql\_connectivity\_type) | Connectivity mode for the SQL Server endpoint: 'PRIVATE' (VNet via Private Endpoint), or 'PUBLIC' (internet-facing). | `string` | `"PRIVATE"` | no |
 | <a name="input_support_free_sql_database"></a> [support\_free\_sql\_database](#input\_support\_free\_sql\_database) | If true, support the totally Free SQL Server. Failover must be disabled and the SQL Server cannot have an alias. | `bool` | `true` | no |
+| <a name="input_virtual_wan_hub_firewall_id"></a> [virtual\_wan\_hub\_firewall\_id](#input\_virtual\_wan\_hub\_firewall\_id) | The ID of the Azure Firewall deployed in the Virtual WAN hub for filtering and routing traffic. | `string` | `null` | no |
+| <a name="input_virtual_wan_hub_id"></a> [virtual\_wan\_hub\_id](#input\_virtual\_wan\_hub\_id) | The ID of the Azure Virtual WAN hub to which the route table will be associated. | `string` | `null` | no |
+| <a name="input_virtual_wan_id"></a> [virtual\_wan\_id](#input\_virtual\_wan\_id) | The ID of the existing Virtual WAN. null if not created. | `string` | `null` | no |
 | <a name="input_vmss_autoscale_business_hours_start"></a> [vmss\_autoscale\_business\_hours\_start](#input\_vmss\_autoscale\_business\_hours\_start) | Virtual Machine Scale Set: hour (0-23) each weekday when the CPU-based business-hours autoscale profile activates. | `number` | `16` | no |
 | <a name="input_vmss_autoscale_cooldown"></a> [vmss\_autoscale\_cooldown](#input\_vmss\_autoscale\_cooldown) | Virtual Machine Scale Set: time to wait after a scale action before scaling again in ISO 8601 format (e.g., PT30M for 30 minutes). | `string` | `"PT30M"` | no |
 | <a name="input_vmss_autoscale_default_capacity"></a> [vmss\_autoscale\_default\_capacity](#input\_vmss\_autoscale\_default\_capacity) | Virtual Machine Scale Set: default instance count used during normal business hours. | `number` | `1` | no |
@@ -225,9 +230,6 @@ Next steps here
 | <a name="input_vmss_sku_name"></a> [vmss\_sku\_name](#input\_vmss\_sku\_name) | Azure Virtual Machine SKU for the scale set (e.g., Standard\_D2s\_v5). Determines vCPU, memory, and pricing. | `string` | `"Standard_D2s_v5"` | no |
 | <a name="input_vpn_access_group_display_name"></a> [vpn\_access\_group\_display\_name](#input\_vpn\_access\_group\_display\_name) | Entra ID display name for the user or group that will have VPN access. | `string` | `null` | no |
 | <a name="input_vpn_access_group_object_id"></a> [vpn\_access\_group\_object\_id](#input\_vpn\_access\_group\_object\_id) | The Entra ID object ID for the VPN access group (can be a user or a group) | `string` | `null` | no |
-| <a name="input_vwan_hub_firewall_id"></a> [vwan\_hub\_firewall\_id](#input\_vwan\_hub\_firewall\_id) | The ID of the Azure Firewall deployed in the Virtual WAN hub for filtering and routing traffic. | `string` | `null` | no |
-| <a name="input_vwan_hub_id"></a> [vwan\_hub\_id](#input\_vwan\_hub\_id) | The ID of the Azure Virtual WAN hub to which the route table will be associated. | `string` | `null` | no |
-| <a name="input_vwan_id"></a> [vwan\_id](#input\_vwan\_id) | description = <<DESC<br/>The ID of the existing Virtual WAN. null if not created. | `string` | `null` | no |
 
 ## Outputs
 
@@ -281,6 +283,7 @@ Next steps here
 | <a name="output_swa_url"></a> [swa\_url](#output\_swa\_url) | The URL for the Static Web App site. |
 | <a name="output_virtual_machine_x64_sku_list"></a> [virtual\_machine\_x64\_sku\_list](#output\_virtual\_machine\_x64\_sku\_list) | List of x64 virtual machine SKUs |
 | <a name="output_virtual_machine_x64_sku_random"></a> [virtual\_machine\_x64\_sku\_random](#output\_virtual\_machine\_x64\_sku\_random) | Randomly selected x64 virtual machine SKU |
+| <a name="output_virtual_wan_hub_id"></a> [virtual\_wan\_hub\_id](#output\_virtual\_wan\_hub\_id) | The ID of the vWAN Hub. |
 | <a name="output_vmss_admin_password_keyvault_id"></a> [vmss\_admin\_password\_keyvault\_id](#output\_vmss\_admin\_password\_keyvault\_id) | The Key Vault ID where the VMSS admin password is stored. |
 | <a name="output_vmss_admin_password_keyvault_secret_name"></a> [vmss\_admin\_password\_keyvault\_secret\_name](#output\_vmss\_admin\_password\_keyvault\_secret\_name) | The Key Vault secret name where the VMSS admin password is stored. |
 | <a name="output_vmss_admin_username"></a> [vmss\_admin\_username](#output\_vmss\_admin\_username) | The admin username for the VMSS. |
