@@ -705,3 +705,21 @@ The resource ID of the Cosmos DB free account to be used.
 DESC
   default     = null
 }
+
+variable "role_mssql_db_reader_id" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The ID of the role for the MSSQL DB reader operations.
+DESC
+  default     = null
+}
+
+variable "role_mssql_db_restore_id" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The ID of the role for the MSSQL DB restore operations.
+DESC
+  default     = null
+}
