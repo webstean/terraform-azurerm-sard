@@ -134,27 +134,6 @@ resource "azurerm_subnet_route_table_association" "subnet01_kms_route" {
   route_table_id = azurerm_route_table.this.id
 }
 
-## Send traffic in vWAN hub to the Firewall
-## This avoids having to use UDR (User Defined Routes)
-resource "azurerm_virtual_hub_routing_intent" "this" {
-  count = (var.virtual_wan_hub_id != null && var.virtual_wan_hub_firewall_id != null) ? 1 : 0
-
-  name           = "routing-intent-for-vwan"
-  virtual_hub_id = var.virtual_wan_hub_id
-
-  routing_policy {
-    name         = "PrivateTraffic"
-    destinations = ["PrivateTraffic"]
-    next_hop     = var.virtual_wan_hub_firewall_id
-  }
-
-  routing_policy {
-    name         = "InternetTraffic"
-    destinations = ["Internet"]
-    next_hop     = var.virtual_wan_hub_firewall_id
-  }
-}
-
 resource "azurerm_network_security_group" "general" { ## designed to be associated to NIC or subnets or both!
   name                = "nsg-general-access-${lower(module.environment_resource_group.resource.location)}"
   resource_group_name = module.environment_resource_group.resource.name

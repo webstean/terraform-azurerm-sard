@@ -57,3 +57,24 @@ resource "azurerm_vpn_gateway" "this" {
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 */
+
+## Send traffic in vWAN hub to the Firewall
+## This avoids having to use UDR (User Defined Routes)
+resource "azurerm_virtual_hub_routing_intent" "this" {
+  count = (var.virtual_wan_hub_id != null && var.virtual_wan_hub_firewall_id != null) ? 1 : 0
+
+  name           = "routing-intent-for-vwan"
+  virtual_hub_id = var.virtual_wan_hub_id
+
+  routing_policy {
+    name         = "PrivateTraffic"
+    destinations = ["PrivateTraffic"]
+    next_hop     = var.virtual_wan_hub_firewall_id
+  }
+
+  routing_policy {
+    name         = "InternetTraffic"
+    destinations = ["Internet"]
+    next_hop     = var.virtual_wan_hub_firewall_id
+  }
+}
