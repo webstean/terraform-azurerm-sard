@@ -398,16 +398,16 @@ DESC
   }
 }
 
-variable "vwan_id" {
+variable "virtual_wan_id" {
   type        = string
-  description = <<DESC
+  sensitive   = false
   description = <<DESC
 The ID of the existing Virtual WAN. null if not created.
 DESC
   default     = null
 }
 
-variable "vwan_hub_id" {
+variable "virtual_wan_hub_id" {
   type        = string
   sensitive   = false
   description = <<DESC
@@ -416,14 +416,14 @@ DESC
   default     = null ## azurerm_virtual_hub.example.id
   validation {
     condition = (
-      (try(trimspace(var.vwan_hub_id), "") == "" && try(trimspace(var.vwan_hub_firewall_id), "") == "") ||
-      (try(trimspace(var.vwan_hub_id), "") != "" && try(trimspace(var.vwan_hub_firewall_id), "") != "")
+      (try(trimspace(var.virtual_wan_hub_id), "") == "" && try(trimspace(var.virtual_wan_hub_firewall_id), "") == "") ||
+      (try(trimspace(var.virtual_wan_hub_id), "") != "" && try(trimspace(var.virtual_wan_hub_firewall_id), "") != "")
     )
-    error_message = "Both variables 'vwan_hub_id' and 'vwan_hub_firewall_id' must either both be set or both be empty."
+    error_message = "Both variables 'virtual_wan_hub_id' and 'virtual_wan_hub_firewall_id' must either both be set or both be empty."
   }
 }
 
-variable "vwan_hub_firewall_id" {
+variable "virtual_wan_hub_firewall_id" {
   type        = string
   sensitive   = false
   description = <<DESC
