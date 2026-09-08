@@ -142,8 +142,6 @@ Next steps here
 | [azurerm_user_assigned_identity.environment](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_user_assigned_identity.free_sql_database](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_user_assigned_identity.sqlserver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
-| [azurerm_virtual_hub.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_hub) | resource |
-| [azurerm_virtual_hub_connection.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_hub_connection) | resource |
 | [azurerm_virtual_hub_routing_intent.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_hub_routing_intent) | resource |
 | [azurerm_virtual_machine_scale_set_standby_pool.hibernated](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_scale_set_standby_pool) | resource |
 | [azurerm_virtual_network.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
@@ -283,7 +281,6 @@ Next steps here
 | <a name="output_swa_url"></a> [swa\_url](#output\_swa\_url) | The URL for the Static Web App site. |
 | <a name="output_virtual_machine_x64_sku_list"></a> [virtual\_machine\_x64\_sku\_list](#output\_virtual\_machine\_x64\_sku\_list) | List of x64 virtual machine SKUs |
 | <a name="output_virtual_machine_x64_sku_random"></a> [virtual\_machine\_x64\_sku\_random](#output\_virtual\_machine\_x64\_sku\_random) | Randomly selected x64 virtual machine SKU |
-| <a name="output_virtual_wan_hub_id"></a> [virtual\_wan\_hub\_id](#output\_virtual\_wan\_hub\_id) | The ID of the vWAN Hub. |
 | <a name="output_vmss_admin_password_keyvault_id"></a> [vmss\_admin\_password\_keyvault\_id](#output\_vmss\_admin\_password\_keyvault\_id) | The Key Vault ID where the VMSS admin password is stored. |
 | <a name="output_vmss_admin_password_keyvault_secret_name"></a> [vmss\_admin\_password\_keyvault\_secret\_name](#output\_vmss\_admin\_password\_keyvault\_secret\_name) | The Key Vault secret name where the VMSS admin password is stored. |
 | <a name="output_vmss_admin_username"></a> [vmss\_admin\_username](#output\_vmss\_admin\_username) | The admin username for the VMSS. |
