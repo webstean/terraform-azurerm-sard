@@ -1,3 +1,13 @@
+resource "random_string" "environment" {
+  length  = 6
+  special = false
+  upper   = false
+  lower   = true
+  keepers = {
+    base_name = var.prefix
+  }
+}
+
 locals {
   environment_name          = "env-${var.prefix}"
   environment_name_location = lower("${local.environment_name}-${lower(var.location)}")
