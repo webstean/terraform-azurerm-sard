@@ -30,6 +30,7 @@ terraform {
   }
 }
 
+/*
 provider "azurerm" {
   ## "extended" is chosen over "automatic" to ensure all recommended and custom resource providers are registered, as required by Azure Landing Zones and advanced scenarios.
   resource_provider_registrations = "extended"
@@ -165,3 +166,4 @@ provider "azapi" {
   use_cli                   = true
   enable_preflight          = true
 }
+*/

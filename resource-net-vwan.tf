@@ -29,15 +29,15 @@ resource "azurerm_virtual_hub" "this" {
 }
 
 resource "azurerm_virtual_hub_connection" "vnet" {
-  name                      = "link-VNET:${azurerm_virtual_network.this.name}-to-HUB:${azurerm_virtual_hub.this.name}"
-  virtual_hub_id            = try(azurerm_virtual_hub.this.id, var.virtual_wan_hub_id)
+  name                      = "link-VNET:${azurerm_virtual_network.this.name}-to-HUB:${azurerm_virtual_hub.this[0].name}"
+  virtual_hub_id            = try(azurerm_virtual_hub.this[0].id, var.virtual_wan_hub_id)
   remote_virtual_network_id = azurerm_virtual_network.this.id
 }
 
 output "virtual_wan_hub_id" {
   description = "The ID of the vWAN Hub."
   sensitive   = false
-  value       = try(azurerm_virtual_hub.this.id, var.virtual_wan_hub_id)
+  value       = try(azurerm_virtual_hub.this[0].id, var.virtual_wan_hub_id)
 }
 
 /*
@@ -49,7 +49,7 @@ resource "azurerm_vpn_gateway" "this" {
   name                                  = "vpn-gateway-${var.prefix}-${title(each.value.short_name)}"
   resource_group_name                   = module.environment_resource_group.resource.name
   location                              = module.environment_resource_group.resource.location
-  virtual_hub_id                        = try(azurerm_virtual_hub.this.id, var.vwan_hub_id)
+  virtual_hub_id                        = try(azurerm_virtual_hub.this[0].id, var.vwan_hub_id)
   bgp_route_translation_for_nat_enabled = false
   routing_preference                    = "Microsoft Network"
   scale_unit                            = 1
