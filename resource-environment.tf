@@ -3,6 +3,7 @@ resource "random_string" "environment" {
   special = false
   upper   = false
   numeric = false
+  #number  = false
   lower   = true
   keepers = {
     base_name = var.prefix
