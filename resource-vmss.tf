@@ -27,7 +27,7 @@ module "nat_gateway" {
   count = var.vmss_number_of_instances == 0 || var.vmss_autoscale_enabled == false ? 0 : 1
 
   source           = "Azure/avm-res-network-natgateway/azurerm"
-  version          = "0.2.0"
+  version          = "~>0.0, < 1.0"
   enable_telemetry = var.enable_telemetry
 
   name                = "nat-${local.nat_name_location}"
