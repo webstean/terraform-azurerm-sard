@@ -28,6 +28,7 @@ module "redis" {
   eviction_policy   = "AllKeysLRU"
   zones             = (tobool(var.data_pii) || tobool(var.data_phi)) ? local.regions[module.environment_resource_group.resource.location].zones : null
   high_availability = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? "Enabled" : "Disabled"
+  public_network_access = (tobool(var.deploy_private_endpoints)) ? "Disabled" : "Enabled"
 
   managed_identities = {
     system_assigned = false
