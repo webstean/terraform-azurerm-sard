@@ -4,7 +4,7 @@ locals {
   pls_name               = "pls-${var.prefix}"
   pls_name_location      = lower("${local.pls_name}-${lower(var.location)}")
   pls_random_suffix      = substr(md5(local.pls_name_location), 0, 6)
-  pls_name_hostname      = lower(substr(replace("l${local.pls_random_suffix}${local.pls_name_location}", "-", ""), 0, 24))
+  pls_name_hostname      = lower(substr(replace("l${local.pls_random_suffix}${var.prefix}${local.pls_name_location}", "-", ""), 0, 24))
   proxy_protocol_enabled = true
 }
 
