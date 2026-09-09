@@ -26,7 +26,7 @@ module "redis" {
   sku_name          = local.redis_sku_name
   clustering_policy = local.redis_clustering_policy
   eviction_policy   = "AllKeysLRU"
-  zones             = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? local.regions[module.environment_resource_group.resource.location] : null
+  zones             = (tobool(var.data_pii) || tobool(var.data_phi)) ? local.regions[module.environment_resource_group.resource.location] : null
   high_availability = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? "Enabled" : "Disabled"
 
   managed_identities = {
@@ -67,7 +67,9 @@ action "azurerm_managed_redis_databases_flush" "this" {
 }
 
 output "redis_id" {
-  description = "The ID of the Redis instance."
+  description = <<DESC
+The ID of the Redis instance.
+DESC
   sensitive   = false
   value       = try(module.redis.resource_id, null)
 }
