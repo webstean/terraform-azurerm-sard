@@ -35,7 +35,7 @@ Next steps here
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0, < 2.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~>1.9, < 2.0 |
 | <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | ~>2.0, < 3.0 |
 | <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) | ~>3.0, < 4.0 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~>4.0, < 5.0 |
@@ -87,8 +87,6 @@ Next steps here
 | [azurerm_mssql_server_dns_alias.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server_dns_alias) | resource |
 | [azurerm_mssql_server_dns_alias.this_failover](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server_dns_alias) | resource |
 | [azurerm_mssql_server_extended_auditing_policy.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server_extended_auditing_policy) | resource |
-| [azurerm_nat_gateway.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/nat_gateway) | resource |
-| [azurerm_nat_gateway_public_ip_association.vnet-nat-gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/nat_gateway_public_ip_association) | resource |
 | [azurerm_network_security_group.bastion](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
 | [azurerm_network_security_group.general](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
 | [azurerm_network_security_group.inbound_sqlserver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
@@ -248,6 +246,10 @@ Next steps here
 | <a name="output_databox_gateway_id"></a> [databox\_gateway\_id](#output\_databox\_gateway\_id) | The ID of the Databox Edge Gateway device. |
 | <a name="output_databox_gateway_properties"></a> [databox\_gateway\_properties](#output\_databox\_gateway\_properties) | The properties of the Databox Edge Gateway device. |
 | <a name="output_environment_diag_storage_account_name"></a> [environment\_diag\_storage\_account\_name](#output\_environment\_diag\_storage\_account\_name) | The name of the main storage account for this environment. |
+| <a name="output_environment_home_page"></a> [environment\_home\_page](#output\_environment\_home\_page) | The SARD Environment home page |
+| <a name="output_environment_name"></a> [environment\_name](#output\_environment\_name) | The SARD Environment name |
+| <a name="output_environment_name_location"></a> [environment\_name\_location](#output\_environment\_name\_location) | The SARD Environment default location |
+| <a name="output_environment_random_string"></a> [environment\_random\_string](#output\_environment\_random\_string) | The SARD Environment random string |
 | <a name="output_environment_resource_group_location"></a> [environment\_resource\_group\_location](#output\_environment\_resource\_group\_location) | The Azure Resource Group that contains this environment |
 | <a name="output_environment_resource_group_name"></a> [environment\_resource\_group\_name](#output\_environment\_resource\_group\_name) | The Azure Resource Group that contains this environment |
 | <a name="output_environment_storage_account_name"></a> [environment\_storage\_account\_name](#output\_environment\_storage\_account\_name) | The name of the main storage account for this environment. |
@@ -259,6 +261,7 @@ Next steps here
 | <a name="output_logs_otel_dce_id"></a> [logs\_otel\_dce\_id](#output\_logs\_otel\_dce\_id) | The ID of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_logs_ingestion_endpoint"></a> [logs\_otel\_logs\_ingestion\_endpoint](#output\_logs\_otel\_logs\_ingestion\_endpoint) | The OTEL logs ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_metrics_ingestion_endpoint"></a> [logs\_otel\_metrics\_ingestion\_endpoint](#output\_logs\_otel\_metrics\_ingestion\_endpoint) | The OTEL metrics ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
+| <a name="output_portal_link"></a> [portal\_link](#output\_portal\_link) | The SARD Azure Portal url |
 | <a name="output_relay_mssql_public_ip"></a> [relay\_mssql\_public\_ip](#output\_relay\_mssql\_public\_ip) | The public IP address of the relay load balancer. |
 | <a name="output_security_perimeter_inbound_public_ips"></a> [security\_perimeter\_inbound\_public\_ips](#output\_security\_perimeter\_inbound\_public\_ips) | List of public IPs allowed for inbound traffic to the security perimeter |
 | <a name="output_security_perimeter_outbound_fqdns"></a> [security\_perimeter\_outbound\_fqdns](#output\_security\_perimeter\_outbound\_fqdns) | List of FQDNs allowed for outbound traffic from the security perimeter |
@@ -300,8 +303,8 @@ Next steps here
 | <a name="module_environment_resource_group"></a> [environment\_resource\_group](#module\_environment\_resource\_group) | Azure/avm-res-resources-resourcegroup/azurerm | ~>0.0, < 1.0 |
 | <a name="module_foundry_keyvault"></a> [foundry\_keyvault](#module\_foundry\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
 | <a name="module_log_analytics_workspace"></a> [log\_analytics\_workspace](#module\_log\_analytics\_workspace) | Azure/avm-res-operationalinsights-workspace/azurerm | ~>0.0, < 1.0 |
+| <a name="module_nat_gateway"></a> [nat\_gateway](#module\_nat\_gateway) | Azure/avm-res-network-natgateway/azurerm | 0.2.0 |
 | <a name="module_private_endpoint_sqlserver"></a> [private\_endpoint\_sqlserver](#module\_private\_endpoint\_sqlserver) | Azure/avm-res-network-privateendpoint/azurerm | ~>0.0, < 1.0 |
-| <a name="module_public_ip_nat"></a> [public\_ip\_nat](#module\_public\_ip\_nat) | Azure/avm-res-network-publicipaddress/azurerm | 0.2.1 |
 | <a name="module_virtualmachinescaleset"></a> [virtualmachinescaleset](#module\_virtualmachinescaleset) | Azure/avm-res-compute-virtualmachinescaleset/azurerm | ~>0.0, < 1.0 |
 | <a name="module_vm_x64_skus"></a> [vm\_x64\_skus](#module\_vm\_x64\_skus) | Azure/avm-utl-sku-finder/azapi | ~>0.0, < 1.0 |
 | <a name="module_vmss_autoscale_setting"></a> [vmss\_autoscale\_setting](#module\_vmss\_autoscale\_setting) | Azure/avm-res-insights-autoscalesetting/azurerm | ~>0.0, < 1.0 |
