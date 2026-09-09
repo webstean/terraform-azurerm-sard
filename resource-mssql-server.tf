@@ -290,6 +290,27 @@ resource "azurerm_mssql_server" "this" {
   ]
 }
 
+module "private_endpoint_sqlserver" {
+  count = tobool(var.deploy_private_endpoints) ? 1 : 0
+
+  source           = "Azure/avm-res-network-privateendpoint/azurerm"
+  version          = "~>0.0, < 1.0"
+  enable_telemetry = var.enable_telemetry # see variables.tf
+
+  name                           = "${local.pep_name_location}-${azurerm_mssql_server.this.name}"
+  resource_group_name            = module.environment_resource_group.resource.name
+  location                       = module.environment_resource_group.resource.location
+  network_interface_name         = "pep-${azurerm_mssql_server.this.name}"
+  private_connection_resource_id = azurerm_mssql_server.this.id
+  subnet_resource_id             = azurerm_subnet.private_endpoints[0].id
+  subresource_names              = ["sqlServer"]
+  lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
+    kind = "CanNotDelete"
+  } : null
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
+
+
 ## https://learn.microsoft.com/en-us/azure/azure-sql/database/dns-alias-overview?view=azuresql
 ## A DNS alias can be used in place of the server name.
 ## Client programs can use the alias in their connection strings.

@@ -73,19 +73,25 @@ output "redis_id" {
 }
 
 output "redis_name" {
-  description = "The Name of the Redis instance."
+  description = <<DESC
+The Name of this environment's Redis instance.
+DESC
   sensitive   = false
   value       = try(module.redis.name, null)
 }
 
 output "redis_resource" {
-  description = "Details of Redis resource"
+  description = <<DESC
+Details of this environment's Redis instance.
+DESC
   sensitive   = false
   value       = try(module.redis.resource, null)
 }
 
 output "redis_default_database" {
-  description = "The details of the Redis default database"
+  description = <<DESC
+The Name of the default database within this environment's Redis instance
+DESC
   sensitive   = false
   value       = try(module.redis.resource.default_database[0].id, null)
 }
