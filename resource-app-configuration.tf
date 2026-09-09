@@ -101,6 +101,14 @@ module "appconfiguration" {
       principal_type                   = "ServicePrincipal"
       description                      = local.iac_message
     }
+    role_assignment_4 = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/App Configuration Data Owner/${var.owner_entra_object_id}")
+      role_definition_id_or_name       = "App Configuration Data Owner"
+      principal_id                     = var.owner_entra_object_id
+      skip_service_principal_aad_check = false
+      principal_type                   = "User"
+      description                      = local.iac_message
+    }
   }
 
   replicas = contains(["standard", "premium"], local.appconfiguration_sku) ? {
