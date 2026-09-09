@@ -29,7 +29,7 @@ resource "azurerm_virtual_hub" "this" {
 }
 
 resource "azurerm_virtual_hub_connection" "vnet" {
-  name                      = substr("link-vnet-${azurerm_virtual_network.this.name}-to-hub-${azurerm_virtual_hub.this[0].name}", 0, 80)
+  name                      = "link-vnet-${substr(md5("${azurerm_virtual_network.this.id}-${try(azurerm_virtual_hub.this[0].id, var.virtual_wan_hub_id)}"), 0, 16)}"
   virtual_hub_id            = try(azurerm_virtual_hub.this[0].id, var.virtual_wan_hub_id)
   remote_virtual_network_id = azurerm_virtual_network.this.id
 }
