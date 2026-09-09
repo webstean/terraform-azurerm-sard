@@ -30,10 +30,10 @@ module "nat_gateway" {
   version          = "~>0.0, < 1.0"
   enable_telemetry = var.enable_telemetry
 
-  name                = "nat-${local.nat_name_location}"
-  resource_group_name = module.environment_resource_group.resource.name
-  location            = module.environment_resource_group.resource.location
-  sku_name            = "Standard"
+  name      = "nat-${local.nat_name_location}"
+  parent_id = module.environment_resource_group.resource.id
+  location  = module.environment_resource_group.resource.location
+  sku_name  = "Standard"
 
   public_ips = {
     main = {
@@ -46,15 +46,9 @@ module "nat_gateway" {
       allocation_method       = "Static"
       idle_timeout_in_minutes = 30
       ip_version              = "IPv4"
-      sku                     = "Standard"
+      sku                     = "StandardV2"
       sku_tier                = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? "Global" : "Regional"
       zones                   = local.regions[var.location].zones
-    }
-  }
-
-  subnet_associations = {
-    vmss = {
-      resource_id = local.vmss_subnet_id
     }
   }
 
