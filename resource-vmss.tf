@@ -23,26 +23,46 @@ locals {
   nat_name_hostname = lower(substr(replace("l${local.nat_random_suffix}${local.nat_name_location}", "-", ""), 0, 24))
 }
 
-module "public_ip_nat" {
+module "nat_gateway" {
   count = var.vmss_number_of_instances == 0 || var.vmss_autoscale_enabled == false ? 0 : 1
 
-  source           = "Azure/avm-res-network-publicipaddress/azurerm"
-  version          = "0.2.1"
+  source           = "Azure/avm-res-network-natgateway/azurerm"
+  version          = "0.2.0"
   enable_telemetry = var.enable_telemetry
 
-  name                = "pip-${local.nat_name_location}"
-  location            = module.environment_resource_group.resource.location
+  name                = "nat-${local.nat_name_location}"
   resource_group_name = module.environment_resource_group.resource.name
-  allocation_method   = "Static"
-  sku                 = "Standard"
-  sku_tier            = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? "Global" : "Regional"
-  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-  #domain_name_label_scope = "TenantReuse"
+  location            = module.environment_resource_group.resource.location
+  sku_name            = "Standard"
 
-  #domain_name_label = local.vmms_name_hostname
-  #domain_name_label_scope = "TenantReuse" # (Optional) Scope for the domain name label. If a domain name label scope is specified,
-  # an A DNS record is created in the Microsoft Azure DNS system with a hashed value
-  # includes in FQDN. Possible values are NoReuse, ResourceGroupReuse, SubscriptionReuse and TenantReuse.
+  public_ips = {
+    main = {
+      name = "pip-${local.nat_name_location}"
+    }
+  }
+
+  public_ip_configuration = {
+    main = {
+      allocation_method       = "Static"
+      idle_timeout_in_minutes = 30
+      ip_version              = "IPv4"
+      sku                     = "Standard"
+      sku_tier                = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? "Global" : "Regional"
+      zones                   = local.regions[var.location].zones
+    }
+  }
+
+  subnet_associations = {
+    vmss = {
+      resource_id = local.vmss_subnet_id
+    }
+  }
+
+  lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
+    kind = "CanNotDelete"
+  } : null
+
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 /*
@@ -70,27 +90,11 @@ resource "azurerm_monitor_diagnostic_setting" "pip_logs" {
 }
 */
 
-resource "azurerm_nat_gateway" "this" {
-  count = var.vmss_number_of_instances == 0 || var.vmss_autoscale_enabled == false ? 0 : 1
-
-  name                = "nat-${local.nat_name_location}"
-  resource_group_name = module.environment_resource_group.resource.name
-  location            = module.environment_resource_group.resource.location
-  sku_name            = "StandardV2" ## There is no cost difference between the two SKUs. Standard and Standardv2 - StandardV2 is multi-zones for free
-  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-}
-
-resource "azurerm_nat_gateway_public_ip_association" "vnet-nat-gateway" {
-  count = var.vmss_number_of_instances == 0 || var.vmss_autoscale_enabled == false ? 0 : 1
-
-  nat_gateway_id       = azurerm_nat_gateway.this[0].id
-  public_ip_address_id = module.public_ip_nat[0].resource_id
-}
 resource "azurerm_subnet_nat_gateway_association" "this" {
   count = var.vmss_number_of_instances == 0 || var.vmss_autoscale_enabled == false ? 0 : 1
 
   subnet_id      = local.vmss_subnet_id
-  nat_gateway_id = azurerm_nat_gateway.this[0].id
+  nat_gateway_id = module.nat_gateway[0].resource_id
 }
 
 /*

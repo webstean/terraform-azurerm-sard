@@ -2,6 +2,7 @@ resource "random_string" "environment" {
   length  = 6
   special = false
   upper   = false
+  numeric = false
   lower   = true
   keepers = {
     base_name = var.prefix
@@ -16,6 +17,20 @@ locals {
   environment_home_page     = "www.webstean.com"
   portal_link               = "https://portal.azure.com/#@${data.azurerm_client_config.current.tenant_id}/resource/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourceGroups/${module.environment_resource_group.name}/overview"
 }
+
+resource "azurerm_user_assigned_identity" "environment" {
+  name = "id-${local.environment_name_location}"
+
+  resource_group_name = module.environment_resource_group.resource.name
+  location            = module.environment_resource_group.resource.location
+  isolation_scope     = "Regional"
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
+resource "time_sleep" "environment_identity_create_wait" {
+  create_duration = "1m"
+  depends_on      = [azurerm_user_assigned_identity.environment]
+}
+## https://learn.microsoft.com/en-us/azure/operations/configuration-enrollment#managed-identity
 
 module "environment_resource_group" {
   source           = "Azure/avm-res-resources-resourcegroup/azurerm"
@@ -169,20 +184,6 @@ output "security_perimeter_outbound_fqdns" {
   value       = var.security_perimeter_outbound_fqdns
 }
 
-resource "azurerm_user_assigned_identity" "environment" {
-  name = "id-${local.environment_name_location}"
-
-  resource_group_name = module.environment_resource_group.resource.name
-  location            = module.environment_resource_group.resource.location
-  isolation_scope     = "Regional"
-  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-}
-resource "time_sleep" "environment_identity_create_wait" {
-  create_duration = "1m"
-  depends_on      = [azurerm_user_assigned_identity.environment]
-}
-## https://learn.microsoft.com/en-us/azure/operations/configuration-enrollment#managed-identity
-
 output "subscription_display_name" {
   description = "The subscription display name of the current Azure subscription."
   sensitive   = false
@@ -195,3 +196,42 @@ output "subscription_id" {
   value       = try(data.azurerm_subscription.current.subscription_id, null)
 }
 
+output "environment_name" {
+  description = <<DESC
+The SARD Environment name
+DESC
+  sensitive   = false
+  value       = try(local.environment_name, null)
+}
+
+output "environment_name_location" {
+  description = <<DESC
+The SARD Environment default location
+DESC
+  sensitive   = false
+  value       = try(local.environment_name_location, null)
+}
+
+output "environment_random_string" {
+  description = <<DESC
+The SARD Environment random string
+DESC
+  sensitive   = false
+  value       = try(random_string.environment.result, null)
+}
+
+output "environment_home_page" {
+  description = <<DESC
+The SARD Environment home page
+DESC
+  sensitive   = false
+  value       = try(local.environment_home_page, null)
+}
+
+output "portal_link" {
+  description = <<DESC
+The SARD Azure Portal url
+DESC
+  sensitive   = false
+  value       = try(local.portal_link, null)
+}

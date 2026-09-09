@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.9.0, < 2.0"
+  required_version = "~>1.9, < 2.0"
 
   required_providers {
     azurerm = {
@@ -13,7 +13,7 @@ terraform {
       version = "~>3.0, < 4.0"
     }
     msgraph = {
-      ## Microsoft Graph - replacement for azuread *future*
+      ## Microsoft Graph - eventual replacement for azuread
       version = "~> 0.0, < 1.0"
       source  = "microsoft/msgraph"
     }
@@ -29,141 +29,3 @@ terraform {
     }
   }
 }
-
-/*
-provider "azurerm" {
-  ## "extended" is chosen over "automatic" to ensure all recommended and custom resource providers are registered, as required by Azure Landing Zones and advanced scenarios.
-  resource_provider_registrations = "extended"
-  ## These are recommendations from the Azure Landing Zone, plus some others :-)
-  resource_providers_to_register = [
-    "Microsoft.Advisor",
-    "Microsoft.AlertsManagement",
-    "Microsoft.App",
-    "Microsoft.ApiCenter",
-    "Microsoft.ApiManagement",
-    "Microsoft.Automation",
-    "Microsoft.AzureTerraform",
-    "Microsoft.Cache",
-    "Microsoft.Capacity",
-    "Microsoft.CodeSigning",
-    "Microsoft.Communication",
-    "Microsoft.Compute",
-    "Microsoft.Compute/EncryptionAtHost",
-    "Microsoft.ContainerRegistry",
-    "Microsoft.ContainerService",
-    "Microsoft.DataBoxEdge",
-    "Microsoft.Dashboard",
-    "Microsoft.DevCenter",
-    "Microsoft.DeviceUpdate",
-    "Microsoft.DevOpsInfrastructure",
-    "Microsoft.DevTestLab",
-    "Microsoft.EdgeZones",
-    "Microsoft.EventGrid",
-    "Microsoft.ExtendedLocation",
-    "Microsoft.FluidRelay",
-    "Microsoft.GuestConfiguration",
-    "Microsoft.HorizonDB",
-    "Microsoft.Insights",
-    "Microsoft.IoTSecurity",
-    "Microsoft.IoTOperations",
-    "Microsoft.KeyVault",
-    "Microsoft.Monitor",
-    "Microsoft.ManagedIdentity",
-    "Microsoft.ManagedOps",
-    "Microsoft.ManagedServices",
-    "Microsoft.Management",
-    "Microsoft.Network",
-    "Microsoft.OperationalInsights",
-    "Microsoft.OperationsManagement",
-    "Microsoft.PolicyInsights",
-    "Microsoft.Purview",
-    "Microsoft.RecoveryServices",
-    "Microsoft.ResourceHealth",
-    "Microsoft.Security",
-    "Microsoft.SecurityInsights",
-    "Microsoft.ServiceLinker",
-    "Microsoft.StandbyPool",
-    "Microsoft.Storage",
-    "Microsoft.Sql",
-    "Microsoft.VerifiedId",
-    "NGINX.NGINXPLUS",
-  ]
-  features {
-    enhanced_validation {
-      preflight_enabled  = true
-      locations          = true # Re-enable location validation at plan time
-      resource_providers = true # Re-enable resource provider validation at plan time
-    }
-    app_configuration {
-      purge_soft_delete_on_destroy = true
-      recover_soft_deleted         = false
-    }
-    api_management {
-      purge_soft_delete_on_destroy = true  # Keep soft-deleted API Management resources for recovery.
-      recover_soft_deleted         = false # Automatically recover soft-deleted API Management resources.
-    }
-    cognitive_account {
-      purge_soft_delete_on_destroy = true
-    }
-    resource_group {
-      prevent_deletion_if_contains_resources = false # Allow deletion of resource groups even if they contain resources.
-    }
-    key_vault {
-      purge_soft_delete_on_destroy    = true  # Retain soft-deleted Key Vaults for potential recovery.
-      recover_soft_deleted_key_vaults = false # Automatically recover soft-deleted Key Vaults.
-    }
-    log_analytics_workspace {
-      permanently_delete_on_destroy = true # Ensure Log Analytics Workspaces are permanently deleted on destroy.
-    }
-    machine_learning {
-      purge_soft_deleted_workspace_on_destroy = true # Permanently delete soft-deleted ML workspaces on destroy.
-    }
-    virtual_machine {
-      delete_os_disk_on_deletion = true # Automatically delete OS disks when deleting VMs.
-    }
-    virtual_machine_scale_set {
-      force_delete                  = true
-      roll_instances_when_required  = true
-      scale_to_zero_before_deletion = true
-    }
-    template_deployment {
-      delete_nested_items_during_deletion = false # Do not delete nested items during template deployment deletion.
-    }
-  }
-  storage_use_azuread = true
-  ## Authentication strategy: Prefer OIDC and Azure CLI for authentication;
-  ## Managed Identity and AKS Workload Identity are disabled for explicit control and compatibility.
-  use_oidc                  = true
-  use_aks_workload_identity = false
-  use_msi                   = false
-  use_cli                   = true
-}
-
-provider "msgraph" {
-  ## Authentication strategy: Prefer OIDC and Azure CLI for authentication;
-  ## Managed Identity and AKS Workload Identity are disabled for explicit control and compatibility.
-  use_oidc                  = true
-  use_aks_workload_identity = false
-  use_msi                   = false
-  use_cli                   = true
-}
-
-provider "azuread" {
-  ## Authentication strategy: Prefer OIDC and Azure CLI for authentication;
-  ## Managed Identity and AKS Workload Identity are disabled for explicit control and compatibility.
-  use_oidc                  = true
-  use_aks_workload_identity = false
-  use_msi                   = false
-  use_cli                   = true
-}
-
-provider "azapi" {
-  ## Authentication strategy: Prefer OIDC and Azure CLI for authentication;
-  ## Managed Identity and AKS Workload Identity are disabled for explicit control and compatibility.
-  use_oidc                  = true
-  use_aks_workload_identity = false
-  use_msi                   = false
-  use_cli                   = true
-  enable_preflight          = true
-}
-*/
