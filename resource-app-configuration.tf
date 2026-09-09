@@ -2,8 +2,8 @@ locals {
   appconfiguration_sku               = "free" ## "standard" is the default/null,  options are: free, developer, standard, and premium
   appconfiguration_env_name          = "app-configuration-${local.appconfiguration_sku}-${var.prefix}"
   appconfiguration_env_name_location = lower("${local.appconfiguration_env_name}-${lower(var.location)}")
-  appconfiguration_env_random_suffix = substr(md5(local.appconfiguration_env_name_location), 0, 6)
-  appconfiguration_env_name_hostname = lower(substr(replace("a${local.appconfiguration_env_random_suffix}${local.appconfiguration_env_name_location}", "-", ""), 0, 24))
+  appconfiguration_env_random_suffix = substr(random_string.environment.result, 0, 6)
+  appconfiguration_env_name_hostname = lower(substr(replace("a${local.appconfiguration_env_random_suffix}${var.prefix}${local.appconfiguration_env_name_location}", "-", ""), 0, 24))
 }
 
 #data "azuread_service_principal" "cert_spn" {
@@ -20,8 +20,7 @@ module "appconfiguration" {
   resource_group_resource_id      = module.environment_resource_group.resource_id
   azapi_schema_validation_enabled = false
   sku                             = local.appconfiguration_sku
-  public_network_access_enabled   = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)
- ? false : true
+  public_network_access_enabled   = tobool(var.deploy_private_endpoints) ? false : true
   soft_delete_retention_days      = local.appconfiguration_sku == "free" ? null : 7
   purge_protection_enabled        = local.appconfiguration_sku == "free" ? false : true
 
@@ -56,19 +55,16 @@ module "appconfiguration" {
       value = var.customer
     }
     PREFIX = {
-
       key   = upper("prefix")
       label = "basic"
       value = var.prefix
     }
     LOCATION = {
-
       key   = upper("location")
       label = "basic"
       value = var.location
     }
     SUBSCRIPTION_ID = {
-
       key   = upper("subscription-id")
       label = "basic"
       value = var.subscription_id
