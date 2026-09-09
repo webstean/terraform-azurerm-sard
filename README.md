@@ -276,6 +276,10 @@ Next steps here
 | <a name="output_logs_otel_logs_ingestion_endpoint"></a> [logs\_otel\_logs\_ingestion\_endpoint](#output\_logs\_otel\_logs\_ingestion\_endpoint) | The OTEL logs ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_metrics_ingestion_endpoint"></a> [logs\_otel\_metrics\_ingestion\_endpoint](#output\_logs\_otel\_metrics\_ingestion\_endpoint) | The OTEL metrics ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_portal_link"></a> [portal\_link](#output\_portal\_link) | The SARD Azure Portal url |
+| <a name="output_redis_default_database"></a> [redis\_default\_database](#output\_redis\_default\_database) | The Name of the default database within this environment's Redis instance |
+| <a name="output_redis_id"></a> [redis\_id](#output\_redis\_id) | The ID of the Redis instance. |
+| <a name="output_redis_name"></a> [redis\_name](#output\_redis\_name) | The Name of this environment's Redis instance. |
+| <a name="output_redis_resource"></a> [redis\_resource](#output\_redis\_resource) | Details of this environment's Redis instance. |
 | <a name="output_relay_mssql_public_ip"></a> [relay\_mssql\_public\_ip](#output\_relay\_mssql\_public\_ip) | The public IP address of the relay load balancer. |
 | <a name="output_security_perimeter_inbound_public_ips"></a> [security\_perimeter\_inbound\_public\_ips](#output\_security\_perimeter\_inbound\_public\_ips) | List of public IPs allowed for inbound traffic to the security perimeter |
 | <a name="output_security_perimeter_outbound_fqdns"></a> [security\_perimeter\_outbound\_fqdns](#output\_security\_perimeter\_outbound\_fqdns) | List of FQDNs allowed for outbound traffic from the security perimeter |
@@ -321,6 +325,7 @@ Next steps here
 | <a name="module_log_analytics_workspace"></a> [log\_analytics\_workspace](#module\_log\_analytics\_workspace) | Azure/avm-res-operationalinsights-workspace/azurerm | ~>0.0, < 1.0 |
 | <a name="module_nat_gateway"></a> [nat\_gateway](#module\_nat\_gateway) | Azure/avm-res-network-natgateway/azurerm | ~>0.0, < 1.0 |
 | <a name="module_private_endpoint_sqlserver"></a> [private\_endpoint\_sqlserver](#module\_private\_endpoint\_sqlserver) | Azure/avm-res-network-privateendpoint/azurerm | ~>0.0, < 1.0 |
+| <a name="module_redis"></a> [redis](#module\_redis) | Azure/avm-res-cache-redisenterprise/azurerm | ~>0.0, < 1.0 |
 | <a name="module_virtualmachinescaleset"></a> [virtualmachinescaleset](#module\_virtualmachinescaleset) | Azure/avm-res-compute-virtualmachinescaleset/azurerm | ~>0.0, < 1.0 |
 | <a name="module_vm_x64_skus"></a> [vm\_x64\_skus](#module\_vm\_x64\_skus) | Azure/avm-utl-sku-finder/azapi | ~>0.0, < 1.0 |
 | <a name="module_vmss_autoscale_setting"></a> [vmss\_autoscale\_setting](#module\_vmss\_autoscale\_setting) | Azure/avm-res-insights-autoscalesetting/azurerm | ~>0.0, < 1.0 |
