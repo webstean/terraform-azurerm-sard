@@ -2,7 +2,7 @@ locals {
   aca_env_name          = "aca-env-${var.prefix}"
   aca_env_name_location = lower("${local.aca_env_name}-${lower(var.location)}")
   aca_env_random_suffix = substr(random_string.environment.result, 0, 6)
-  aca_env_name_hostname = lower(substr(replace("e${local.aca_env_random_suffix}${var.prefix}${local.aca_env_name_location}", "-", ""), 0, 24))
+  aca_env_name_hostname = lower(substr(replace("a${local.aca_env_random_suffix}${var.prefix}${local.aca_env_name_location}", "-", ""), 0, 24))
 }
 
 resource "azurerm_subnet" "containerappenv" {

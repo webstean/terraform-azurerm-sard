@@ -4,7 +4,7 @@ locals {
   swa_name               = "sswa-${var.prefix}"
   swa_name_location      = "${local.swa_name}-${lower(var.location)}"
   swa_name_random_suffix = substr(random_string.environment.result, 0, 6)
-  swa_name_hostname      = lower(substr(replace("d${local.swa_name_random_suffix}${local.swa_name_location}", "-", ""), 0, 24))
+  swa_name_hostname      = lower(substr(replace("s${local.swa_name_random_suffix}${local.swa_name_location}", "-", ""), 0, 24))
   swa_sku_tier           = "Free"
   swa_sku_size           = "Free"
 }

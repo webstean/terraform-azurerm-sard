@@ -4,7 +4,7 @@ locals {
   redis_name          = "redis-${var.prefix}"
   redis_name_location = lower("${local.redis_name}-${lower(var.location)}")
   redis_random_suffix = substr(random_string.environment.result, 0, 6)
-  redis_name_hostname = lower(substr(replace("l${local.redis_random_suffix}${local.redis_name_location}", "-", ""), 0, 24))
+  redis_name_hostname = lower(substr(replace("r${local.redis_random_suffix}${local.redis_name_location}", "-", ""), 0, 24))
   redis_sku_name      = "Balanced_B0"
   ## Memory-Optimized : Memory-Optimized_M10, Memory-Optimized_M20
   ## Balanced         : Balanced_B0, Balanced_B1, Balanced_B3, Balanced_B5

@@ -13,7 +13,7 @@ locals {
   environment_name          = "env-${var.prefix}"
   environment_name_location = lower("${local.environment_name}-${lower(var.location)}")
   environment_random_suffix = substr(random_string.environment.result, 0, 6)
-  environment_name_hostname = lower(substr(replace("${local.environment_random_suffix}${var.prefix}${local.environment_name_location}", "-", ""), 0, 24))
+  environment_name_hostname = lower(substr(replace("e${local.environment_random_suffix}${var.prefix}${local.environment_name_location}", "-", ""), 0, 24))
   environment_home_page     = "www.webstean.com"
   portal_link               = "https://portal.azure.com/#@${data.azurerm_client_config.current.tenant_id}/resource/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourceGroups/${module.environment_resource_group.name}/overview"
 }

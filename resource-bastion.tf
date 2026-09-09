@@ -3,7 +3,7 @@ locals {
   bastion_name          = "ba-${var.prefix}"
   bastion_name_location = lower("${local.bastion_name}-${lower(var.location)}")
   bastion_random_suffix = substr(random_string.environment.result, 0, 6)
-  bastion_name_hostname = lower(substr(replace("c${local.bastion_random_suffix}${local.bastion_name_location}", "-", ""), 0, 24))
+  bastion_name_hostname = lower(substr(replace("b${local.bastion_random_suffix}${local.bastion_name_location}", "-", ""), 0, 24))
   subnet_bastion = {
     address_format_ipv4 = "10.%s.2.0/23"
     service_endpoints   = null

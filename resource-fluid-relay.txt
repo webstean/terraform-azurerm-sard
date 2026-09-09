@@ -4,7 +4,7 @@ locals {
   fluid_name                = "fluid-relay-${var.prefix}"
   fluid_name_location       = lower("${local.fluid_name}-${lower(var.location)}")
   fluid_random_suffix       = substr(random_string.environment.result, 0, 6)
-  fluid_name_hostname       = lower(substr(replace("cc${local.fluid_random_suffix}${local.fluid_name_location}", "-", ""), 0, 24))
+  fluid_name_hostname       = lower(substr(replace("f${local.fluid_random_suffix}${local.fluid_name_location}", "-", ""), 0, 24))
 }
 
 resource "azurerm_fluid_relay_server" "this" {

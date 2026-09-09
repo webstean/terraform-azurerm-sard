@@ -3,7 +3,7 @@ locals {
   iothub_name          = "iothub-${var.prefix}"
   iothub_name_location = lower("${local.iothub_name}-${lower(var.location)}")
   iothub_random_suffix = substr(md5(local.iothub_name_location), 0, 6)
-  iothub_name_hostname = lower(substr(replace("i${local.iothub_random_suffix}${local.iothub_name_location}", "-", ""), 0, 24))
+  iothub_name_hostname = lower(substr(replace("h${local.iothub_random_suffix}${local.iothub_name_location}", "-", ""), 0, 24))
   iot_hub_sku          = "F" ## Free (F), Basic (B) -$$ , Standard (S) -$$$
   iot_hub_capacity     = 1
 }

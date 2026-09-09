@@ -2,7 +2,7 @@ locals {
   pep_name          = "pep-${var.prefix}"
   pep_name_location = lower("${local.pep_name}-${lower(var.location)}")
   pep_random_suffix = substr(random_string.environment.result, 0, 6)
-  pep_name_hostname = lower(substr(replace("l${local.pep_random_suffix}${local.pep_name_location}", "-", ""), 0, 24))
+  pep_name_hostname = lower(substr(replace("p${local.pep_random_suffix}${local.pep_name_location}", "-", ""), 0, 24))
 }
 
 resource "azurerm_subnet" "private_endpoints" {
