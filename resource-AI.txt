@@ -1,8 +1,8 @@
 locals {
   cog_name          = "cog-${var.prefix}"
   cog_name_location = lower("${local.cog_name}-${lower(var.location)}")
-  cog_random_suffix = substr(md5(local.cog_name_location), 0, 6)
-  cog_name_hostname = lower(substr(replace("e${local.cog_random_suffix}${local.cog_name_location}", "-", ""), 0, 24))
+  cog_random_suffix = substr(random_string.environment.result, 0, 6)
+  cog_name_hostname = lower(substr(replace("${local.cog_random_suffix}${var.prefix}${local.cog_name_location}", "-", ""), 0, 24))
   rai_policy_name   = "policy0"
 }
 

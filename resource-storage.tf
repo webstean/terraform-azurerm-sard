@@ -2,11 +2,11 @@ locals {
   storage_friendly_name      = "Storage Accounts"
   storage_name               = "st-${var.prefix}"
   storage_name_location      = lower("${local.storage_name}-${lower(var.location)}")
-  storage_random_suffix      = substr(md5(local.storage_name_location), 0, 6)
+  storage_random_suffix      = substr(random_string.environment.result, 0, 6)
   storage_name_hostname      = lower(substr(replace("c${local.storage_random_suffix}${local.storage_name_location}", "-", ""), 0, 24))
   diag_storage_name          = "dia-${var.prefix}"
   diag_storage_name_location = lower("${local.diag_storage_name}-${lower(var.location)}")
-  diag_storage_random_suffix = substr(md5(local.diag_storage_name_location), 0, 6)
+  diag_storage_random_suffix = substr(random_string.environment.result, 0, 6)
   diag_storage_name_hostname = lower(substr(replace("d${local.diag_storage_random_suffix}${local.diag_storage_name_location}", "-", ""), 0, 24))
 }
 

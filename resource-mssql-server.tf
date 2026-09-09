@@ -2,7 +2,7 @@ locals {
   sql_server_friendly_name = "SQL Server"
   sql_server_name          = "sqldb-${var.prefix}"
   sql_server_location      = "${local.sql_server_name}-${lower(var.location)}"
-  sql_server_random_suffix = substr(md5(local.sql_server_location), 0, 6)
+  sql_server_random_suffix = substr(random_string.environment.result, 0, 6)
   sql_server_hostname      = lower(substr(replace("s${local.sql_server_random_suffix}${local.sql_server_location}", "-", ""), 0, 24))
   sql_port                 = "1433"
 }

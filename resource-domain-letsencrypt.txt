@@ -2,7 +2,7 @@ locals {
   cert_friendly_name = "Lets Encrypt Certificate KeyVault"
   cert_name          = "cert-letse-${var.prefix}"
   cert_name_location = lower("${local.cert_name}-${lower(var.location)}")
-  cert_random_suffix = substr(md5(local.cert_name_location), 0, 6)
+  cert_random_suffix = substr(random_string.environment.result, 0, 6)
   cert_name_hostname = lower(substr(replace("cc${local.cert_random_suffix}${local.cert_name_location}", "-", ""), 0, 24))
   min_days_remaining = 30
 }

@@ -5,7 +5,7 @@ locals {
   law_friendly_name = "Log Analytics Workspace"
   law_name          = "law-${var.prefix}"
   law_name_location = lower("${local.law_name}-${lower(var.location)}")
-  law_random_suffix = substr(md5(local.law_name_location), 0, 6)
+  law_random_suffix = substr(random_string.environment.result, 0, 6)
   law_name_hostname = lower(substr(replace("l${local.law_random_suffix}${local.law_name_location}", "-", ""), 0, 24))
 }
 

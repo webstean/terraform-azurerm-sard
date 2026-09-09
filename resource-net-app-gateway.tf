@@ -2,7 +2,7 @@ locals {
   gateway_friendly_name = "Application Gateway"
   gateway_name          = "gateway-${var.prefix}"
   gateway_name_location = lower("${local.gateway_name}-${lower(var.location)}")
-  gateway_random_suffix = substr(md5(local.gateway_name_location), 0, 6)
+  gateway_random_suffix = substr(random_string.environment.result, 0, 6)
   gateway_name_hostname = lower(substr(replace("l${local.gateway_random_suffix}${local.gateway_name_location}", "-", ""), 0, 24))
 }
 

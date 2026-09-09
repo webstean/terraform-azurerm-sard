@@ -2,7 +2,7 @@ locals {
   adf_friendly_name       = "Azure Data Factory"
   adf_name                = "adf-${var.prefix}"
   adf_name_location       = "${local.adf_name}-${lower(var.location)}"
-  adf_name_random_suffix  = substr(md5(local.adf_name_location), 0, 6)
+  adf_name_random_suffix  = substr(random_string.environment.result, 0, 6)
   adf_name_hostname       = lower(substr(replace("d${local.adf_name_random_suffix}${local.adf_name_location}", "-", ""), 0, 24))
   adf_ir_self_hosted_name = "ir-self-hosted-${local.adf_name_hostname}"
   adf_ls_blob_name        = "ls-adf-working-blob"

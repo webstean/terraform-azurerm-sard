@@ -2,8 +2,10 @@ locals {
   pubsub_friendly_name = "Publish Web Pub Sub"
   pubsub_name          = substr("pubsub${var.prefix}", 0, 8) ## can only be 9 characters or less
   pubsub_name_location = lower("${local.pubsub_name}${lower(var.location)}")
-  pubsub_random_suffix = substr(md5(local.pubsub_name_location), 0, 6)
-  pubsub_name_hostname = lower(substr("pubsub${local.pubsub_random_suffix}${replace(local.pubsub_name_location, "/[^0-9A-Za-z]/", "")}", 0, 63))
+  pubsub_random_suffix = substr(random_string.environment.result, 0, 6)
+  pubsub_name_hostname = lower(substr("ps${local.pubsub_random_suffix}${var.prefix}${replace(local.pubsub_name_location, "/[^0-9A-Za-z]/", "")}", 0, 63))
+  pubsub_sku           = "Free_F1" ## Free_F1, Standard_S1, Premium_P1
+  pubsub_capacity      = 1
 }
 
 resource "azurerm_web_pubsub" "this" {
@@ -11,8 +13,8 @@ resource "azurerm_web_pubsub" "this" {
   location            = module.environment_resource_group.resource.location
   resource_group_name = module.environment_resource_group.resource.name
 
-  sku      = "Free_F1" # Free_F1, Standard_S1, Premium_P1
-  capacity = 1
+  sku      = local.pubsub_sku
+  capacity = local.pubsub_capacity
 
   local_auth_enabled            = false
   tls_client_cert_enabled       = false

@@ -3,7 +3,7 @@ locals {
   redis_docs          = "https://learn.microsoft.com/en-us/azure/redis/"
   redis_name          = "redis-${var.prefix}"
   redis_name_location = lower("${local.redis_name}-${lower(var.location)}")
-  redis_random_suffix = substr(md5(local.redis_name_location), 0, 6)
+  redis_random_suffix = substr(random_string.environment.result, 0, 6)
   redis_name_hostname = lower(substr(replace("l${local.redis_random_suffix}${local.redis_name_location}", "-", ""), 0, 24))
   redis_sku_name      = "Balanced_B0"
   ## Memory-Optimized : Memory-Optimized_M10, Memory-Optimized_M20

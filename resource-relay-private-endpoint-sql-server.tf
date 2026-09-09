@@ -1,7 +1,7 @@
 locals {
   relay_name          = "relay-${var.prefix}"
   relay_name_location = lower("${local.relay_name}-${lower(var.location)}")
-  relay_random_suffix = substr(md5(local.relay_name_location), 0, 6)
+  relay_random_suffix = substr(random_string.environment.result, 0, 6)
   relay_name_hostname = lower(substr(replace("l${local.relay_random_suffix}${local.relay_name_location}", "-", ""), 0, 24))
   relay_port          = 1433 ## sql server
 }

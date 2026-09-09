@@ -1,7 +1,7 @@
 locals {
   comms_name          = "cm-${var.prefix}"
   comms_name_location = lower("${local.comms_name}-${lower(var.location)}")
-  comms_random_suffix = substr(md5(local.comms_name_location), 0, 6)
+  comms_random_suffix = substr(random_string.environment.result, 0, 6)
   comms_name_hostname = lower(substr(replace("cn${local.comms_random_suffix}${local.comms_name_location}", "-", ""), 0, 24))
 }
 

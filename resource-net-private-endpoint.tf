@@ -1,7 +1,7 @@
 locals {
   pep_name          = "pep-${var.prefix}"
   pep_name_location = lower("${local.pep_name}-${lower(var.location)}")
-  pep_random_suffix = substr(md5(local.pep_name_location), 0, 6)
+  pep_random_suffix = substr(random_string.environment.result, 0, 6)
   pep_name_hostname = lower(substr(replace("l${local.pep_random_suffix}${local.pep_name_location}", "-", ""), 0, 24))
 }
 

@@ -2,7 +2,7 @@ locals {
   vnet_friendly_name = "Virtual Network"
   vnet_name          = "vnet-${var.prefix}"
   vnet_name_location = lower("${local.vnet_name}-${lower(var.location)}")
-  vnet_random_suffix = substr(md5(local.vnet_name_location), 0, 6)
+  vnet_random_suffix = substr(random_string.environment.result, 0, 6)
   vnet_name_hostname = lower(substr(replace("l${local.vnet_random_suffix}${local.vnet_name_location}", "-", ""), 0, 24))
 }
 

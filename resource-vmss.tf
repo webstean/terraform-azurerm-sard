@@ -2,7 +2,7 @@ locals {
   vmss_friendly_name                  = "Virtual Machine Scale Set"
   vmss_name                           = substr("vmss${var.prefix}", 0, 8) ## can only be 9 characters or less
   vmss_name_location                  = lower("${local.vmss_name}${lower(var.location)}")
-  vmss_random_suffix                  = substr(md5(local.vmss_name_location), 0, 6)
+  vmss_random_suffix                  = substr(random_string.environment.result, 0, 6)
   vmss_name_hostname                  = lower(substr(replace("cc${local.vmss_random_suffix}${local.vmss_name_location}", "-", ""), 0, 24))
   vmss_number_of_instances            = var.vmss_number_of_instances
   vmss_admin_username                 = "azureuser"
@@ -19,25 +19,30 @@ locals {
   nat_friendly_name = "NAT Gateway"
   nat_name          = var.prefix
   nat_name_location = lower("${local.nat_name}-${lower(var.location)}")
-  nat_random_suffix = substr(md5(local.nat_name_location), 0, 6)
+  nat_random_suffix = substr(random_string.environment.result, 0, 6)
   nat_name_hostname = lower(substr(replace("l${local.nat_random_suffix}${local.nat_name_location}", "-", ""), 0, 24))
 }
 
-resource "azurerm_public_ip" "nat" {
+module "public_ip_nat" {
   count = var.vmss_number_of_instances == 0 || var.vmss_autoscale_enabled == false ? 0 : 1
 
+  source           = "Azure/avm-res-network-publicipaddress/azurerm"
+  version          = "0.2.1"
+  enable_telemetry = var.enable_telemetry
+
   name                = "pip-${local.nat_name_location}"
-  allocation_method   = "Static"
   location            = module.environment_resource_group.resource.location
   resource_group_name = module.environment_resource_group.resource.name
-  sku                 = "StandardV2"
-  sku_tier            = "Regional" ## "Global"
+  allocation_method   = "Static"
+  sku                 = "Standard"
+  sku_tier            = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? "Global" : "Regional"
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  #domain_name_label_scope = "TenantReuse"
+
   #domain_name_label = local.vmms_name_hostname
   #domain_name_label_scope = "TenantReuse" # (Optional) Scope for the domain name label. If a domain name label scope is specified,
-  # an A DNS record is created for the public IP in the Microsoft Azure DNS system with a hashed value
+  # an A DNS record is created in the Microsoft Azure DNS system with a hashed value
   # includes in FQDN. Possible values are NoReuse, ResourceGroupReuse, SubscriptionReuse and TenantReuse.
-
-  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 /*
@@ -79,7 +84,7 @@ resource "azurerm_nat_gateway_public_ip_association" "vnet-nat-gateway" {
   count = var.vmss_number_of_instances == 0 || var.vmss_autoscale_enabled == false ? 0 : 1
 
   nat_gateway_id       = azurerm_nat_gateway.this[0].id
-  public_ip_address_id = azurerm_public_ip.nat[0].id
+  public_ip_address_id = module.public_ip_nat[0].resource_id
 }
 resource "azurerm_subnet_nat_gateway_association" "this" {
   count = var.vmss_number_of_instances == 0 || var.vmss_autoscale_enabled == false ? 0 : 1

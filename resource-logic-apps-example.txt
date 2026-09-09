@@ -2,7 +2,7 @@ locals {
   logic_apps_friendly_name = "Logic Apps Example"
   logic_apps_name          = "wf-${var.prefix}-example1"
   logic_apps_location      = lower("${local.logic_apps_name}-${lower(var.location)}")
-  logic_apps_random_suffix = substr(md5(local.logic_apps_location), 0, 6)
+  logic_apps_random_suffix = substr(random_string.environment.result, 0, 6)
   logic_apps_name_hostname = lower(substr(replace("d${local.logic_apps_random_suffix}${local.logic_apps_location}", "-", ""), 0, 24))
 }
 

@@ -3,7 +3,7 @@ locals {
   swa_docs               = "https://learn.microsoft.com/en-us/azure/static-web-apps/"
   swa_name               = "sswa-${var.prefix}"
   swa_name_location      = "${local.swa_name}-${lower(var.location)}"
-  swa_name_random_suffix = substr(md5(local.swa_name_location), 0, 6)
+  swa_name_random_suffix = substr(random_string.environment.result, 0, 6)
   swa_name_hostname      = lower(substr(replace("d${local.swa_name_random_suffix}${local.swa_name_location}", "-", ""), 0, 24))
   swa_sku_tier           = "Free"
   swa_sku_size           = "Free"
@@ -32,7 +32,7 @@ resource "azurerm_static_web_app" "this" {
 
   /*
   app_settings {
-    ## "WEBSITE_NODE_DEFAULT_VERSION" = "14.17.0"         
+    ## "WEBSITE_NODE_DEFAULT_VERSION" = "14.17.0"
   }
 */
 

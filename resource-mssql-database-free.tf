@@ -2,7 +2,7 @@ locals {
   sql_free_database_friendly_name = "Free SQL Database"
   sql_free_database_name          = "sqldb-${var.prefix}-free"
   sql_free_database_location      = lower("${local.sql_free_database_name}-${lower(var.location)}")
-  sql_free_database_random_suffix = substr(md5(local.sql_free_database_location), 0, 6)
+  sql_free_database_random_suffix = substr(random_string.environment.result, 0, 6)
   sql_free_database_name_hostname = lower(substr(replace("d${local.sql_free_database_random_suffix}${local.sql_free_database_location}", "-", ""), 0, 24))
 }
 
