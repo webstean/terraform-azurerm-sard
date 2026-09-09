@@ -8,7 +8,7 @@ locals {
   fluid_sku                 = "basic"
 }
 
-resource "azurerm_fluid_relay_server" "this" {
+resource "azurerm_fluid_relay_server" "this" { ## Takes a long time to deploy
   name                = local.fluid_name_hostname
   resource_group_name = module.environment_resource_group.resource.name
   location            = module.environment_resource_group.resource.location
