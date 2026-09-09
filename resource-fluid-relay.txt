@@ -20,6 +20,11 @@ resource "azurerm_fluid_relay_server" "this" { ## Takes a long time to deploy
   }
 
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  timeouts {
+    create = "60m"
+    update = "60m"
+    delete = "60m"
+  }
 }
 
 output "fluid_relay_service_id" {
