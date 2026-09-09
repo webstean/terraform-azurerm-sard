@@ -177,7 +177,6 @@ module "vmss_keyvault" {
       description                      = local.iac_message
     }
   }
-
   lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
     kind = "CanNotDelete"
   } : null
