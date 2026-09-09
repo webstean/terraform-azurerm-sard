@@ -20,8 +20,7 @@ resource "azurerm_static_web_app" "this" {
   sku_size                           = local.swa_sku_size
   preview_environments_enabled       = true
   configuration_file_changes_enabled = true
-  public_network_access_enabled      = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
-
+  public_network_access_enabled      = tobool(var.deploy_private_endpoints) ? false : true
   dynamic "identity" {
     for_each = local.swa_sku_tier != "Free" ? [1] : []
     content {

@@ -20,7 +20,8 @@ module "appconfiguration" {
   resource_group_resource_id      = module.environment_resource_group.resource_id
   azapi_schema_validation_enabled = false
   sku                             = local.appconfiguration_sku
-  public_network_access_enabled   = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+  public_network_access_enabled   = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)
+ ? false : true
   soft_delete_retention_days      = local.appconfiguration_sku == "free" ? null : 7
   purge_protection_enabled        = local.appconfiguration_sku == "free" ? false : true
 

@@ -61,8 +61,10 @@ resource "azurerm_iothub" "this" {
     }
   }
 
-  local_authentication_enabled  = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
-  public_network_access_enabled = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+  local_authentication_enabled  = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)
+ ? false : true
+  public_network_access_enabled = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)
+ ? false : true
 
   ### endpoint types are:
   ### AzureIotHub.StorageContainer, AzureIotHub.ServiceBusQueue, AzureIotHub.ServiceBusTopic

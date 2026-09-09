@@ -9,7 +9,8 @@ resource "azurerm_dashboard_grafana" "grafana" {
   sku_size                          = "X1" ## X1 or X2
   api_key_enabled                   = true
   deterministic_outbound_ip_enabled = true
-  public_network_access_enabled     = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+  public_network_access_enabled     = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)
+ ? false : true
   zone_redundancy_enabled           = false
 
   azure_monitor_workspace_integrations {

@@ -277,7 +277,8 @@ module "ai-services" {
   allow_project_management           = true
   deployment_serialization_enabled   = true
   dynamic_throttling_enabled         = each.value.dynamic_throttling_enabled
-  local_auth_enabled                 = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+  local_auth_enabled                 = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)
+ ? false : true
   outbound_network_access_restricted = false
 
   #custom_question_answering_search_service_id  = each.value.kind == "TextAnalytics" ? module.ai_search_service.resource_id : null

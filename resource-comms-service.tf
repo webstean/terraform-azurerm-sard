@@ -23,7 +23,7 @@ module "comms_keyvault" {
   enabled_for_disk_encryption     = false ## Whether Azure Disk Encryption is permitted to retrieve secrets from the vault
   enabled_for_template_deployment = false ## Whether Azure Resource Manager is permitted to retrieve secrets from the vault
   network_acls = {
-    default_action             = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? "Deny" : "Allow"
+    default_action             = tobool(var.deploy_private_endpoints) ? "Deny" : "Allow"
     bypass                     = "AzureServices"
     virtual_network_subnet_ids = [for subnets in azurerm_virtual_network.this.subnet : subnets.id if contains(subnets.service_endpoints, "Microsoft.KeyVault")]
   }

@@ -20,16 +20,16 @@ resource "azurerm_storage_account" "this" {
   min_tls_version                 = "TLS1_2"
   shared_access_key_enabled       = true ## still needed for compatbility, such ACA and Azure Data Box Gateway, and Azure File Sync, and Azure Backup, and Azure Site Recovery, and Azure Storage Explorer, and AzCopy, and Microsoft SQL Server, and Windows Server 2012 R2 or later, and Windows 8.1 or later, and Windows PowerShell 5.1 or later, and Windows PowerShell Core 6.0 or later, and Windows PowerShell Core 7.0 or later, and Windows PowerShell Core 7.1 or later, and Windows PowerShell Core 7.2 or later, and Windows PowerShell Core 7.3 or later, and Windows PowerShell Core 7.4 or later
   allow_nested_items_to_be_public = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
-  public_network_access_enabled   = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+  public_network_access_enabled   = tobool(var.deploy_private_endpoints) ? false : true
 
   #blob_properties {
   #  versioning_enabled = true
   #}
 
   network_rules {
-    default_action             = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? "Deny" : "Allow"
+    default_action             = tobool(var.deploy_private_endpoints) ? "Deny" : "Allow"
     bypass                     = ["AzureServices"]
-    ip_rules                   = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? [] : ["0.0.0.0/0"]
+    ip_rules                   = tobool(var.deploy_private_endpoints) ? [] : ["0.0.0.0/0"]
     virtual_network_subnet_ids = [for subnets in azurerm_virtual_network.this.subnet : subnets.id if contains(subnets.service_endpoints, "Storage")]
   }
 
@@ -159,7 +159,7 @@ resource "azurerm_storage_account" "diag" {
   min_tls_version                 = "TLS1_2"
   shared_access_key_enabled       = true
   allow_nested_items_to_be_public = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
-  public_network_access_enabled   = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+  public_network_access_enabled   = tobool(var.deploy_private_endpoints) ? false : true
 
   blob_properties {
     versioning_enabled = true
@@ -168,7 +168,7 @@ resource "azurerm_storage_account" "diag" {
   network_rules {
     default_action             = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? "Deny" : "Deny"
     bypass                     = ["AzureServices"]
-    ip_rules                   = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? [] : ["0.0.0.0/0"]
+    ip_rules                   = tobool(var.deploy_private_endpoints) ? [] : ["0.0.0.0/0"]
     virtual_network_subnet_ids = [for subnets in azurerm_virtual_network.this.subnet : subnets.id if contains(subnets.service_endpoints, "Storage")]
   }
 

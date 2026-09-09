@@ -6,7 +6,7 @@ locals {
 }
 
 resource "azurerm_subnet" "private_endpoints" {
-  count = tobool(var.deploy_private_endpoints) ? 1 : 1
+  count = tobool(var.deploy_private_endpoints) ? 1 : 0
 
   name                            = "private-endpoints"
   resource_group_name             = module.environment_resource_group.resource.name

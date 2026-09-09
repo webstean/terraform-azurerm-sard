@@ -32,12 +32,12 @@ locals {
       ## microsoft.datalakestore/accounts, microsoft.datashare/accounts, microsoft.dbformariadb/servers,
       ## microsoft.dbformysql/servers, microsoft.dbforpostgresql/flexibleservers, microsoft.dbforpostgresql/servers,
       ## microsoft.dbforpostgresql/serversv2, microsoft.digitaltwins/digitaltwinsinstances,
-      ## microsoft.documentdb/cassandraclusters, microsoft.documentdb/databaseaccounts, 
+      ## microsoft.documentdb/cassandraclusters, microsoft.documentdb/databaseaccounts,
       ## microsoft.desktopvirtualization/applicationgroups, microsoft.desktopvirtualization/hostpools,
       ## microsoft.desktopvirtualization/workspaces, microsoft.devices/iothubs, microsoft.devices/provisioningservices,
       ## microsoft.dynamics/fraudprotection/purchase, microsoft.eventgrid/domains, microsoft.eventgrid/topics,
       ## microsoft.eventgrid/partnernamespaces, microsoft.eventgrid/partnertopics, microsoft.eventgrid/systemtopics,
-      ## microsoft.eventhub/namespaces, microsoft.experimentation/experimentworkspaces, microsoft.hdinsight/clusters, 
+      ## microsoft.eventhub/namespaces, microsoft.experimentation/experimentworkspaces, microsoft.hdinsight/clusters,
       ## microsoft.healthcareapis/services, microsoft.informationprotection/datasecuritymanagement, microsoft.intune/operations,
       ## microsoft.insights/autoscalesettings, microsoft.insights/components, microsoft.insights/workloadmonitoring,
       ## microsoft.keyvault/vaults, microsoft.kubernetes/connectedclusters, microsoft.kusto/clusters,
@@ -51,13 +51,13 @@ locals {
       ## microsoft.network/virtualnetworkgateways, microsoft.network/vpngateways, microsoft.networkfunction/azuretrafficcollectors,
       ## microsoft.openenergyplatform/energyservices, microsoft.openlogisticsplatform/workspaces, microsoft.operationalinsights/workspaces,
       ## microsoft.powerbi/tenants, microsoft.powerbi/tenants/workspaces, microsoft.powerbidedicated/capacities,
-      ## microsoft.purview/accounts, microsoft.recoveryservices/vaults, microsoft.resources/azureactivity, 
+      ## microsoft.purview/accounts, microsoft.recoveryservices/vaults, microsoft.resources/azureactivity,
       ## microsoft.scvmm/virtualmachines, microsoft.search/searchservices, microsoft.security/antimalwaresettings,
       ## microsoft.securityinsights/amazon, microsoft.securityinsights/anomalies, microsoft.securityinsights/cef,
       ## microsoft.securityinsights/datacollection, microsoft.securityinsights/dnsnormalized, microsoft.securityinsights/mda,
       ## microsoft.securityinsights/mde, microsoft.securityinsights/mdi, microsoft.securityinsights/mdo,
       ## microsoft.securityinsights/networksessionnormalized, microsoft.securityinsights/office365,
-      ## microsoft.securityinsights/purview, microsoft.securityinsights/securityinsights, 
+      ## microsoft.securityinsights/purview, microsoft.securityinsights/securityinsights,
       ## microsoft.securityinsights/securityinsights/mcas, microsoft.securityinsights/tvm,
       ## microsoft.securityinsights/watchlists, microsoft.servicebus/namespaces, microsoft.servicefabric/clusters,
       ## microsoft.signalrservice/signalr, microsoft.signalrservice/webpubsub, microsoft.sql/managedinstances,
@@ -184,7 +184,7 @@ resource "azurerm_monitor_workspace" "this" {
   resource_group_name = module.environment_resource_group.resource.name
   location            = module.environment_resource_group.resource.location
 
-  public_network_access_enabled = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+  public_network_access_enabled = tobool(var.deploy_private_endpoints) ? false : true
 
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }

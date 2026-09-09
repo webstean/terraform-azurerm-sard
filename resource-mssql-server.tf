@@ -268,7 +268,7 @@ resource "azurerm_mssql_server" "this" {
   resource_group_name                  = module.environment_resource_group.resource.name
   location                             = module.environment_resource_group.resource.location
   version                              = "12.0"
-  public_network_access_enabled        = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+  public_network_access_enabled        = tobool(var.deploy_private_endpoints) ? false : false
   outbound_network_restriction_enabled = false
   azuread_administrator {
     login_username              = var.sql_administrator_group_display_name

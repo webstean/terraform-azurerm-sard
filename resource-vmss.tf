@@ -128,15 +128,15 @@ module "vmss_keyvault" {
   sku_name                        = "standard"
   purge_protection_enabled        = true
   soft_delete_retention_days      = 7
-  public_network_access_enabled   = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+  public_network_access_enabled   = tobool(var.deploy_private_endpoints) ? false : true
   legacy_access_policies_enabled  = false
   enabled_for_deployment          = true ## Whether Azure Virtual Machines are permitted to retrieve certificates
   enabled_for_disk_encryption     = true ## Whether Azure Disk Encryption is permitted to retrieve secrets from the vault
   enabled_for_template_deployment = true ## Whether Azure Resource Manager is permitted to retrieve secrets from the vault
   network_acls = {
-    default_action             = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? "Deny" : "Allow"
+    default_action             = tobool(var.deploy_private_endpoints) ? "Deny" : "Allow"
     bypass                     = "AzureServices"
-    ip_rules                   = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? [] : ["0.0.0.0/0"]
+    ip_rules                   = tobool(var.deploy_private_endpoints) ? [] : ["0.0.0.0/0"]
     virtual_network_subnet_ids = [for subnets in azurerm_virtual_network.this.subnet : subnets.id if contains(subnets.service_endpoints, "Microsoft.KeyVault")]
   }
 
