@@ -1,9 +1,15 @@
 ## Automation Account, created at subscription (lgoal) level since we are not limited to 2 for the number of Automaiton account per subscription
 
+locals {
+  automation_account_id_parts            = var.automation_account_id == null ? [] : split("/", trim(var.automation_account_id, "/"))
+  automation_account_name                = var.automation_account_name != null ? var.automation_account_name : try(local.automation_account_id_parts[7], null)
+  automation_account_resource_group_name = var.automation_account_resource_group_name != null ? var.automation_account_resource_group_name : try(local.automation_account_id_parts[3], module.environment_resource_group.resource.name)
+}
+
 resource "azurerm_automation_variable_string" "user_assigned_identity" {
   name                    = "${upper(var.prefix)}_USER_ASSIGNED_IDENTITY_PRINCIPAL_ID"
-  resource_group_name     = module.environment_resource_group.resource.name
-  automation_account_name = var.automation_account_name
+  resource_group_name     = local.automation_account_resource_group_name
+  automation_account_name = local.automation_account_name
   encrypted               = (tobool(var.data_pii) == true || tobool(var.data_phi) == true) ? true : false
 
   value       = azurerm_user_assigned_identity.environment.principal_id
@@ -14,8 +20,8 @@ resource "azurerm_automation_variable_string" "user_assigned_identity" {
 resource "azurerm_automation_runbook" "demo_powershell_script1" {
   name = "Get-AzResourceGroupInfo-${lower(var.prefix)}"
 
-  resource_group_name      = module.environment_resource_group.resource.name
-  automation_account_name  = var.automation_account_name
+  resource_group_name      = local.automation_account_resource_group_name
+  automation_account_name  = local.automation_account_name
   location                 = module.environment_resource_group.resource.location
   runtime_environment_name = "PowerShell-7.2" ## azurerm_automation_runtime_environment.pwsh76.name
 

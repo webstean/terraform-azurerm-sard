@@ -648,6 +648,15 @@ DESC
   default     = null
 }
 
+variable "automation_account_resource_group_name" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+Resource group name of the Azure Automation Account. If omitted, the resource group is inferred from automation_account_id when supplied, otherwise the environment resource group is used.
+DESC
+  default     = null
+}
+
 variable "automation_account_id" {
   type        = string
   sensitive   = false
