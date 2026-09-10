@@ -11,7 +11,7 @@ resource "azurerm_automation_variable_string" "user_assigned_identity" {
 }
 
 resource "azurerm_automation_runbook" "demo_powershell_script1" {
-  name = "Get-AzResourceGroupInfo-${var.prefix}"
+  name = "Get-AzResourceGroupInfo-${lower(var.prefix)}"
 
   resource_group_name      = module.environment_resource_group.resource.name
   automation_account_name  = var.automation_account_name
