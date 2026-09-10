@@ -2,8 +2,8 @@
 
 locals {
   automation_account_id_parts            = var.automation_account_id == null ? [] : split("/", trim(var.automation_account_id, "/"))
-  automation_account_name                = var.automation_account_name != null ? var.automation_account_name : try(local.automation_account_id_parts[7], null)
-  automation_account_resource_group_name = var.automation_account_resource_group_name != null ? var.automation_account_resource_group_name : try(local.automation_account_id_parts[3], module.environment_resource_group.resource.name)
+  automation_account_name                = try(local.automation_account_id_parts[7], null)
+  automation_account_resource_group_name = try(local.automation_account_id_parts[3], module.environment_resource_group.resource.name)
 }
 
 resource "azurerm_automation_variable_string" "user_assigned_identity" {

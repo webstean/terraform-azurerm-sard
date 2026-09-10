@@ -639,6 +639,7 @@ DESC
   default     = []
 }
 
+/*
 variable "automation_account_name" {
   type        = string
   sensitive   = false
@@ -656,6 +657,7 @@ Resource group name of the Azure Automation Account. If omitted, the resource gr
 DESC
   default     = null
 }
+*/
 
 variable "automation_account_id" {
   type        = string
