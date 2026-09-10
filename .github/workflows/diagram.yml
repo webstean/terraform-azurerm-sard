@@ -21,7 +21,7 @@ jobs:
       - name: Create & comment diagram on PR
         uses: erzz/inframap-action@v1
         with:
-          plan-files: .
+          plan-files: state.json
           always-run: true
           pr-comment: true
           output-filename: docs/plan.png
