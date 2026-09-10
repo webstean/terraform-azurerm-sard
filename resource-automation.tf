@@ -8,6 +8,7 @@ resource "azurerm_automation_variable_string" "user_assigned_identity" {
 
   value       = azurerm_user_assigned_identity.environment.principal_id
   description = local.iac_message
+  depends_on = [azurerm_user_assigned_identity.environment]
 }
 
 resource "azurerm_automation_runbook" "demo_powershell_script1" {
