@@ -7,7 +7,7 @@ resource "azurerm_automation_variable_string" "user_assigned_identity" {
   encrypted               = (tobool(var.data_pii) == true || tobool(var.data_phi) == true) ? true : false
 
   value       = azurerm_user_assigned_identity.environment.principal_id
-  description = "User Assigned Identity"
+  description = local.iac_message
 }
 
 resource "azurerm_automation_runbook" "demo_powershell_script1" {
