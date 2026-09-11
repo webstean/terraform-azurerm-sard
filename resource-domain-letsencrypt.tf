@@ -19,8 +19,7 @@ module "cert_keyvault" {
   sku_name                        = "standard"
   purge_protection_enabled        = true
   soft_delete_retention_days      = 7
-  public_network_access_enabled   = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)
- ? false : true
+  public_network_access_enabled   = tobool(var.deploy_private_endpoints) ? false : true
   legacy_access_policies_enabled  = false
   enabled_for_deployment          = false ## Whether Azure Virtual Machines are permitted to retrieve certificates
   enabled_for_disk_encryption     = false ## Whether Azure Disk Encryption is permitted to retrieve secrets from the vault

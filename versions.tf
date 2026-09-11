@@ -27,5 +27,10 @@ terraform {
       source  = "hashicorp/random"
       version = "~>3.0, < 4.0"
     }
+    acme = {
+      ## ACME for Let's Encrypt
+      source  = "vancluever/acme"
+      version = "~>2.0, < 3.0"
+    }
   }
 }
