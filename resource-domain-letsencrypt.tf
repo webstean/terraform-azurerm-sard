@@ -74,8 +74,7 @@ module "cert_keyvault" {
   } : null
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [
-    azurerm_role_assignment.kvault_admin,
-    azurerm_user_assigned_identity.environment
+    azurerm_user_assigned_identity.environment,
   ]
 }
 

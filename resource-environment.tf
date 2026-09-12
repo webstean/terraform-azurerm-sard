@@ -123,6 +123,31 @@ module "environment_resource_group" {
       principal_type                   = "User"
       description                      = local.iac_message
     }
+    "up_roleassignment3" = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Contributor/${var.owner_entra_object_id}")
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Windows Admin Center Administrator Login/${var.owner_entra_object_id}")
+      role_definition_id_or_name       = "Windows Admin Center Administrator Login"
+      principal_id                     = var.owner_entra_object_id
+      skip_service_principal_aad_check = false
+      principal_type                   = "User"
+      description                      = local.iac_message
+    }
+    "up_roleassignment4" = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Virtual Machine Administrator Login/${var.owner_entra_object_id}")
+      role_definition_id_or_name       = "Virtual Machine Administrator Login"
+      principal_id                     = var.owner_entra_object_id
+      skip_service_principal_aad_check = false
+      principal_type                   = "User"
+      description                      = local.iac_message
+    }
+    "up_roleassignment5" = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Essential Machine Management Administrator/${var.owner_entra_object_id}")
+      role_definition_id_or_name       = "Essential Machine Management Administrator"
+      principal_id                     = var.owner_entra_object_id
+      skip_service_principal_aad_check = false
+      principal_type                   = "User"
+      description                      = local.iac_message
+    }
     /*
     "up_roleassignment3" = {
       role_definition_id_or_name       = "Storage Blob Data Reader"

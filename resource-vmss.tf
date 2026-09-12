@@ -466,27 +466,6 @@ module "virtualmachinescaleset" {
     }
   }
 
-  role_assignments = {
-    role_assignment_1 = {
-      role_definition_id_or_name = "Windows Admin Center Administrator Login"
-      principal_id               = var.owner_entra_object_id
-      principal_type             = "User"
-      description                = local.iac_message
-    }
-    role_assignment_2 = {
-      role_definition_id_or_name = "Virtual Machine Administrator Login"
-      principal_id               = var.owner_entra_object_id
-      principal_type             = "User"
-      description                = local.iac_message
-    }
-    role_assignment_3 = {
-      role_definition_id_or_name = "Essential Machine Management Administrator"
-      principal_id               = var.owner_entra_object_id
-      principal_type             = "User"
-      description                = local.iac_message
-    }
-  }
-
   upgrade_policy = {
     upgrade_mode = local.vmss_patching_mode == "Manual" ? "Manual" : "Rolling"
     rolling_upgrade_policy = {

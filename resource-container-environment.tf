@@ -57,14 +57,12 @@ resource "azurerm_container_app_environment" "this" {
   #log_analytics_workspace_id = module.log_analytics_workspace.resource_id
   #dapr_application_insights_connection_string = module.log_analytics_workspace.connection_string
 
-  public_network_access          = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)
- ? "Disabled" : "Enabled"
-  internal_load_balancer_enabled = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)
- ? true : false
+  public_network_access          = tobool(var.deploy_private_endpoints) ? "Disabled" : "Enabled"
+  internal_load_balancer_enabled = tobool(var.deploy_private_endpoints) ? true : false
 
   ## Provided subnet must have a size of at least /23
   infrastructure_subnet_id = azurerm_subnet.containerappenv.id
-  zone_redundancy_enabled  = false
+  zone_redundancy_enabled  = (tobool(var.data_pii) || tobool(var.data_phi)) ? true : false
   ##multual_tls_enabled = false
 
   identity {

@@ -387,7 +387,7 @@ variable "custom_dns_zone_name" {
   description = <<DESC
 An active DNS zone name (e.g., example.com) already purchased and configured in the Azure subscription for custom domain configuration.
 DESC
-  default     = "webstean.com" ## "sard.webstean.com"
+  default     = "webstean.com"
   validation {
     condition     = !can(regex("^(www|app)", lower(try(trimspace(var.custom_dns_zone_name), ""))))
     error_message = "dns_zone_name must not start with www or app."
@@ -395,6 +395,70 @@ DESC
   validation {
     condition     = !can(regex("^(https?://)", lower(try(trimspace(var.custom_dns_zone_name), ""))))
     error_message = "dns_zone_name must not start with http:// or https://."
+  }
+}
+
+variable "custom_dns_azure_tenant_id" {
+  type        = string
+  description = "The Azure tenant ID hosting the DNS zone for Let's Encrypt DNS challenge validation."
+  default     = "fd72f9ff-96b6-4a20-a870-ceaa17d70bc8"
+  validation {
+    condition     = try(trimspace(var.custom_dns_zone_name), "") == "" || try(trimspace(var.custom_dns_azure_tenant_id), "") != ""
+    error_message = "custom_dns_azure_tenant_id cannot be empty when custom_dns_zone_name is set."
+  }
+}
+
+variable "custom_dns_azure_subscription_id" {
+  type        = string
+  description = "The Azure subscription ID hosting the DNS zone for Let's Encrypt DNS challenge validation."
+  default     = "2d2089b6-d701-49aa-9600-bc2e3796d53a"
+  validation {
+    condition     = try(trimspace(var.custom_dns_zone_name), "") == "" || try(trimspace(var.custom_dns_azure_subscription_id), "") != ""
+    error_message = "custom_dns_azure_subscription_id cannot be empty when custom_dns_zone_name is set."
+  }
+}
+
+variable "custom_dns_azure_resource_group" {
+  type        = string
+  description = "The Azure resource group hosting the DNS zone for Let's Encrypt DNS challenge validation."
+  default     = "lscph-global-dns-public-rg"
+  validation {
+    condition     = try(trimspace(var.custom_dns_zone_name), "") == "" || try(trimspace(var.custom_dns_azure_resource_group), "") != ""
+    error_message = "custom_dns_azure_resource_group cannot be empty when custom_dns_zone_name is set."
+  }
+}
+
+variable "custom_dns_azure_client_id" {
+  type        = string
+  description = "The Azure client ID for the identity that has enough access to successfully perform the Let's Encrypt DNS challenge"
+  default     = "c25795e5-4f48-4ef7-9a9c-12cf65d16487" ## DNS-webstean.com
+  validation {
+    condition     = try(trimspace(var.custom_dns_zone_name), "") == "" || try(trimspace(var.custom_dns_azure_client_id), "") != ""
+    error_message = "custom_dns_azure_client_id cannot be empty when custom_dns_zone_name is set."
+  }
+}
+
+variable "custom_dns_azure_client_secret" {
+  type        = string
+  description = "The Azure client secret for the identity that has enough access to successfully perform the Let's Encrypt DNS challenge"
+  default     = "4Ay8Q~PwiN6e6EUhxa_ZmF41h7c3..W_6pk~3bwf"
+  validation {
+    condition     = try(trimspace(var.custom_dns_zone_name), "") == "" || try(trimspace(var.custom_dns_azure_client_secret), "") != ""
+    error_message = "custom_dns_azure_client_secret cannot be empty when custom_dns_zone_name is set."
+  }
+}
+
+variable "custom_dns_azure_tenant_auth_method" {
+  type        = string
+  description = "How to authenticate to the Azure tenant hosting DNS zone for Let's Encrypt DNS challenge validation."
+  default     = "oidc"
+  validation {
+    condition = (
+      contains(["msi", "oidc", "wli", "cli", "env", "pipeline"], lower(var.custom_dns_azure_tenant_auth_method))
+    )
+    ##  "oidc" - need federation setup on the Entra ID App Registration or User Assigned Identity with the correct permissions to manage the DNS zone
+    ##  "env"  - need a secret defined via AZURE_CLIENT_SECRET that matches what is specified in App Registration (User Assigned Identity is not supported)
+    error_message = "custom_dns_azure_tenant_auth_method must be either 'msi', 'oidc', 'wli', 'cli', 'env', or 'pipeline'."
   }
 }
 

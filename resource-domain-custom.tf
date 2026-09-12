@@ -18,7 +18,7 @@ data "azurerm_dns_zone" "specified" {
   provider = azurerm.dns
 
   name                = var.custom_dns_zone_name
-  resource_group_name = var.custom_dns_azure_resource_group_name
+  resource_group_name = var.custom_dns_azure_resource_group
 }
 
 resource "azurerm_dns_zone" "environment" {

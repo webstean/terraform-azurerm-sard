@@ -34,3 +34,20 @@ terraform {
     }
   }
 }
+
+## assume OIDC
+provider "azurerm" {
+  alias = "dns"
+  features {}
+  tenant_id           = var.custom_dns_azure_tenant_id
+  subscription_id     = var.custom_dns_azure_subscription_id
+  client_id           = var.custom_dns_azure_client_id
+  client_secret       = var.custom_dns_azure_tenant_auth_method == "env" ? var.custom_dns_azure_client_secret : null
+  storage_use_azuread = true
+  ## Authentication strategy: Prefer OIDC and Azure CLI for authentication;
+  ## Managed Identity and AKS Workload Identity are disabled for explicit control and compatibility.
+  use_oidc                  = var.custom_dns_azure_tenant_auth_method == "oidc" ? true : false
+  use_aks_workload_identity = var.custom_dns_azure_tenant_auth_method == "wli" ? true : false
+  use_msi                   = var.custom_dns_azure_tenant_auth_method == "msi" ? true : false
+  use_cli                   = var.custom_dns_azure_tenant_auth_method == "cli" ? true : false
+}
