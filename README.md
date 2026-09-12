@@ -57,6 +57,7 @@ Next steps here
 | [azapi_resource.free_sql_database](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource_action.comms-link-notification-hub](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource_action) | resource |
 | [azapi_resource_action.sql_server_automatic_tuning](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource_action) | resource |
+| [azapi_update_resource.aca_env_otel](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/update_resource) | resource |
 | [azapi_update_resource.comms-identity](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/update_resource) | resource |
 | [azapi_update_resource.configurationStore_telemetry](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/update_resource) | resource |
 | [azurerm_app_configuration_feature.test_feature](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/app_configuration_feature) | resource |
@@ -74,7 +75,10 @@ Next steps here
 | [azurerm_cdn_frontdoor_route.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_route) | resource |
 | [azurerm_communication_service.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/communication_service) | resource |
 | [azurerm_communication_service_email_domain_association.comms](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/communication_service_email_domain_association) | resource |
+| [azurerm_container_app_environment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment) | resource |
 | [azurerm_container_app_environment_certificate.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_certificate) | resource |
+| [azurerm_container_app_environment_storage.logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_storage) | resource |
+| [azurerm_container_app_environment_storage.shared](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_storage) | resource |
 | [azurerm_databox_edge_device.gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/databox_edge_device) | resource |
 | [azurerm_dns_a_record.aca](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
 | [azurerm_dns_a_record.acatest](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
@@ -148,6 +152,7 @@ Next steps here
 | [azurerm_public_ip.app_gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_public_ip.bastion](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_public_ip.relay](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
+| [azurerm_role_assignment.aspire_dotnet_dashboard_access](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.comms_service_owner1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.comms_service_owner2](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.compute_recommendations](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
@@ -181,9 +186,12 @@ Next steps here
 | [azurerm_storage_container.rag_documents](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_container.sku_finder_cache](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_container.sqldiag](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
+| [azurerm_storage_share.containerappenv_logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) | resource |
+| [azurerm_storage_share.containerappenv_shared](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) | resource |
 | [azurerm_storage_share.global](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) | resource |
 | [azurerm_subnet.app_gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.bastion](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_subnet.containerappenv](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.outbound](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.private_endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.sqlserver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
@@ -245,6 +253,12 @@ Next steps here
 | <a name="input_bastion_sku"></a> [bastion\_sku](#input\_bastion\_sku) | Azure Bastion SKU tier that determines features and pricing. See https://learn.microsoft.com/en-us/azure/bastion/bastion-sku-comparison | `string` | `"Developer"` | no |
 | <a name="input_container_registry_id"></a> [container\_registry\_id](#input\_container\_registry\_id) | The ID of the Azure Container Registry to be used. | `string` | `null` | no |
 | <a name="input_cosmos_db_free_account_resource_id"></a> [cosmos\_db\_free\_account\_resource\_id](#input\_cosmos\_db\_free\_account\_resource\_id) | The resource ID of the Cosmos DB free account to be used. | `string` | `null` | no |
+| <a name="input_custom_dns_azure_client_id"></a> [custom\_dns\_azure\_client\_id](#input\_custom\_dns\_azure\_client\_id) | The Azure client ID for the identity that has enough access to successfully perform the Let's Encrypt DNS challenge | `string` | `"c25795e5-4f48-4ef7-9a9c-12cf65d16487"` | no |
+| <a name="input_custom_dns_azure_client_secret"></a> [custom\_dns\_azure\_client\_secret](#input\_custom\_dns\_azure\_client\_secret) | The Azure client secret for the identity that has enough access to successfully perform the Let's Encrypt DNS challenge | `string` | `"4Ay8Q~PwiN6e6EUhxa_ZmF41h7c3..W_6pk~3bwf"` | no |
+| <a name="input_custom_dns_azure_resource_group"></a> [custom\_dns\_azure\_resource\_group](#input\_custom\_dns\_azure\_resource\_group) | The Azure resource group hosting the DNS zone for Let's Encrypt DNS challenge validation. | `string` | `"lscph-global-dns-public-rg"` | no |
+| <a name="input_custom_dns_azure_subscription_id"></a> [custom\_dns\_azure\_subscription\_id](#input\_custom\_dns\_azure\_subscription\_id) | The Azure subscription ID hosting the DNS zone for Let's Encrypt DNS challenge validation. | `string` | `"2d2089b6-d701-49aa-9600-bc2e3796d53a"` | no |
+| <a name="input_custom_dns_azure_tenant_auth_method"></a> [custom\_dns\_azure\_tenant\_auth\_method](#input\_custom\_dns\_azure\_tenant\_auth\_method) | How to authenticate to the Azure tenant hosting DNS zone for Let's Encrypt DNS challenge validation. | `string` | `"oidc"` | no |
+| <a name="input_custom_dns_azure_tenant_id"></a> [custom\_dns\_azure\_tenant\_id](#input\_custom\_dns\_azure\_tenant\_id) | The Azure tenant ID hosting the DNS zone for Let's Encrypt DNS challenge validation. | `string` | `"fd72f9ff-96b6-4a20-a870-ceaa17d70bc8"` | no |
 | <a name="input_custom_dns_zone_name"></a> [custom\_dns\_zone\_name](#input\_custom\_dns\_zone\_name) | An active DNS zone name (e.g., example.com) already purchased and configured in the Azure subscription for custom domain configuration. | `string` | `"webstean.com"` | no |
 | <a name="input_data_phi"></a> [data\_phi](#input\_data\_phi) | If true, this environment contains PHI (Protected Health Information) so deploy additional security controls. If false, deploys a non-PHI environment. | `bool` | `false` | no |
 | <a name="input_data_pii"></a> [data\_pii](#input\_data\_pii) | If true, this environment contains PII (Personally Identifiable Information) so deploy additional security controls. If false, deploys a non-PII environment. | `bool` | `false` | no |
@@ -292,6 +306,10 @@ Next steps here
 
 | Name | Description |
 |------|-------------|
+| <a name="output_aca_env_custom_domain_verification_id"></a> [aca\_env\_custom\_domain\_verification\_id](#output\_aca\_env\_custom\_domain\_verification\_id) | The custom domain verification ID of the Container App Environment. |
+| <a name="output_aca_env_default_domain"></a> [aca\_env\_default\_domain](#output\_aca\_env\_default\_domain) | The default domain of the Container App Environment. |
+| <a name="output_aca_env_id"></a> [aca\_env\_id](#output\_aca\_env\_id) | The ID of the Container App Environment. |
+| <a name="output_aca_env_static_ip_address"></a> [aca\_env\_static\_ip\_address](#output\_aca\_env\_static\_ip\_address) | The static IP address of the Container App Environment. |
 | <a name="output_appconfiguration_endpoint"></a> [appconfiguration\_endpoint](#output\_appconfiguration\_endpoint) | The endpoint of the environment's Azure App Configuration store. |
 | <a name="output_appconfiguration_id"></a> [appconfiguration\_id](#output\_appconfiguration\_id) | The resource ID of the environment's Azure App Configuration store. |
 | <a name="output_appconfiguration_name"></a> [appconfiguration\_name](#output\_appconfiguration\_name) | The name of the environment's Azure App Configuration store. |
