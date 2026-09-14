@@ -43,8 +43,8 @@ locals {
   caa_records = [
     { flags = 0, tag = "issue", value = "letsencrypt.org" },
     { flags = 0, tag = "issuewild", value = "letsencrypt.org" },
-    { flags = 0, tag = "issue", value = "digicert.com" }, ## Microsoft needs this
-    { flags = 0, tag = "issuewild", value = "digicert.com" },
+    { flags = 0, tag = "issue", value = "digicert.com" },     ## Microsoft needs this for its internal certificates
+    { flags = 0, tag = "issuewild", value = "digicert.com" }, ## Microsoft needs this for its internal certificates
     # { flags = 0, tag = "issue",     value = "godaddy.com" },
     # { flags = 0, tag = "issuewild", value = "godaddy.com" },
     # { flags = 0, tag = "issue",     value = "pki.goog" },
