@@ -317,6 +317,7 @@ Next steps here
 | <a name="output_aca_env_default_domain"></a> [aca\_env\_default\_domain](#output\_aca\_env\_default\_domain) | The default domain of the Container App Environment. |
 | <a name="output_aca_env_id"></a> [aca\_env\_id](#output\_aca\_env\_id) | The ID of the Container App Environment. |
 | <a name="output_aca_env_static_ip_address"></a> [aca\_env\_static\_ip\_address](#output\_aca\_env\_static\_ip\_address) | The static IP address of the Container App Environment. |
+| <a name="output_aca_portal_url"></a> [aca\_portal\_url](#output\_aca\_portal\_url) | The portal URL of the Container App Environment. |
 | <a name="output_appconfiguration_endpoint"></a> [appconfiguration\_endpoint](#output\_appconfiguration\_endpoint) | The endpoint of the environment's Azure App Configuration store. |
 | <a name="output_appconfiguration_id"></a> [appconfiguration\_id](#output\_appconfiguration\_id) | The resource ID of the environment's Azure App Configuration store. |
 | <a name="output_appconfiguration_name"></a> [appconfiguration\_name](#output\_appconfiguration\_name) | The name of the environment's Azure App Configuration store. |
