@@ -45,7 +45,7 @@ locals {
       rai_policy                 = false
     }
     ComputerVision = {
-      enable                     = false
+      enable                     = true
       classic                    = false
       kind                       = "ComputerVision"
       storage                    = false
@@ -63,7 +63,7 @@ locals {
       rai_policy                 = false
     }
     ContentSafety = {
-      enable                     = false
+      enable                     = true
       classic                    = false
       kind                       = "ContentSafety"
       storage                    = true
@@ -125,7 +125,7 @@ locals {
       rai_policy                 = false
     }
     ImmersiveReader = {
-      enable                     = false
+      enable                     = true
       classic                    = false
       kind                       = "ImmersiveReader"
       storage                    = true
@@ -215,7 +215,7 @@ locals {
       rai_policy                 = true
     }
     SpeechServices = {
-      enable                     = false
+      enable                     = true
       classic                    = false
       kind                       = "SpeechServices"
       storage                    = true
@@ -224,7 +224,7 @@ locals {
       rai_policy                 = false
     }
     SpeechTranslation = {
-      enable                     = false
+      enable                     = true
       classic                    = false
       kind                       = "SpeechTranslation"
       storage                    = true
