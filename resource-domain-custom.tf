@@ -185,11 +185,18 @@ resource "azurerm_dns_txt_record" "frontdoor_swa_verify" {
   record {
     value = try(azurerm_static_web_app_custom_domain.apex.validation_token, "already-used")
   }
-  record { ## FrontDoor
-    value = "_dnsauth.www"
+
+  dynamic "record" {
+    for_each = var.inbound_access == "FrontDoor" ? [1] : []
+    content {
+      value = "_dnsauth.www"
+    }
   }
-  record { ## FrontDoor
-    value = "_dnsauth"
+  dynamic "record" {
+    for_each = var.inbound_access == "FrontDoor" ? [1] : []
+    content {
+      value = "_dnsauth"
+    }
   }
 
   dynamic "record" {
