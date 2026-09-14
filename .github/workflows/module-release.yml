@@ -15,6 +15,7 @@ on:
         default: false
 
 permissions:
+  actions: read
   contents: write
 
 jobs:
@@ -26,6 +27,26 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0 # full history for release notes generation
+
+      - name: Wait for Terraform module docs
+        run: |
+          mapfile -t run_ids < <(
+            gh run list \
+              --workflow "Terraform-Modules-Docs" \
+              --limit 20 \
+              --json databaseId,status \
+              --jq 'map(select(.status == "queued" or .status == "in_progress")) | .[].databaseId'
+          )
+
+          for run_id in "${run_ids[@]}"; do
+            gh run watch "$run_id" --exit-status
+          done
+
+          if [[ ${#run_ids[@]} -eq 0 ]]; then
+            echo "No queued or running Terraform-Modules-Docs workflow found."
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Compute next minor version
         run: |
