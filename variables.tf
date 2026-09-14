@@ -462,6 +462,21 @@ variable "custom_dns_azure_tenant_auth_method" {
   }
 }
 
+variable "letsencrypt_dns_auth_method" {
+  type        = string
+  description = "How to authenticate to this Azure tenant for creating LetsEncrupt certificates"
+  default     = "oidc"
+  validation {
+    condition = (
+      contains(["msi", "oidc", "wli", "cli", "env", "pipeline"], lower(var.letsencrypt_dns_auth_method))
+    )
+    ##  "oidc" - need federation setup on the Entra ID App Registration or User Assigned Identity with the correct permissions to manage the DNS zone
+    ##  "env"  - need a secret defined via AZURE_CLIENT_SECRET that matches what is specified in App Registration (User Assigned Identity is not supported)
+    error_message = "letsencrypt_dns_auth_method must be either 'msi', 'oidc', 'wli', 'cli', 'env', or 'pipeline'."
+  }
+}
+
+
 variable "virtual_wan_id" {
   type        = string
   sensitive   = false

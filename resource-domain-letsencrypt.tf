@@ -109,12 +109,13 @@ resource "acme_certificate" "pubsub" {
   dns_challenge {
     provider = "azuredns"
     config = {
-      AZURE_AUTH_METHOD     = "oidc"
+      AZURE_AUTH_METHOD     = var.letsencrypt_dns_auth_method ## oidc or env
       AZURE_TENANT_ID       = data.azurerm_client_config.current.tenant_id
       AZURE_CLIENT_ID       = data.azurerm_client_config.current.client_id
       AZURE_SUBSCRIPTION_ID = data.azurerm_client_config.current.subscription_id
       AZURE_RESOURCE_GROUP  = module.environment_resource_group.resource.name
       AZURE_ZONE_NAME       = azurerm_dns_zone.environment.name
+      AZURE_CLIENT_SECRET   = var.letsencrypt_dns_auth_method == "env" ? var.custom_dns_azure_client_secret : ""
       AZURE_TTL             = 300
     }
   }
@@ -148,12 +149,13 @@ resource "acme_certificate" "aca_wildcard" {
   dns_challenge {
     provider = "azuredns"
     config = {
-      AZURE_AUTH_METHOD     = "oidc"
+      AZURE_AUTH_METHOD     = var.letsencrypt_dns_auth_method ## oidc or env
       AZURE_TENANT_ID       = data.azurerm_client_config.current.tenant_id
       AZURE_CLIENT_ID       = data.azurerm_client_config.current.client_id
       AZURE_SUBSCRIPTION_ID = data.azurerm_client_config.current.subscription_id
       AZURE_RESOURCE_GROUP  = module.environment_resource_group.resource.name
       AZURE_ZONE_NAME       = azurerm_dns_zone.aca.name
+      AZURE_CLIENT_SECRET   = var.letsencrypt_dns_auth_method == "env" ? var.custom_dns_azure_client_secret : ""
       AZURE_TTL             = 300
     }
   }
@@ -164,6 +166,12 @@ resource "acme_certificate" "aca_wildcard" {
     azurerm_dns_ns_record.aca
   ]
 }
+
+import {
+  to = azurerm_key_vault_certificate.letsencrypt-aca
+  id = "${module.cert_keyvault.resource_id}/certificates/cert-wildcard-${lower(replace(acme_certificate.aca_wildcard.certificate_domain, ".", "-"))}"
+}
+
 ## write/update certificate in KeyVault so you can use it in other services
 resource "azurerm_key_vault_certificate" "letsencrypt-aca" {
   name         = "cert-wildcard-${lower(replace(acme_certificate.aca_wildcard.certificate_domain, ".", "-"))}"
@@ -174,6 +182,7 @@ resource "azurerm_key_vault_certificate" "letsencrypt-aca" {
   }
 }
 ## azurerm_key_vault_certificate.letsencrypt-aca.certificate_data_base64
+
 
 resource "azurerm_container_app_environment_certificate" "this" {
   name                         = "${lower(local.ingress_custom_aca)}-certificate"
