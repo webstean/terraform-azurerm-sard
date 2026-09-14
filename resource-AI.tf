@@ -17,7 +17,7 @@ locals {
       dynamic_throttling_enabled = true
       rai_policy                 = false
     }
-    AIServices = { ## This is AI foundry (we create this separately)
+    AIServices = { ## This is the AI foundry (we create this separately)
       enable                     = false
       classic                    = false
       kind                       = "AIServices"
@@ -69,7 +69,7 @@ locals {
       storage                    = true
       sku_name                   = "S0"
       dynamic_throttling_enabled = false ## This feature is currently not supported for the resource kind ContentSafety and sku S0.
-      rai_policy                 = false
+      rai_policy                 = true
     }
     CustomSpeech = {
       enable                     = false
