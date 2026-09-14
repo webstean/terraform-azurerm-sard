@@ -136,7 +136,7 @@ resource "azurerm_key_vault_certificate" "letsencrypt-pubsub" {
 ## azurerm_key_vault_certificate.letsencrypt-pubsub.certificate_data_base64
 
 ## create wildcard certificate for aca
-resource "acme_certificate" "aca" {
+resource "acme_certificate" "aca_wildcard" {
   account_key_pem = acme_registration.this.account_key_pem
   profile         = "tlsserver" ## classic, tlsserver, shortlived
   common_name     = azurerm_dns_zone.aca.name
@@ -166,11 +166,11 @@ resource "acme_certificate" "aca" {
 }
 ## write/update certificate in KeyVault so you can use it in other services
 resource "azurerm_key_vault_certificate" "letsencrypt-aca" {
-  name         = "cert-wildcard-${lower(replace(acme_certificate.aca.certificate_domain, ".", "-"))}"
+  name         = "cert-wildcard-${lower(replace(acme_certificate.aca_wildcard.certificate_domain, ".", "-"))}"
   key_vault_id = module.cert_keyvault.resource_id
 
   certificate {
-    contents = acme_certificate.aca.certificate_p12
+    contents = acme_certificate.aca_wildcard.certificate_p12
   }
 }
 ## azurerm_key_vault_certificate.letsencrypt-aca.certificate_data_base64
@@ -179,7 +179,7 @@ resource "azurerm_container_app_environment_certificate" "this" {
   name                         = "${lower(local.ingress_custom_aca)}-certificate"
   container_app_environment_id = azurerm_container_app_environment.this.id
 
-  certificate_key_vault {
+  certificate_key_vault { ## wildcard certificate for aca
     identity            = azurerm_user_assigned_identity.environment.id
     key_vault_secret_id = azurerm_key_vault_certificate.letsencrypt-aca.versionless_secret_id
   }
@@ -188,7 +188,8 @@ resource "azurerm_container_app_environment_certificate" "this" {
     azurerm_dns_caa_record.aca_cas,
     azurerm_dns_a_record.aca,
     azurerm_dns_txt_record.aca,
-    azurerm_dns_ns_record.aca
+    azurerm_dns_ns_record.aca,
+    azurerm_container_app_environment.this
   ]
   lifecycle {
     create_before_destroy = true

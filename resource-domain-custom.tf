@@ -177,14 +177,35 @@ resource "azurerm_dns_txt_record" "swa_dnsauth" {
   ]
 }
 */
-resource "azurerm_dns_txt_record" "swa_dnsauth_verify" {
-  name                = "@" ## local.static_web_app_alias ## www
+resource "azurerm_dns_txt_record" "frontdoor_swa_verify" {
+  name                = "@"
   zone_name           = azurerm_dns_zone.environment.name
   resource_group_name = module.environment_resource_group.resource.name
   ttl                 = 300
   record {
     value = try(azurerm_static_web_app_custom_domain.apex.validation_token, "already-used")
   }
+  record { ## FrontDoor
+    value = "_dnsauth.www"
+  }
+  record { ## FrontDoor
+    value = "_dnsauth"
+  }
+
+  dynamic "record" {
+    for_each = local.create_m365_records ? [1] : []
+    content {
+      ## MailChimp = include:mandrillapp.com
+      ## Mailgun = include:mailgun.org
+      ## SendGrid = include:sendgrid.net
+      ## Microsoft 365 = include:spf.protection.outlook.com
+      ## Google Workspace = include:_spf.google.com
+      ## Amazon SES = include:amazonses.com
+      ## Zoho Mail = include:zoho.com
+      value = "v=spf1 include:spf.protection.outlook.com ~all"
+    }
+  }
+
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [
     azurerm_static_web_app_custom_domain.apex,
@@ -457,35 +478,6 @@ resource "azurerm_dns_txt_record" "frontdoor_validation" {
 
   record {
     value = azurerm_cdn_frontdoor_custom_domain.this[each.key].validation_token
-  }
-  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-}
-
-resource "azurerm_dns_txt_record" "txt1" {
-  name                = "@"
-  zone_name           = azurerm_dns_zone.environment.name
-  resource_group_name = module.environment_resource_group.resource.name
-  ttl                 = 3600
-
-  record { ## FrontDoor
-    value = "_dnsauth.www"
-  }
-  record { ## FrontDoor
-    value = "_dnsauth"
-  }
-
-  dynamic "record" {
-    for_each = local.create_m365_records ? [1] : []
-    content {
-      ## MailChimp = include:mandrillapp.com
-      ## Mailgun = include:mailgun.org
-      ## SendGrid = include:sendgrid.net
-      ## Microsoft 365 = include:spf.protection.outlook.com
-      ## Google Workspace = include:_spf.google.com
-      ## Amazon SES = include:amazonses.com
-      ## Zoho Mail = include:zoho.com
-      value = "v=spf1 include:spf.protection.outlook.com ~all"
-    }
   }
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
