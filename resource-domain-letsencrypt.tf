@@ -45,22 +45,22 @@ module "cert_keyvault" {
   role_assignments = {
     role_assignment_1 = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Key Vault Secrets User/${azurerm_user_assigned_identity.environment.principal_id}")
-      role_definition_id_or_name       = "Key Vault Secrets Officer"
+      role_definition_id_or_name       = "Key Vault Secrets User"
       principal_id                     = azurerm_user_assigned_identity.environment.principal_id
       skip_service_principal_aad_check = true
       principal_type                   = "ServicePrincipal"
       description                      = local.iac_message
     }
     role_assignment_2 = {
-      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Key Vault Administrator/${azurerm_user_assigned_identity.environment.principal_id}")
-      role_definition_id_or_name       = "Key Vault Administrator"
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Key Vault Certificate Officer/${azurerm_user_assigned_identity.environment.principal_id}")
+      role_definition_id_or_name       = "Key Vault Certificate Officer"
       principal_id                     = azurerm_user_assigned_identity.environment.principal_id
       skip_service_principal_aad_check = true
       principal_type                   = "ServicePrincipal"
       description                      = local.iac_message
     }
     role_assignment_3 = {
-      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Key Vault Administrator/${azurerm_user_assigned_identity.environment.principal_id}")
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Key Vault Administrator/${data.azurerm_client_config.current.object_id}")
       role_definition_id_or_name       = "Key Vault Administrator"
       principal_id                     = data.azurerm_client_config.current.object_id
       skip_service_principal_aad_check = true
@@ -182,26 +182,4 @@ resource "azurerm_key_vault_certificate" "letsencrypt-aca" {
   }
 }
 ## azurerm_key_vault_certificate.letsencrypt-aca.certificate_data_base64
-
-
-resource "azurerm_container_app_environment_certificate" "this" {
-  name                         = "${lower(local.ingress_custom_aca)}-certificate"
-  container_app_environment_id = azurerm_container_app_environment.this.id
-
-  certificate_key_vault { ## wildcard certificate for aca
-    identity            = azurerm_user_assigned_identity.environment.id
-    key_vault_secret_id = azurerm_key_vault_certificate.letsencrypt-aca.versionless_secret_id
-  }
-  depends_on = [
-    azurerm_key_vault_certificate.letsencrypt-aca,
-    azurerm_dns_caa_record.aca_allowed_certs,
-    azurerm_dns_a_record.aca,
-    azurerm_dns_txt_record.aca,
-    azurerm_dns_ns_record.aca,
-    azurerm_container_app_environment.this
-  ]
-  lifecycle {
-    create_before_destroy = true
-  }
-}
 

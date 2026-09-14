@@ -178,6 +178,7 @@ resource "azurerm_role_assignment" "aspire_dotnet_dashboard_access" {
   principal_id         = var.owner_entra_object_id
 }
 
+
 ## The dashboard should be found here:
 ## https://<DOTNET_COMPONENT_NAME>.ext.<CLUSTER_NAME>.<REGION>.azurecontainerapps.io
 ## https://www.ssllabs.com/ssltest/analyze.html?d=helloworld.app.sard.webstean.com
@@ -256,4 +257,10 @@ output "aca_env_custom_domain_verification_id" {
   description = "The custom domain verification ID of the Container App Environment."
   sensitive   = false
   value       = azurerm_container_app_environment.this.custom_domain_verification_id
+}
+
+output "aca_portal_url" {
+  description = "The portal URL of the Container App Environment."
+  sensitive   = false
+  value       = "https://containerapps.azure.com/"
 }

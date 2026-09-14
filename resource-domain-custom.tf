@@ -86,6 +86,29 @@ resource "azurerm_dns_caa_record" "aca_allowed_certs" {
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
+resource "azurerm_container_app_environment_certificate" "this" {
+  name                         = "${lower(local.ingress_custom_aca)}-certificate"
+  container_app_environment_id = azurerm_container_app_environment.this.id
+
+  certificate_key_vault { ## letsencrypt wildcard certificate for aca
+    identity            = azurerm_user_assigned_identity.environment.id
+    key_vault_secret_id = azurerm_key_vault_certificate.letsencrypt-aca.versionless_secret_id
+  }
+  depends_on = [
+    azurerm_key_vault_certificate.letsencrypt-aca,
+    azurerm_dns_caa_record.aca_allowed_certs,
+    azurerm_dns_a_record.aca,
+    azurerm_dns_txt_record.aca,
+    azurerm_dns_ns_record.aca,
+    azurerm_container_app_environment.this
+  ]
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+
+
 resource "azurerm_dns_a_record" "testv4" {
   name                = "testv4"
   resource_group_name = module.environment_resource_group.resource.name
@@ -386,8 +409,8 @@ resource "azurerm_cdn_frontdoor_custom_domain" "this" {
   for_each = var.inbound_access == "FrontDoor" ? local.ingress_aliases_frontdoor : toset([])
 
   name                     = "custom-domain-${each.key}"
-  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.this[0].id
   host_name                = each.value
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.this[0].id
 
   tls {
     certificate_type = "ManagedCertificate"
