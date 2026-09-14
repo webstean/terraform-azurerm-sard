@@ -68,7 +68,7 @@ locals {
       kind                       = "ContentSafety"
       storage                    = true
       sku_name                   = "S0"
-      dynamic_throttling_enabled = true
+      dynamic_throttling_enabled = false ## This feature is currently not supported for the resource kind ContentSafety and sku S0.
       rai_policy                 = false
     }
     CustomSpeech = {
@@ -220,7 +220,7 @@ locals {
       kind                       = "SpeechServices"
       storage                    = true
       sku_name                   = "S0"
-      dynamic_throttling_enabled = true
+      dynamic_throttling_enabled = false ## This feature is currently not supported for the resource kind SpeechServices and sku S0."
       rai_policy                 = false
     }
     SpeechTranslation = {
