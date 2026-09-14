@@ -156,6 +156,7 @@ resource "azurerm_static_web_app_custom_domain" "apex" {
   # Ensure DNS record exists before Azure attempts validation
   depends_on = [
     azurerm_static_web_app_custom_domain.this,
+    azurerm_dns_txt_record.frontdoor_swa_verify,
     azurerm_dns_a_record.apex_alias,
   ]
   timeouts {
