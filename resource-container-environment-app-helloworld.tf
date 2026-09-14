@@ -237,8 +237,8 @@ resource "azapi_resource" "helloworld_resiliency_policy" {
         maxEjectionPercent = 50
       }
       httpConnectionPool = {
-        http1MaxPendingRequests = 1000
-        http2MaxRequests        = 100
+        http1MaxPendingRequests = 500
+        http2MaxRequests        = 50
       }
       httpRetryPolicy = {
         matches = {
@@ -275,7 +275,7 @@ resource "azapi_resource" "helloworld_resiliency_policy" {
         }
       }
       tcpConnectionPool = {
-        maxConnections = 1000
+        maxConnections = 500
       }
       tcpRetryPolicy = {
         maxConnectAttempts = 3

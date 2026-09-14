@@ -1,9 +1,11 @@
 locals {
-  github_runner_name   = "github-runner"
+  github_runner_name  = "github-runner"
   github_runner_image = "github-runner:latest"
 }
 
 resource "azurerm_container_app_job" "github_runner" {
+  count = var.github_runner_repo_owner != null && var.github_runner_repo_name != null ? 1 : 0
+
   name                         = local.github_runner_name
   resource_group_name          = module.environment_resource_group.resource.name
   location                     = module.environment_resource_group.resource.location
@@ -18,13 +20,13 @@ resource "azurerm_container_app_job" "github_runner" {
   }
 
   registry {
-    server   = "${var.container_registry_name}.azurecr.io"
+    server   = "${var.container_registry_id}.azurecr.io"
     identity = azurerm_user_assigned_identity.environment.id
   }
 
   secret {
     name  = "personal-access-token"
-    value = var.github_pat
+    value = var.github_runner_pat
   }
 
   event_trigger_config {
@@ -42,9 +44,9 @@ resource "azurerm_container_app_job" "github_runner" {
 
         metadata = {
           githubAPIURL              = "https://api.github.com"
-          owner                     = var.repo_owner
+          owner                     = var.github_runner_repo_owner
           runnerScope               = "repo"
-          repos                     = var.repo_name
+          repos                     = var.github_runner_repo_name
           targetWorkflowQueueLength = "1"
         }
 
@@ -59,7 +61,7 @@ resource "azurerm_container_app_job" "github_runner" {
   template {
     container {
       name   = "github-runner"
-      image  = "${var.container_registry_name}.azurecr.io/${var.container_image_name}"
+      image  = "${var.container_registry_id}.azurecr.io/${local.github_runner_image}"
       cpu    = 2.0
       memory = "4Gi"
 
@@ -70,16 +72,16 @@ resource "azurerm_container_app_job" "github_runner" {
 
       env {
         name  = "GH_URL"
-        value = "https://github.com/${var.repo_owner}/${var.repo_name}"
+        value = "https://github.com/${var.github_runner_repo_owner}/${var.github_runner_repo_name}"
       }
 
       env {
         name  = "REGISTRATION_TOKEN_API_URL"
-        value = "https://api.github.com/repos/${var.repo_owner}/${var.repo_name}/actions/runners/registration-token"
+        value = "https://api.github.com/repos/${var.github_runner_repo_owner}/${var.github_runner_repo_name}/actions/runners/registration-token"
       }
     }
   }
-    depends_on = [
+  depends_on = [
     azurerm_container_app_environment.this,
     azurerm_container_app_environment_storage.logs,
     azurerm_container_app_environment_storage.shared,

@@ -813,3 +813,30 @@ The ID of the role for the MSSQL DB restore operations.
 DESC
   default     = null
 }
+
+variable "github_runner_repo_owner" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The owner of the repository.
+DESC
+  default     = null
+}
+
+variable "github_runner_repo_name" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The name of the repository.
+DESC
+  default     = null
+}
+
+variable "github_runner_pat" {
+  type        = string
+  sensitive   = true
+  description = <<DESC
+The personal access token for the GitHub repository.
+DESC
+  default     = null
+}

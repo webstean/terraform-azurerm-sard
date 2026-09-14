@@ -1,82 +1,79 @@
-resource "azurerm_container_app" "aspire" {
-  name                         = "aspire"
-  resource_group_name          = module.environment_resource_group.resource.name
-  container_app_environment_id = azurerm_container_app_environment.this.id
-  revision_mode                = "Single"
+module "aspire_container_app" {
+  source           = "Azure/avm-res-app-containerapp/azurerm"
+  version          = "~> 0.9, < 1.0"
+  enable_telemetry = var.enable_telemetry
 
-  identity {
-    type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.environment.id]
+  name                                  = "aspire"
+  resource_group_name                   = module.environment_resource_group.resource.name
+  container_app_environment_resource_id = azurerm_container_app_environment.this.id
+  revision_mode                         = "Single"
+
+  managed_identities = {
+    user_assigned_resource_ids = [azurerm_user_assigned_identity.environment.id]
   }
 
-  ingress {
+  ingress = {
     external_enabled = true
     target_port      = 8080
-
-    traffic_weight {
+    traffic_weight = [{
       percentage      = 100
       latest_revision = true
-    }
+    }]
   }
 
-  template {
-    volume {
-      name         = azurerm_storage_share.containerappenv_logs.name
-      storage_name = azurerm_container_app_environment_storage.logs.name
-      storage_type = "AzureFile" ## NfsAzureFile
-      #mount_options = local.cifs_mount_options
-    }
-    volume {
-      name         = azurerm_storage_share.containerappenv_shared.name
-      storage_name = azurerm_container_app_environment_storage.shared.name
-      storage_type = "AzureFile" ## NfsAzureFile
-      #mount_options = local.cifs_mount_options
-    }
-    #cooldown_period_in_seconds = 120
-    container {
+  template = {
+    volumes = [
+      {
+        name         = azurerm_storage_share.containerappenv_logs.name
+        storage_name = azurerm_container_app_environment_storage.logs.name
+        storage_type = "AzureFile" ## NfsAzureFile
+      },
+      {
+        name         = azurerm_storage_share.containerappenv_shared.name
+        storage_name = azurerm_container_app_environment_storage.shared.name
+        storage_type = "AzureFile" ## NfsAzureFile
+      }
+    ]
+    containers = [{
       name   = "aspire"
       image  = "${var.containerregistry_id}:latest"
       cpu    = 0.5
       memory = "1Gi"
-      env {
-        name  = "ENTRA_ID_CLIENT_ID"
-        value = azurerm_user_assigned_identity.environment.client_id
-      }
-      env {
-        name  = "ENTRA_ID_CLIENT_SECRET"
-        value = azurerm_user_assigned_identity.environment.client_id
-      }
-      env {
-        name  = "ENTRA_ID_ISSUER_URL"
-        value = azurerm_user_assigned_identity.environment.client_id
-      }
-      env {
-        name  = "AZURE_APP_CONFIGURATION_ENDPOINT"
-        value = module.appconfiguration.endpoint
-      }
-      env {
-        name  = "AZURE_ACA_ENVIRONMENT_NAME"
-        value = azurerm_container_app_environment.this.name
-      }
-      env {
-        name  = "AZURE_ACA_ENVIRONMENT_RESOURCE_GROUP_NAME"
-        value = azurerm_container_app_environment.this.resource_group_name
-      }
-      env {
-        name  = "ASPNETCORE_ENVIRONMENT"
-        value = "Production"
-      }
-      #volume_mounts {
-      #  name = azurerm_storage_share.containerappenv_logs.name
-      #  path = "/mnt/logs"
-      #}
-      #volume_mounts {
-      #  name = azurerm_storage_share.containerappenv_shared.name
-      #  path = "/mnt/shared"
-      # }
-    }
+      env = [
+        {
+          name  = "ENTRA_ID_CLIENT_ID"
+          value = azurerm_user_assigned_identity.environment.client_id
+        },
+        {
+          name  = "ENTRA_ID_CLIENT_SECRET"
+          value = azurerm_user_assigned_identity.environment.client_id
+        },
+        {
+          name  = "ENTRA_ID_ISSUER_URL"
+          value = azurerm_user_assigned_identity.environment.client_id
+        },
+        {
+          name  = "AZURE_APP_CONFIGURATION_ENDPOINT"
+          value = module.appconfiguration.endpoint
+        },
+        {
+          name  = "AZURE_ACA_ENVIRONMENT_NAME"
+          value = azurerm_container_app_environment.this.name
+        },
+        {
+          name  = "AZURE_ACA_ENVIRONMENT_RESOURCE_GROUP_NAME"
+          value = azurerm_container_app_environment.this.resource_group_name
+        },
+        {
+          name  = "ASPNETCORE_ENVIRONMENT"
+          value = "Production"
+        }
+      ]
+    }]
   }
+
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+
   depends_on = [
     azurerm_container_app_environment.this,
     azurerm_container_app_environment_storage.logs,
@@ -90,7 +87,7 @@ resource "azurerm_container_app" "aspire" {
 resource "azapi_resource" "aspire_auth" {
   type      = "Microsoft.App/containerApps/authConfigs@2026-01-01"
   name      = "current"
-  parent_id = azurerm_container_app.aspire.id
+  parent_id = module.aspire_container_app.resource_id
 
   body = {
     properties = {
@@ -132,9 +129,9 @@ resource "azapi_resource" "aspire_auth" {
 */
 
 resource "azurerm_monitor_diagnostic_setting" "azurerm_container_app_aspire" {
-  name                       = "Metrics-${azurerm_container_app.aspire.name}-${azurerm_container_app_environment.this.name}-to-Azure-Monitor"
-  target_resource_id         = azurerm_container_app.aspire.id
-  log_analytics_workspace_id =   workspace_id = module.log_analytics_workspace.resource.resource_id
+  name                       = "Metrics-${module.aspire_container_app.resource.name}-${azurerm_container_app_environment.this.name}-to-Azure-Monitor"
+  target_resource_id         = module.aspire_container_app.resource_id
+  log_analytics_workspace_id = module.log_analytics_workspace.resource.resource_id
 
   enabled_metric {
     category = "AllMetrics"
@@ -145,7 +142,7 @@ resource "azurerm_monitor_diagnostic_setting" "azurerm_container_app_aspire" {
 resource "azurerm_role_assignment" "aca_blob_data_contributor" {
   scope                            = azurerm_storage_account.this.id
   role_definition_name             = "Storage Blob Data Contributor"
-  principal_id                     = azurerm_container_app.aspire.identity[0].principal_id
+  principal_id                     = module.aspire_container_app.resource.identity[0].principal_id
   skip_service_principal_aad_check = true
   description                      = local.iac_message
 }
@@ -153,7 +150,7 @@ resource "azurerm_role_assignment" "aca_blob_data_contributor" {
 resource "azapi_resource" "aca_to_blob_linker" {
   type      = "Microsoft.ServiceLinker/linkers@2024-07-01-preview"
   name      = "aca-to-blob"
-  parent_id = azurerm_container_app.aspire.id
+  parent_id = module.aspire_container_app.resource_id
 
   schema_validation_enabled = false
 
