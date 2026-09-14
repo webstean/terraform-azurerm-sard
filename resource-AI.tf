@@ -41,11 +41,11 @@ locals {
       kind                       = "CognitiveServices"
       storage                    = true
       sku_name                   = "S0"
-      dynamic_throttling_enabled = true
+      dynamic_throttling_enabled = false ## not support for sku 'S0'
       rai_policy                 = false
     }
     ComputerVision = {
-      enable                     = true
+      enable                     = false ## "The subscription does not have QuotaId/Feature required by SKU 'S0' from kind 'ComputerVision'
       classic                    = false
       kind                       = "ComputerVision"
       storage                    = false
@@ -224,7 +224,7 @@ locals {
       rai_policy                 = false
     }
     SpeechTranslation = {
-      enable                     = true
+      enable                     = false ## not available
       classic                    = false
       kind                       = "SpeechTranslation"
       storage                    = true
