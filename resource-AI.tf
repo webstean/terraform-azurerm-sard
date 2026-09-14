@@ -262,6 +262,13 @@ locals {
   }
 }
 
+resource "random_string" "cog_random_suffix" {
+  for_each = { for k, v in local.ai_kind : k => v if try(v.enable, false) }
+
+  length  = 3
+  special = false
+}
+
 module "ai-services" {
   for_each = { for k, v in local.ai_kind : k => v if try(v.enable, false) }
 
@@ -269,7 +276,7 @@ module "ai-services" {
   version          = "~>0.0, < 1.0"
   enable_telemetry = var.enable_telemetry
 
-  name                               = each.value.classic == true ? "classic-${local.cog_name_hostname}-${lower(each.value.kind)}" : "${local.cog_name_hostname}-${lower(each.value.kind)}"
+  name                               = each.value.classic == true ? "classic-${local.cog_name_hostname}${random_string.cog_random_suffix[each.key].result}-${lower(each.value.kind)}" : "${local.cog_name_hostname}${random_string.cog_random_suffix[each.key].result}-${lower(each.value.kind)}"
   parent_id                          = module.environment_resource_group.resource_id
   location                           = module.environment_resource_group.resource.location
   kind                               = each.value.kind
