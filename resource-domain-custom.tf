@@ -200,7 +200,7 @@ resource "azurerm_dns_txt_record" "frontdoor_swa_verify" {
   resource_group_name = module.environment_resource_group.resource.name
   ttl                 = 300
   record {
-    value = try(azurerm_static_web_app_custom_domain.apex.validation_token, "already-used")
+    value = length(azurerm_static_web_app_custom_domain.apex.validation_token) != 0 ? azurerm_static_web_app_custom_domain.apex.validation_token : "already-used"
   }
 
   dynamic "record" {
