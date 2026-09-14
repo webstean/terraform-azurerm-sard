@@ -55,6 +55,7 @@ Next steps here
 | [azapi_resource.embedding_small](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource.foundry](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource.free_sql_database](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
+| [azapi_resource.helloworld_resiliency_policy](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource_action.comms-link-notification-hub](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource_action) | resource |
 | [azapi_resource_action.sql_server_automatic_tuning](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource_action) | resource |
 | [azapi_update_resource.aca_env_otel](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/update_resource) | resource |
@@ -79,6 +80,7 @@ Next steps here
 | [azurerm_container_app_environment_certificate.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_certificate) | resource |
 | [azurerm_container_app_environment_storage.logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_storage) | resource |
 | [azurerm_container_app_environment_storage.shared](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_storage) | resource |
+| [azurerm_container_app_job.github_runner](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_job) | resource |
 | [azurerm_databox_edge_device.gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/databox_edge_device) | resource |
 | [azurerm_dns_a_record.aca](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
 | [azurerm_dns_a_record.acatest](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
@@ -266,6 +268,9 @@ Next steps here
 | <a name="input_deploy_sql_failover"></a> [deploy\_sql\_failover](#input\_deploy\_sql\_failover) | If true, deploys a Microsoft SQL failover environment in the linked region. If false, deploys a single SQL instance. | `bool` | `false` | no |
 | <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry) | This variable controls whether or not the AVM (Azure Verified Modules) telemetry is enabled for the module.<br/>For more information see <https://aka.ms/avm/telemetryinfo>.<br/>If it is set to false, then no telemetry will be collected. | `bool` | `false` | no |
 | <a name="input_frontdoor_sku"></a> [frontdoor\_sku](#input\_frontdoor\_sku) | Specifies the SKU for Azure Front Door. Options are: 'Standard' or 'Premium'. | `string` | `"Standard"` | no |
+| <a name="input_github_runner_pat"></a> [github\_runner\_pat](#input\_github\_runner\_pat) | The personal access token for the GitHub repository. | `string` | `null` | no |
+| <a name="input_github_runner_repo_name"></a> [github\_runner\_repo\_name](#input\_github\_runner\_repo\_name) | The name of the repository. | `string` | `null` | no |
+| <a name="input_github_runner_repo_owner"></a> [github\_runner\_repo\_owner](#input\_github\_runner\_repo\_owner) | The owner of the repository. | `string` | `null` | no |
 | <a name="input_inbound_access"></a> [inbound\_access](#input\_inbound\_access) | Specifies the type of inbound access to the environment via the Internet. Options are: 'None' (free), 'App-Gateway' ($$), 'FrontDoor' ($$). | `string` | `"None"` | no |
 | <a name="input_letsencrypt_dns_auth_method"></a> [letsencrypt\_dns\_auth\_method](#input\_letsencrypt\_dns\_auth\_method) | How to authenticate to this Azure tenant for creating LetsEncrupt certificates | `string` | `"oidc"` | no |
 | <a name="input_location"></a> [location](#input\_location) | The Azure region where resources will be deployed. | `string` | `"australiaeast"` | no |
@@ -386,6 +391,7 @@ Next steps here
 | <a name="module_comms_keyvault"></a> [comms\_keyvault](#module\_comms\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
 | <a name="module_environment_resource_group"></a> [environment\_resource\_group](#module\_environment\_resource\_group) | Azure/avm-res-resources-resourcegroup/azurerm | ~>0.0, < 1.0 |
 | <a name="module_foundry_keyvault"></a> [foundry\_keyvault](#module\_foundry\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
+| <a name="module_helloworld_container_app"></a> [helloworld\_container\_app](#module\_helloworld\_container\_app) | Azure/avm-res-app-containerapp/azurerm | ~> 0.9, < 1.0 |
 | <a name="module_log_analytics_workspace"></a> [log\_analytics\_workspace](#module\_log\_analytics\_workspace) | Azure/avm-res-operationalinsights-workspace/azurerm | ~>0.0, < 1.0 |
 | <a name="module_nat_gateway"></a> [nat\_gateway](#module\_nat\_gateway) | Azure/avm-res-network-natgateway/azurerm | ~>0.0, < 1.0 |
 | <a name="module_private_endpoint_sqlserver"></a> [private\_endpoint\_sqlserver](#module\_private\_endpoint\_sqlserver) | Azure/avm-res-network-privateendpoint/azurerm | ~>0.0, < 1.0 |
