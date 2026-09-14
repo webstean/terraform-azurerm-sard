@@ -37,7 +37,7 @@ locals {
     }
     CognitiveServices = {
       enable                     = true
-      classic                    = false
+      classic                    = true
       kind                       = "CognitiveServices"
       storage                    = true
       sku_name                   = "S0"
@@ -45,11 +45,11 @@ locals {
       rai_policy                 = false
     }
     ComputerVision = {
-      enable                     = false ## "The subscription does not have QuotaId/Feature required by SKU 'S0' from kind 'ComputerVision'
+      enable                     = false ## upgrade to pay-as-you-go: The subscription does not have QuotaId/Feature required by SKU 'S0' from kind 'ComputerVision'
       classic                    = false
       kind                       = "ComputerVision"
       storage                    = false
-      sku_name                   = "S0"
+      sku_name                   = "F0"
       dynamic_throttling_enabled = false
       rai_policy                 = false
     }
@@ -115,13 +115,13 @@ locals {
       dynamic_throttling_enabled = false
       rai_policy                 = false
     }
-    FormRecognizer = {
-      enable                     = false
+    FormRecognizer = { ## otherwise known as Document Intelligence
+      enable                     = true
       classic                    = false
-      kind                       = "FormRecognizer"
+      kind                       = "FormRecognizer" ## Document Intelligence
       storage                    = true
-      sku_name                   = "S0"
-      dynamic_throttling_enabled = true
+      sku_name                   = "F0"
+      dynamic_throttling_enabled = false
       rai_policy                 = false
     }
     ImmersiveReader = {
@@ -129,7 +129,7 @@ locals {
       classic                    = false
       kind                       = "ImmersiveReader"
       storage                    = true
-      sku_name                   = "S0"
+      sku_name                   = "S1"
       dynamic_throttling_enabled = true
       rai_policy                 = false
     }
@@ -219,7 +219,7 @@ locals {
       classic                    = false
       kind                       = "SpeechServices"
       storage                    = true
-      sku_name                   = "S0"
+      sku_name                   = "F0"
       dynamic_throttling_enabled = false ## This feature is currently not supported for the resource kind SpeechServices and sku S0."
       rai_policy                 = false
     }
