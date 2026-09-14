@@ -185,7 +185,7 @@ resource "azurerm_container_app_environment_certificate" "this" {
   }
   depends_on = [
     azurerm_key_vault_certificate.letsencrypt-aca,
-    azurerm_dns_caa_record.aca_cas,
+    azurerm_dns_caa_record.aca_allowed_certs,
     azurerm_dns_a_record.aca,
     azurerm_dns_txt_record.aca,
     azurerm_dns_ns_record.aca,

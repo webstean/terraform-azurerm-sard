@@ -53,7 +53,7 @@ locals {
   ]
 }
 
-resource "azurerm_dns_caa_record" "cas" {
+resource "azurerm_dns_caa_record" "main_allowed_certs" {
   name                = "@"
   resource_group_name = module.environment_resource_group.resource.name
   zone_name           = azurerm_dns_zone.environment.name
@@ -69,6 +69,23 @@ resource "azurerm_dns_caa_record" "cas" {
   }
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
+resource "azurerm_dns_caa_record" "aca_allowed_certs" {
+  name                = "@"
+  zone_name           = azurerm_dns_zone.aca.name
+  resource_group_name = module.environment_resource_group.resource.name
+  ttl                 = 30
+
+  dynamic "record" {
+    for_each = local.caa_records
+    content {
+      flags = record.value.flags
+      tag   = record.value.tag
+      value = record.value.value
+    }
+  }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
+
 
 resource "azurerm_dns_a_record" "testv4" {
   name                = "testv4"
@@ -128,10 +145,11 @@ resource "azurerm_static_web_app_custom_domain" "this" {
 
   # Ensure DNS record exists before Azure attempts validation
   depends_on = [
-    #azurerm_dns_cname_record.web,
+    azurerm_dns_a_record.apex_alias,
+    azurerm_dns_cname_record.web,
     azurerm_dns_ns_record.delegation,
-    azurerm_dns_caa_record.cas,
-    azurerm_dns_caa_record.aca_cas
+    azurerm_dns_caa_record.main_allowed_certs,
+    azurerm_dns_caa_record.aca_allowed_certs,
   ]
   timeouts {
     delete = "90m"
@@ -153,10 +171,8 @@ resource "azurerm_static_web_app_custom_domain" "apex" {
   domain_name       = azurerm_dns_zone.environment.name
   validation_type   = "dns-txt-token" # use "dns-txt-token" for apex/root domains
 
-  # Ensure DNS record exists before Azure attempts validation
+  # Ensure the apex A record exists before Azure attempts validation.
   depends_on = [
-    azurerm_static_web_app_custom_domain.this,
-    azurerm_dns_txt_record.frontdoor_swa_verify,
     azurerm_dns_a_record.apex_alias,
   ]
   timeouts {
@@ -215,10 +231,6 @@ resource "azurerm_dns_txt_record" "frontdoor_swa_verify" {
   }
 
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-  depends_on = [
-    azurerm_static_web_app_custom_domain.apex,
-    azurerm_dns_a_record.apex_alias,
-  ]
 }
 
 resource "azurerm_dns_zone" "aca" {
@@ -263,22 +275,12 @@ resource "azurerm_dns_txt_record" "aca" { ## establish domain ownership
   }
   ttl  = 300
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-}
-resource "azurerm_dns_caa_record" "aca_cas" {
-  name                = "@"
-  zone_name           = azurerm_dns_zone.aca.name
-  resource_group_name = module.environment_resource_group.resource.name
-  ttl                 = 30
-
-  dynamic "record" {
-    for_each = local.caa_records
-    content {
-      flags = record.value.flags
-      tag   = record.value.tag
-      value = record.value.value
-    }
-  }
-  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  depends_on = [
+    azurerm_dns_a_record.aca,
+    azurerm_dns_zone.aca,
+    azurerm_container_app_environment.this,
+    azurerm_dns_caa_record.aca_allowed_certs,
+  ]
 }
 
 resource "azurerm_dns_cname_record" "pubsub" { ## custom domain, needs premium SKU
@@ -381,6 +383,38 @@ resource "azurerm_dns_a_record" "ingress_app_gateway" {
   tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
+resource "azurerm_cdn_frontdoor_custom_domain" "this" {
+  for_each = var.inbound_access == "FrontDoor" ? local.ingress_aliases_frontdoor : toset([])
+
+  name                     = "custom-domain-${each.key}"
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.this[0].id
+  host_name                = each.value
+
+  tls {
+    certificate_type = "ManagedCertificate"
+  }
+  depends_on = [
+    azurerm_cdn_frontdoor_profile.this,
+    azurerm_dns_txt_record.frontdoor_swa_verify,
+  ]
+}
+
+resource "azurerm_dns_txt_record" "frontdoor_validation" {
+  for_each = var.inbound_access == "FrontDoor" ? local.ingress_aliases_frontdoor : toset([])
+
+  name                = "_dnsauth.app"
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
+  ttl                 = 3600
+
+  record {
+    value = azurerm_cdn_frontdoor_custom_domain.this[each.key].validation_token
+  }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
+
+// +==== M365 DNS RE C O R D S (Optional)
+
 resource "azurerm_dns_mx_record" "mail" {
   count = local.create_m365_records ? 1 : 0
 
@@ -396,14 +430,14 @@ resource "azurerm_dns_mx_record" "mail" {
 
 /*
 resource "azurerm_dns_cname_record" "m365_dkim1" {
-  for_each = var.domains
+  count = local.create_m365_records ? 1 : 0
 
   name                = "selector1._domainkey"
-  zone_name           = azurerm_dns_zone.environment[each.key].name
+  zone_name           = azurerm_dns_zone.environment.name
   resource_group_name = module.environment_resource_group.resource.name
   record              = "selector1-${replace(each.key, ".", "-")}._domainkey.${var.m365_tenant_onmicrosoft_domain}"
   ttl                 = 3600
-  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 */
 
@@ -461,32 +495,6 @@ resource "azurerm_dns_txt_record" "dmarc" {
     value = "v=DMARC1; p=quarantine; pct=100"
   }
   ttl  = 3600
-  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-}
-
-resource "azurerm_cdn_frontdoor_custom_domain" "this" {
-  for_each = var.inbound_access == "FrontDoor" ? local.ingress_aliases_frontdoor : toset([])
-
-  name                     = "custom-domain-${each.key}"
-  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.this[0].id
-  host_name                = each.value
-
-  tls {
-    certificate_type = "ManagedCertificate"
-  }
-}
-
-resource "azurerm_dns_txt_record" "frontdoor_validation" {
-  for_each = var.inbound_access == "FrontDoor" ? local.ingress_aliases_frontdoor : toset([])
-
-  name                = "_dnsauth.app"
-  zone_name           = azurerm_dns_zone.environment.name
-  resource_group_name = module.environment_resource_group.resource.name
-  ttl                 = 3600
-
-  record {
-    value = azurerm_cdn_frontdoor_custom_domain.this[each.key].validation_token
-  }
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
