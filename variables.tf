@@ -756,6 +756,24 @@ DESC
   default     = null
 }
 
+variable "container_registry_name" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The name of the Azure Container Registry to be used.
+DESC
+  default     = null
+}
+
+variable "container_registry_login_server" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The login server of the Azure Container Registry to be used.
+DESC
+  default     = null
+}
+
 variable "vpn_access_group_object_id" {
   type        = string
   sensitive   = false

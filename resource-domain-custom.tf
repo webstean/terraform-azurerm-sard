@@ -86,7 +86,6 @@ resource "azurerm_dns_caa_record" "aca_allowed_certs" {
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
-
 resource "azurerm_dns_a_record" "testv4" {
   name                = "testv4"
   resource_group_name = module.environment_resource_group.resource.name
