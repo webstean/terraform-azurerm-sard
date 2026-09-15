@@ -796,11 +796,20 @@ DESC
   default     = null
 }
 
-variable "ai_search_principal_id" {
+variable "ai_free_search_principal_id" {
   type        = string
   sensitive   = false
   description = <<DESC
 The principal ID of the Azure AI Search service to be used.
+DESC
+  default     = null
+}
+
+variable "ai_free_search_id" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The ID of the Azure AI Search service to be used.
 DESC
   default     = null
 }
