@@ -24,7 +24,7 @@ locals {
       storage                    = true
       sku_name                   = "S0"
       dynamic_throttling_enabled = false
-      rai_policy                 = true
+      rai_policy                 = false
     }
     AnomalyDetector = { ## Classic
       enable                     = false
@@ -69,7 +69,7 @@ locals {
       storage                    = true
       sku_name                   = "S0"
       dynamic_throttling_enabled = false ## This feature is currently not supported for the resource kind ContentSafety and sku S0.
-      rai_policy                 = true
+      rai_policy                 = false
     }
     CustomSpeech = {
       enable                     = false
@@ -167,7 +167,7 @@ locals {
       storage                    = false
       sku_name                   = "S0"
       dynamic_throttling_enabled = false
-      rai_policy                 = false
+      rai_policy                 = true
     }
     Personalizer = { ## Classic
       enable                     = false
@@ -212,7 +212,7 @@ locals {
       storage                    = true
       sku_name                   = "S0"
       dynamic_throttling_enabled = false
-      rai_policy                 = true
+      rai_policy                 = false
     }
     SpeechServices = {
       enable                     = true
@@ -344,7 +344,7 @@ module "ai-services" {
   #    }
   #  }
 
-  rai_policies = each.value.rai_policy == true ? {
+  rai_policies = each.value.kind == "OpenAI" && each.value.rai_policy == true ? {
     policy_0 = {
       name             = local.rai_policy_name
       base_policy_name = "Microsoft.Default"
