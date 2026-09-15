@@ -50,6 +50,7 @@ Next steps here
 | [acme_certificate.aca_wildcard](https://registry.terraform.io/providers/vancluever/acme/latest/docs/resources/certificate) | resource |
 | [acme_certificate.pubsub](https://registry.terraform.io/providers/vancluever/acme/latest/docs/resources/certificate) | resource |
 | [acme_registration.this](https://registry.terraform.io/providers/vancluever/acme/latest/docs/resources/registration) | resource |
+| [azapi_resource.aiservices_connection](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource.default_project](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource.embedding_gpt4o](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource.embedding_small](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
@@ -390,6 +391,8 @@ Next steps here
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_ai-services"></a> [ai-services](#module\_ai-services) | Azure/avm-res-cognitiveservices-account/azurerm | ~>0.0, < 1.0 |
+| <a name="module_ai_keyvault"></a> [ai\_keyvault](#module\_ai\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
+| <a name="module_aihub"></a> [aihub](#module\_aihub) | Azure/avm-res-machinelearningservices-workspace/azurerm | ~>0.0, < 1.0 |
 | <a name="module_appconfiguration"></a> [appconfiguration](#module\_appconfiguration) | Azure/avm-res-appconfiguration-configurationstore/azure | ~>0.0, < 1.0 |
 | <a name="module_application_insights"></a> [application\_insights](#module\_application\_insights) | Azure/avm-res-insights-component/azurerm | ~>0.0, < 1.0 |
 | <a name="module_cert_keyvault"></a> [cert\_keyvault](#module\_cert\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
