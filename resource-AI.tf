@@ -114,7 +114,7 @@ locals {
       rai_policy                 = false
     }
     CognitiveServices = {
-      enable                     = true
+      enable                     = false
       classic                    = true
       kind                       = "CognitiveServices"
       storage                    = true
@@ -202,12 +202,30 @@ locals {
       dynamic_throttling_enabled = false
       rai_policy                 = false
     }
+    HealthInsights = {
+      enable                     = true
+      classic                    = false
+      kind                       = "HealthInsights"
+      storage                    = true
+      sku_name                   = "S0"
+      dynamic_throttling_enabled = false
+      rai_policy                 = false
+    }
     ImmersiveReader = {
       enable                     = true
       classic                    = false
       kind                       = "ImmersiveReader"
       storage                    = true
       sku_name                   = "S1"
+      dynamic_throttling_enabled = true
+      rai_policy                 = false
+    }
+    LanguageAuthoring = {
+      enable                     = true
+      classic                    = false
+      kind                       = "LanguageAuthoring"
+      storage                    = true
+      sku_name                   = "S0"
       dynamic_throttling_enabled = true
       rai_policy                 = false
     }
