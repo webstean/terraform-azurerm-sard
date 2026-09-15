@@ -1,5 +1,5 @@
 locals {
-  bot_friendly_name = "Azure Bastion"
+  bot_friendly_name = "Azure Bot"
   bot_name          = "ba-${var.prefix}"
   bot_name_location = lower("${local.bot_name}-${lower(var.location)}")
   bot_random_suffix = substr(random_string.environment.result, 0, 6)
@@ -9,7 +9,7 @@ locals {
 module "bot" {
   source           = "Azure/avm-res-botservice-botservice/azurerm"
   version          = "~>0.0, < 1.0"
-  enable_telemetry = var.enable_telemetry ## see variables.tf
+  enable_telemetry = var.enable_telemetry
 
   name                      = local.bot_name_hostname
   location                  = "global"

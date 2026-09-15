@@ -6,6 +6,84 @@ locals {
   rai_policy_name   = "policy0"
 }
 
+module "ai_keyvault" {
+  source           = "Azure/avm-res-keyvault-vault/azurerm"
+  version          = "~>0.7, < 1.0"
+  enable_telemetry = var.enable_telemetry
+
+  name                            = local.cog_name_hostname
+  resource_group_name             = module.environment_resource_group.resource.name
+  location                        = module.environment_resource_group.resource.location
+  tenant_id                       = data.azurerm_client_config.current.tenant_id
+  sku_name                        = "standard"
+  purge_protection_enabled        = true
+  soft_delete_retention_days      = 7
+  public_network_access_enabled   = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+  legacy_access_policies_enabled  = false
+  enabled_for_deployment          = false ## Whether Azure Virtual Machines are permitted to retrieve certificates
+  enabled_for_disk_encryption     = false ## Whether Azure Disk Encryption is permitted to retrieve secrets from the vault
+  enabled_for_template_deployment = false ## Whether Azure Resource Manager is permitted to retrieve secrets from the vault
+  network_acls = {
+    default_action             = tobool(var.deploy_private_endpoints) ? "Deny" : "Allow"
+    bypass                     = "AzureServices"
+    virtual_network_subnet_ids = tobool(var.deploy_private_endpoints) ? null : [for subnets in azurerm_virtual_network.this.subnet : subnets.id if contains(subnets.service_endpoints, "Microsoft.KeyVault")]
+  }
+
+  /*
+  diagnostic_settings = {
+    diag_setting_1 = {
+      name                           = "Logs-Metrics-And-Audit to Azure Monitor ${module.log_analytics_workspace.resource.name}"
+      log_groups                     = ["allLogs", "audit"]
+      metric_categories              = ["AllMetrics"]
+      log_analytics_destination_type = null
+      workspace_resource_id          = module.log_analytics_workspace.resource_id
+    }
+  }
+*/
+  role_assignments = {
+    role_assignment_1 = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Key Vault Secrets User/${azurerm_user_assigned_identity.environment.principal_id}")
+      role_definition_id_or_name       = "Key Vault Secrets User"
+      principal_id                     = azurerm_user_assigned_identity.environment.principal_id
+      skip_service_principal_aad_check = true
+      principal_type                   = "ServicePrincipal"
+      description                      = local.iac_message
+    }
+    role_assignment_2 = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Key Vault Administrator/${azurerm_user_assigned_identity.environment.principal_id}")
+      role_definition_id_or_name       = "Key Vault Administrator"
+      principal_id                     = azurerm_user_assigned_identity.environment.principal_id
+      skip_service_principal_aad_check = true
+      principal_type                   = "ServicePrincipal"
+      description                      = local.iac_message
+    }
+    role_assignment_3 = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Key Vault Administrator/${data.azurerm_client_config.current.object_id}")
+      role_definition_id_or_name       = "Key Vault Administrator"
+      principal_id                     = data.azurerm_client_config.current.object_id
+      skip_service_principal_aad_check = true
+      principal_type                   = "ServicePrincipal"
+      description                      = local.iac_message
+    }
+    role_assignment_4 = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Key Vault Secrets Officer/${data.azurerm_client_config.current.object_id}")
+      role_definition_id_or_name       = "Key Vault Secrets Officer"
+      principal_id                     = data.azurerm_client_config.current.object_id
+      skip_service_principal_aad_check = true
+      principal_type                   = "ServicePrincipal"
+      description                      = local.iac_message
+    }
+  }
+
+  lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
+    kind = "CanNotDelete"
+  } : null
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  depends_on = [
+    azurerm_user_assigned_identity.environment
+  ]
+}
+
 locals {
   ai_kind = {
     Academic = {

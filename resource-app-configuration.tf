@@ -13,7 +13,7 @@ locals {
 module "appconfiguration" {
   source           = "Azure/avm-res-appconfiguration-configurationstore/azure"
   version          = "~>0.0, < 1.0"
-  enable_telemetry = var.enable_telemetry ## see variables.tf
+  enable_telemetry = var.enable_telemetry
 
   name                            = local.appconfiguration_env_name_location
   location                        = module.environment_resource_group.resource.location

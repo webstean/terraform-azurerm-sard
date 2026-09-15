@@ -106,6 +106,14 @@ module "environment_resource_group" {
       principal_type                   = "ServicePrincipal"
       description                      = local.iac_message
     }
+    "sp_roleassignment9" = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Azure AI Enterprise Network Connection Approver/${data.azurerm_client_config.current.object_id}")
+      role_definition_id_or_name       = "Azure AI Enterprise Network Connection Approver"
+      principal_id                     = data.azurerm_client_config.current.object_id
+      skip_service_principal_aad_check = true
+      principal_type                   = "ServicePrincipal"
+      description                      = local.iac_message
+    }
     ## ==========================================================================================
     "up_roleassignment1" = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Contributor/${var.owner_entra_object_id}")

@@ -26,7 +26,7 @@ module "private_endpoint_keyvault" {
 
   source           = "Azure/avm-res-network-privateendpoint/azurerm"
   version          = "~>0.0, < 1.0"
-  enable_telemetry = var.enable_telemetry # see variables.tf
+  enable_telemetry = var.enable_telemetry
 
   name                           = "pep-${azurerm_key_vault.this.name}"
   resource_group_name            = module.environment_resource_group.resource.name

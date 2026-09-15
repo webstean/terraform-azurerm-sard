@@ -12,7 +12,7 @@ locals {
 module "log_analytics_workspace" {
   source           = "Azure/avm-res-operationalinsights-workspace/azurerm"
   version          = "~>0.0, < 1.0"
-  enable_telemetry = var.enable_telemetry ## see variables.tf
+  enable_telemetry = var.enable_telemetry
 
   name                                      = local.law_name_location
   resource_group_name                       = module.environment_resource_group.resource.name
