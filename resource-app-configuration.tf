@@ -4,7 +4,14 @@ locals {
   appconfiguration_env_name_location = lower("${local.appconfiguration_env_name}-${lower(var.location)}")
   appconfiguration_env_random_suffix = substr(random_string.environment.result, 0, 6)
   appconfiguration_env_name_hostname = lower(substr(replace("a${local.appconfiguration_env_random_suffix}${var.prefix}${local.appconfiguration_env_name_location}", "-", ""), 0, 24))
+  /*
+app_settings = merge(local.app_settings, {
+    APPLICATIONINSIGHTS_CONNECTION_STRING = azurerm_application_insights.this.connection_string
+    ApplicationInsightsAgent_EXTENSION_VERSION = "~3"
+  })
+*/
 }
+
 
 #data "azuread_service_principal" "cert_spn" {
 #  display_name = "f3c21649-0979-4721-ac85-b0216b2cf413" ## "Microsoft.Azure.CertificateRegistration"
