@@ -276,17 +276,17 @@ module "ai-services" {
   version          = "~>0.0, < 1.0"
   enable_telemetry = var.enable_telemetry
 
-  name                                         = each.value.classic == true ? "classic-${local.cog_name_hostname}${random_string.cog_random_suffix[each.key].result}-${lower(each.value.kind)}" : "${local.cog_name_hostname}${random_string.cog_random_suffix[each.key].result}-${lower(each.value.kind)}"
-  parent_id                                    = module.environment_resource_group.resource_id
-  location                                     = module.environment_resource_group.resource.location
-  kind                                         = each.value.kind
-  sku_name                                     = each.value.sku_name
-  allow_project_management                     = true
-  deployment_serialization_enabled             = true
-  dynamic_throttling_enabled                   = each.value.dynamic_throttling_enabled
-  local_auth_enabled                           = (tobool(var.data_pii) || tobool(var.data_phi)) ? false : true
-  outbound_network_access_restricted           = false
-  custom_subdomain_name                        = "${lower(each.value.kind)}${lower(local.cog_random_suffix)}${lower(local.cog_name_location)}"
+  name                               = each.value.classic == true ? "classic-${local.cog_name_hostname}${random_string.cog_random_suffix[each.key].result}-${lower(each.value.kind)}" : "${local.cog_name_hostname}${random_string.cog_random_suffix[each.key].result}-${lower(each.value.kind)}"
+  parent_id                          = module.environment_resource_group.resource_id
+  location                           = module.environment_resource_group.resource.location
+  kind                               = each.value.kind
+  sku_name                           = each.value.sku_name
+  allow_project_management           = true
+  deployment_serialization_enabled   = true
+  dynamic_throttling_enabled         = each.value.dynamic_throttling_enabled
+  local_auth_enabled                 = (tobool(var.data_pii) || tobool(var.data_phi)) ? false : true
+  outbound_network_access_restricted = false
+  custom_subdomain_name              = "${lower(each.value.kind)}${lower(local.cog_random_suffix)}${lower(local.cog_name_location)}"
   #custom_question_answering_search_service_id  = each.value.kind == "TextAnalytics" ? var.ai_free_search_id : null
   #custom_question_answering_search_service_key = each.value.kind == "TextAnalytics" ? var.ai_free_search_principal_id : null
 

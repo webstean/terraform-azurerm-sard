@@ -1,53 +1,24 @@
-terraform {
-  required_version = "~> 1.5"
-
-  required_providers {
-    azapi = {
-      source  = "Azure/azapi"
-      version = "~> 2.7"
-    }
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 4.57"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.7"
-    }
-  }
-}
-
-provider "azurerm" {
-  features {}
-}
-
-provider "azapi" {}
-
-resource "random_pet" "pet" {}
-
-resource "azurerm_resource_group" "rg" {
-  location = "eastus2"
-  name     = "rg-${random_pet.pet.id}"
-}
-
-resource "azurerm_user_assigned_identity" "uai" {
-  location            = azurerm_resource_group.rg.location
-  name                = "uai-${random_pet.pet.id}"
-  resource_group_name = azurerm_resource_group.rg.name
+locals {
+  bot_friendly_name = "Azure Bastion"
+  bot_name          = "ba-${var.prefix}"
+  bot_name_location = lower("${local.bot_name}-${lower(var.location)}")
+  bot_random_suffix = substr(random_string.environment.result, 0, 6)
+  bot_name_hostname = lower(substr(replace("b${local.bot_random_suffix}${local.bot_name_location}", "-", ""), 0, 24))
 }
 
 module "bot" {
-  source = "../../"
+  source           = "Azure/avm-res-botservice-botservice/azurerm"
+  version          = "~>0.0, < 1.0"
+  enable_telemetry = var.enable_telemetry ## see variables.tf
 
+  name                      = local.bot_name_hostname
   location                  = "global"
-  microsoft_app_id          = azurerm_user_assigned_identity.uai.client_id
-  name                      = "bot-${random_pet.pet.id}"
-  resource_group_name       = azurerm_resource_group.rg.name
-  enable_telemetry          = var.enable_telemetry
-  endpoint                  = "https://example.com/api/messages"
-  microsoft_app_msi_id      = azurerm_user_assigned_identity.uai.id
-  microsoft_app_tenant_id   = azurerm_user_assigned_identity.uai.tenant_id
   microsoft_app_type        = "UserAssignedMSI"
+  microsoft_app_id          = azurerm_user_assigned_identity.environment.client_id
+  microsoft_app_msi_id      = azurerm_user_assigned_identity.environment.id
+  microsoft_app_tenant_id   = azurerm_user_assigned_identity.environment.tenant_id
+  resource_group_name       = module.environment_resource_group.resource.name
+  endpoint                  = "https://example.com/api/messages"
   schema_validation_enabled = false
   sku                       = "F0"
 }
