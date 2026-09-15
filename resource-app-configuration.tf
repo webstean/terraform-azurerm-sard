@@ -84,7 +84,7 @@ module "appconfiguration" {
   }
 
   role_assignments = {
-    role_assignment_1 = {
+    sp_role_assignment_1 = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/App Configuration Data Reader/${azurerm_user_assigned_identity.environment.principal_id}")
       role_definition_id_or_name       = "App Configuration Data Reader"
       principal_id                     = azurerm_user_assigned_identity.environment.principal_id
@@ -92,7 +92,7 @@ module "appconfiguration" {
       principal_type                   = "ServicePrincipal"
       description                      = local.iac_message
     }
-    role_assignment_2 = {
+    sp_role_assignment_2 = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/App Configuration Reader/${azurerm_user_assigned_identity.environment.principal_id}")
       role_definition_id_or_name       = "App Configuration Reader"
       principal_id                     = azurerm_user_assigned_identity.environment.principal_id
@@ -100,7 +100,7 @@ module "appconfiguration" {
       principal_type                   = "ServicePrincipal"
       description                      = local.iac_message
     }
-    role_assignment_3 = {
+    sp_role_assignment_3 = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Owner/${data.azurerm_client_config.current.object_id}")
       role_definition_id_or_name       = "Owner"
       principal_id                     = data.azurerm_client_config.current.object_id
@@ -108,9 +108,9 @@ module "appconfiguration" {
       principal_type                   = "ServicePrincipal"
       description                      = local.iac_message
     }
-    role_assignment_4 = {
+    up_role_assignment_1 = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/App Configuration Data Owner/${var.owner_entra_object_id}")
-      role_definition_id_or_name       = "App Configuration Data Owner"
+      role_definition_id_or_name       = "App Configuration Data Reader"
       principal_id                     = var.owner_entra_object_id
       skip_service_principal_aad_check = false
       principal_type                   = "User"
