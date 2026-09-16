@@ -811,6 +811,7 @@ variable "vmss_sku_name" {
   sensitive   = false
   description = <<DESC
 Azure Virtual Machine SKU for the scale set (e.g., Standard_D2s_v5). Determines vCPU, memory, and pricing.
+Set to null, for a SKU to be randomly selected by the system.
 DESC
   default     = "Standard_D2s_v5" ## Standard_D2s_v5
 }

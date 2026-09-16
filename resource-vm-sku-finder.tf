@@ -16,10 +16,9 @@ module "vm_x64_skus" {
   enable_telemetry = var.enable_telemetry
 
   #cache_storage_details = {
-  #  storage_account_resource_group_name = azurerm_storage_account.this.resource_group_name
   #  storage_account_name                = azurerm_storage_account.this.name
+  #  storage_account_resource_group_name = azurerm_storage_account.this.resource_group_name
   #  storage_account_blob_container_name = azurerm_storage_container.sku_finder_cache.name
-  #  storage_account_blob_prefix         = "cache"
   #}
 
   location      = var.location
