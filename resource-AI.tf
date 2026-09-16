@@ -221,7 +221,7 @@ locals {
       rai_policy                 = false
     }
     LanguageAuthoring = {
-      enable                     = true
+      enable                     = false ## "The account type 'LanguageAuthoring' is either invalid or unavailable in given region."
       classic                    = false
       kind                       = "LanguageAuthoring"
       storage                    = true
