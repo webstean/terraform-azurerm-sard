@@ -22,6 +22,9 @@ resource "azurerm_subnet" "mlhub" {
   #service_endpoint_policy_ids = [
   #  azurerm_subnet_service_endpoint_storage_policy.storage.id
   #]
+  depends_on = [
+    azurerm_virtual_network.this
+  ]
 }
 
 module "aihub" {

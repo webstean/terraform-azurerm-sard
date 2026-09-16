@@ -62,7 +62,7 @@ resource "azurerm_subnet" "bastion" {
 
   name                            = "AzureBastionSubnet"
   resource_group_name             = module.environment_resource_group.resource.name
-  virtual_network_name            = azurerm_virtual_network.this.id
+  virtual_network_name            = azurerm_virtual_network.this.name
   address_prefixes                = [format(local.subnet_bastion.address_format_ipv4, local.regions[var.location].location_number)]
   default_outbound_access_enabled = false
 
@@ -70,7 +70,10 @@ resource "azurerm_subnet" "bastion" {
   private_link_service_network_policies_enabled = false
   ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
   ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
-  private_endpoint_network_policies = "Enabled"
+  private_endpoint_network_policies = "Disabled"
+  depends_on = [
+    azurerm_virtual_network.this
+  ]
 }
 
 resource "azurerm_bastion_host" "this" {
