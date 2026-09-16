@@ -56,8 +56,9 @@ resource "azurerm_monitor_diagnostic_setting" "bastion-publicip2" {
 }
 */
 
+## alway create, (its free), so we can upgrade seamlessly to different Bastion SKUs
 resource "azurerm_subnet" "bastion" {
-  for_each = { for k, v in azurerm_virtual_network.this : k => v if var.bastion_sku != "Developer" }
+  ## for_each = { for k, v in azurerm_virtual_network.this : k => v if var.bastion_sku != "Developer" }
 
   name                            = "AzureBastionSubnet"
   resource_group_name             = module.environment_resource_group.resource.name
