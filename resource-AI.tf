@@ -203,7 +203,7 @@ locals {
       rai_policy                 = false
     }
     HealthInsights = {
-      enable                     = true
+      enable                     = false ## context deadline exceeded
       classic                    = false
       kind                       = "HealthInsights"
       storage                    = true
