@@ -130,10 +130,14 @@ Next steps here
 | [azurerm_key_vault_secret.sql_database_connection_free_encrypted](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
 | [azurerm_key_vault_secret.sql_database_connection_free_unencrypted](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
 | [azurerm_key_vault_secret.vmss_admin_password](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
+| [azurerm_lb.pls](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb) | resource |
 | [azurerm_lb.relay](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb) | resource |
+| [azurerm_lb_backend_address_pool.pls](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_backend_address_pool) | resource |
 | [azurerm_lb_backend_address_pool.relay](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_backend_address_pool) | resource |
 | [azurerm_lb_backend_address_pool_address.target](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_backend_address_pool_address) | resource |
+| [azurerm_lb_probe.pls](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_probe) | resource |
 | [azurerm_lb_probe.tcp](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_probe) | resource |
+| [azurerm_lb_rule.pls](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_rule) | resource |
 | [azurerm_lb_rule.relay](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_rule) | resource |
 | [azurerm_log_analytics_query_pack.platform](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_query_pack) | resource |
 | [azurerm_monitor_data_collection_endpoint.otel](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_data_collection_endpoint) | resource |
@@ -151,6 +155,7 @@ Next steps here
 | [azurerm_notification_hub_authorization_rule.rule1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/notification_hub_authorization_rule) | resource |
 | [azurerm_notification_hub_namespace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/notification_hub_namespace) | resource |
 | [azurerm_private_dns_zone.privatelink-dns1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone) | resource |
+| [azurerm_private_link_service.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_link_service) | resource |
 | [azurerm_public_ip.app_gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_public_ip.bastion](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_public_ip.relay](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
@@ -196,6 +201,7 @@ Next steps here
 | [azurerm_subnet.containerappenv](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.mlhub](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.outbound](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_subnet.pls_nat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.private_endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.sqlserver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet_nat_gateway_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_nat_gateway_association) | resource |
@@ -271,6 +277,7 @@ Next steps here
 | <a name="input_data_pii"></a> [data\_pii](#input\_data\_pii) | If true, this environment contains PII (Personally Identifiable Information) so deploy additional security controls. If false, deploys a non-PII environment. | `bool` | `false` | no |
 | <a name="input_deploy_ai_embeddings"></a> [deploy\_ai\_embeddings](#input\_deploy\_ai\_embeddings) | If true, deploys AI embeddings for the environment. If false, does not deploy AI embeddings. | `bool` | `false` | no |
 | <a name="input_deploy_private_endpoints"></a> [deploy\_private\_endpoints](#input\_deploy\_private\_endpoints) | If true, deploys private endpoints for secure access to Azure services. If false, does not deploy private endpoints. | `bool` | `false` | no |
+| <a name="input_deploy_private_link_service"></a> [deploy\_private\_link\_service](#input\_deploy\_private\_link\_service) | Whether to deploy the Private Link Service. | `bool` | `false` | no |
 | <a name="input_deploy_sql_failover"></a> [deploy\_sql\_failover](#input\_deploy\_sql\_failover) | If true, deploys a Microsoft SQL failover environment in the linked region. If false, deploys a single SQL instance. | `bool` | `false` | no |
 | <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry) | This variable controls whether or not the AVM (Azure Verified Modules) telemetry is enabled for the module.<br/>For more information see <https://aka.ms/avm/telemetryinfo>.<br/>If it is set to false, then no telemetry will be collected. | `bool` | `false` | no |
 | <a name="input_frontdoor_sku"></a> [frontdoor\_sku](#input\_frontdoor\_sku) | Specifies the SKU for Azure Front Door. Options are: 'Standard' or 'Premium'. | `string` | `"Standard"` | no |
@@ -281,9 +288,11 @@ Next steps here
 | <a name="input_letsencrypt_dns_auth_method"></a> [letsencrypt\_dns\_auth\_method](#input\_letsencrypt\_dns\_auth\_method) | How to authenticate to this Azure tenant for creating LetsEncrupt certificates | `string` | `"oidc"` | no |
 | <a name="input_location"></a> [location](#input\_location) | The Azure region where resources will be deployed. | `string` | `"australiaeast"` | no |
 | <a name="input_outbound_access"></a> [outbound\_access](#input\_outbound\_access) | Specifies the type of outbound access to the environment via the Internet. Options are: 'Direct' (free), 'Nat-Gateway' ($$), 'Hub-and-Spoke-with-Nat-Gateway' ($$$).<br/>Note: that 'Direct' does not allowed Virtual Machine Scale Sets to have any OutBound Internet access, you need to use a Nat-Gateway or Hub-and-Spoke | `string` | `"Direct"` | no |
-| <a name="input_pls_allowed_fqdns"></a> [pls\_allowed\_fqdns](#input\_pls\_allowed\_fqdns) | FQDNs allowed for the Private Link Service. | `list(string)` | `[]` | no |
-| <a name="input_pls_nat_ip_configurations"></a> [pls\_nat\_ip\_configurations](#input\_pls\_nat\_ip\_configurations) | One or more (max 8) NAT IP configurations for the Private Link Service. Exactly one must have primary = true. | <pre>list(object({<br/>    name                       = string<br/>    primary                    = bool<br/>    private_ip_address         = optional(string)<br/>    private_ip_address_version = optional(string)<br/>  }))</pre> | <pre>[<br/>  {<br/>    "name": "primary",<br/>    "primary": true,<br/>    "private_ip_address": null,<br/>    "private_ip_address_version": "IPv4"<br/>  },<br/>  {<br/>    "name": "secondary",<br/>    "primary": false,<br/>    "private_ip_address": null,<br/>    "private_ip_address_version": "IPv4"<br/>  }<br/>]</pre> | no |
-| <a name="input_pls_proxy_protocol_enabled"></a> [pls\_proxy\_protocol\_enabled](#input\_pls\_proxy\_protocol\_enabled) | Whether the Private Link Service should support Proxy Protocol (to preserve source IP to the backend). | `bool` | `false` | no |
+| <a name="input_private_link_service_allowed_fqdns"></a> [private\_link\_service\_allowed\_fqdns](#input\_private\_link\_service\_allowed\_fqdns) | FQDNs allowed for the Private Link Service. | `list(string)` | <pre>[<br/>  "*"<br/>]</pre> | no |
+| <a name="input_private_link_service_auto_approval_subscription_ids"></a> [private\_link\_service\_auto\_approval\_subscription\_ids](#input\_private\_link\_service\_auto\_approval\_subscription\_ids) | The list of subscription IDs that are auto-approved for the Private Link Service. | `list(string)` | <pre>[<br/>  "fd72f9ff-96b6-4a20-a870-ceaa17d70bc8"<br/>]</pre> | no |
+| <a name="input_private_link_service_nat_ip_configurations"></a> [private\_link\_service\_nat\_ip\_configurations](#input\_private\_link\_service\_nat\_ip\_configurations) | One or more (max 8) NAT IP configurations for the Private Link Service. Exactly one must have primary = true. | <pre>list(object({<br/>    name                       = string<br/>    primary                    = bool<br/>    private_ip_address         = optional(string)<br/>    private_ip_address_version = optional(string)<br/>  }))</pre> | <pre>[<br/>  {<br/>    "name": "primary",<br/>    "primary": true,<br/>    "private_ip_address": null,<br/>    "private_ip_address_version": "IPv4"<br/>  },<br/>  {<br/>    "name": "secondary",<br/>    "primary": false,<br/>    "private_ip_address": null,<br/>    "private_ip_address_version": "IPv4"<br/>  }<br/>]</pre> | no |
+| <a name="input_private_link_service_proxy_protocol_enabled"></a> [private\_link\_service\_proxy\_protocol\_enabled](#input\_private\_link\_service\_proxy\_protocol\_enabled) | Whether the Private Link Service should support Proxy Protocol (to preserve source IP to the backend). | `bool` | `false` | no |
+| <a name="input_private_link_service_visibility_subscription_ids"></a> [private\_link\_service\_visibility\_subscription\_ids](#input\_private\_link\_service\_visibility\_subscription\_ids) | The list of subscription IDs that have visibility to the Private Link Service. | `list(string)` | <pre>[<br/>  "fd72f9ff-96b6-4a20-a870-ceaa17d70bc8"<br/>]</pre> | no |
 | <a name="input_role_mssql_db_reader_id"></a> [role\_mssql\_db\_reader\_id](#input\_role\_mssql\_db\_reader\_id) | The ID of the role for the MSSQL DB reader operations. | `string` | `null` | no |
 | <a name="input_role_mssql_db_restore_id"></a> [role\_mssql\_db\_restore\_id](#input\_role\_mssql\_db\_restore\_id) | The ID of the role for the MSSQL DB restore operations. | `string` | `null` | no |
 | <a name="input_security_perimeter_inbound_public_ips"></a> [security\_perimeter\_inbound\_public\_ips](#input\_security\_perimeter\_inbound\_public\_ips) | Allowed inbound addresses for the Azure Security Perimeter. | `list(string)` | <pre>[<br/>  "0.0.0.0/0"<br/>]</pre> | no |
@@ -354,6 +363,9 @@ Next steps here
 | <a name="output_logs_otel_dce_id"></a> [logs\_otel\_dce\_id](#output\_logs\_otel\_dce\_id) | The ID of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_logs_ingestion_endpoint"></a> [logs\_otel\_logs\_ingestion\_endpoint](#output\_logs\_otel\_logs\_ingestion\_endpoint) | The OTEL logs ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_metrics_ingestion_endpoint"></a> [logs\_otel\_metrics\_ingestion\_endpoint](#output\_logs\_otel\_metrics\_ingestion\_endpoint) | The OTEL metrics ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
+| <a name="output_pls_alias"></a> [pls\_alias](#output\_pls\_alias) | The Private Link Service global alias. |
+| <a name="output_pls_id"></a> [pls\_id](#output\_pls\_id) | The Private Link Service ID. |
+| <a name="output_pls_name"></a> [pls\_name](#output\_pls\_name) | The Private Link Service name. |
 | <a name="output_portal_link"></a> [portal\_link](#output\_portal\_link) | The SARD Azure Portal url |
 | <a name="output_relay_mssql_public_ip"></a> [relay\_mssql\_public\_ip](#output\_relay\_mssql\_public\_ip) | The public IP address of the relay load balancer. |
 | <a name="output_security_perimeter_inbound_public_ips"></a> [security\_perimeter\_inbound\_public\_ips](#output\_security\_perimeter\_inbound\_public\_ips) | List of public IPs allowed for inbound traffic to the security perimeter |
