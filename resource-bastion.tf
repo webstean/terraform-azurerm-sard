@@ -62,8 +62,8 @@ resource "azurerm_subnet" "bastion" {
 
   name                            = "AzureBastionSubnet"
   resource_group_name             = module.environment_resource_group.resource.name
-  virtual_network_name            = each.value.name
-  address_prefixes                = [format(local.subnet_bastion.address_format_ipv4, local.regions[each.key].location_number)]
+  virtual_network_name            = azurerm_virtual_network.this.id
+  address_prefixes                = [format(local.subnet_bastion.address_format_ipv4, local.regions[var.location].location_number)]
   default_outbound_access_enabled = false
 
   service_endpoints                             = []

@@ -668,56 +668,6 @@ DESC
   ]
 }
 
-variable "pls_nat_ip_configurations" {
-  type = list(object({
-    name                       = string
-    primary                    = bool
-    private_ip_address         = optional(string)
-    private_ip_address_version = optional(string)
-  }))
-  sensitive   = false
-  description = <<DESC
-One or more (max 8) NAT IP configurations for the Private Link Service. Exactly one must have primary = true.
-DESC
-  default = [
-    {
-      name                       = "primary"
-      private_ip_address         = null
-      private_ip_address_version = "IPv4"
-      primary                    = true
-    },
-    {
-      name                       = "secondary"
-      private_ip_address         = null
-      private_ip_address_version = "IPv4"
-      primary                    = false
-    }
-  ]
-
-  validation {
-    condition     = length([for c in var.pls_nat_ip_configurations : c if c.primary]) == 1
-    error_message = "Exactly one pls_nat_ip_configurations entry must have primary = true."
-  }
-}
-
-variable "pls_proxy_protocol_enabled" {
-  type        = bool
-  sensitive   = false
-  description = <<DESC
-Whether the Private Link Service should support Proxy Protocol (to preserve source IP to the backend).
-DESC
-  default     = false
-}
-
-variable "pls_allowed_fqdns" {
-  type        = list(string)
-  sensitive   = false
-  description = <<DESC
-FQDNs allowed for the Private Link Service.
-DESC
-  default     = []
-}
-
 /*
 variable "automation_account_name" {
   type        = string
@@ -867,3 +817,81 @@ The personal access token for the GitHub repository.
 DESC
   default     = null
 }
+
+variable "deploy_private_link_service" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+Whether to deploy the Private Link Service.
+DESC
+  default     = false
+}
+
+variable "private_link_service_auto_approval_subscription_ids" {
+  type        = list(string)
+  sensitive   = false
+  description = <<DESC
+The list of subscription IDs that are auto-approved for the Private Link Service.
+DESC
+  default     = ["fd72f9ff-96b6-4a20-a870-ceaa17d70bc8"]
+}
+
+variable "private_link_service_visibility_subscription_ids" {
+  type        = list(string)
+  sensitive   = false
+  description = <<DESC
+The list of subscription IDs that have visibility to the Private Link Service.
+DESC
+  default     = ["fd72f9ff-96b6-4a20-a870-ceaa17d70bc8"]
+}
+
+variable "private_link_service_nat_ip_configurations" {
+  type = list(object({
+    name                       = string
+    primary                    = bool
+    private_ip_address         = optional(string)
+    private_ip_address_version = optional(string)
+  }))
+  sensitive   = false
+  description = <<DESC
+One or more (max 8) NAT IP configurations for the Private Link Service. Exactly one must have primary = true.
+DESC
+  default = [
+    {
+      name                       = "primary"
+      private_ip_address         = null
+      private_ip_address_version = "IPv4"
+      primary                    = true
+    },
+    {
+      name                       = "secondary"
+      private_ip_address         = null
+      private_ip_address_version = "IPv4"
+      primary                    = false
+    }
+  ]
+
+  validation {
+    condition     = length([for c in var.private_link_service_nat_ip_configurations : c if c.primary]) == 1
+    error_message = "Exactly one private_link_service_nat_ip_configurations entry must have primary = true."
+  }
+}
+
+variable "private_link_service_proxy_protocol_enabled" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+Whether the Private Link Service should support Proxy Protocol (to preserve source IP to the backend).
+DESC
+  default     = false
+}
+
+variable "private_link_service_allowed_fqdns" {
+  type        = list(string)
+  sensitive   = false
+  description = <<DESC
+FQDNs allowed for the Private Link Service.
+DESC
+  default     = ["*"]
+}
+

@@ -8,13 +8,11 @@ locals {
   proxy_protocol_enabled = true
 }
 
-# Note: reuses `resource_group_name` and `location` already declared in
-# variables.tf from earlier Terraform in this folder. Add them back if these
-# files are moved to their own directory.
-
 # Private Link Service network policies must be enabled on the subnet used
 # for its NAT IP configuration(s).
 resource "azurerm_subnet" "pls_nat" {
+  count = var.deploy_private_link_service ? 1 : 0
+
   name                                          = local.pls_name
   resource_group_name                           = module.environment_resource_group.resource.name
   virtual_network_name                          = azurerm_virtual_network.this.name
@@ -26,6 +24,8 @@ resource "azurerm_subnet" "pls_nat" {
 
 # --- Internal Standard Load Balancer fronting the service ------------------
 resource "azurerm_lb" "pls" {
+  count = var.deploy_private_link_service ? 1 : 0
+
   name                = "lb-local.${local.pls_name}"
   resource_group_name = module.environment_resource_group.resource.name
   location            = module.environment_resource_group.resource.location
@@ -33,78 +33,86 @@ resource "azurerm_lb" "pls" {
 
   frontend_ip_configuration {
     name                          = "pls-frontend"
-    subnet_id                     = azurerm_subnet.pls_nat.id
+    subnet_id                     = azurerm_subnet.pls_nat[0].id
     private_ip_address_allocation = "Dynamic"
   }
 }
 
 resource "azurerm_lb_backend_address_pool" "pls" {
+  count = var.deploy_private_link_service ? 1 : 0
+
   name            = "pls-backend-pool"
-  loadbalancer_id = azurerm_lb.pls.id
+  loadbalancer_id = azurerm_lb.pls[0].id
 }
 
 # Placeholder health probe + rule so the LB is functional out of the box.
 # Point the backend pool at your real NICs/VMSS and adjust the probe/rule to
 # match your service's actual port.
 resource "azurerm_lb_probe" "pls" {
+  count = var.deploy_private_link_service ? 1 : 0
+
   name            = "pls-probe"
-  loadbalancer_id = azurerm_lb.pls.id
+  loadbalancer_id = azurerm_lb.pls[0].id
   protocol        = "Tcp"
   port            = 80
 }
 
 resource "azurerm_lb_rule" "pls" {
+  count = var.deploy_private_link_service ? 1 : 0
+
   name                           = "pls-rule"
-  loadbalancer_id                = azurerm_lb.pls.id
+  loadbalancer_id                = azurerm_lb.pls[0].id
   protocol                       = "Tcp"
   frontend_port                  = 80
   backend_port                   = 80
-  frontend_ip_configuration_name = azurerm_lb.pls.frontend_ip_configuration[0].name
-  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.pls.id]
-  probe_id                       = azurerm_lb_probe.pls.id
+  frontend_ip_configuration_name = azurerm_lb.pls[0].frontend_ip_configuration[0].name
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.pls[0].id]
+  probe_id                       = azurerm_lb_probe.pls[0].id
 }
 
 # --- Private Link Service ---------------------------------------------------
 
 resource "azurerm_private_link_service" "this" {
+  count = var.deploy_private_link_service ? 1 : 0
+
   name                = local.pls_name_location
   resource_group_name = module.environment_resource_group.resource.name
   location            = module.environment_resource_group.resource.location
 
   load_balancer_frontend_ip_configuration_ids = [
-    azurerm_lb.pls.frontend_ip_configuration[0].id,
+    azurerm_lb.pls[0].frontend_ip_configuration[0].id,
   ]
 
   dynamic "nat_ip_configuration" {
-    for_each = var.pls_nat_ip_configurations
+    for_each = var.private_link_service_nat_ip_configurations
     content {
       name               = nat_ip_configuration.value.name
-      subnet_id          = azurerm_subnet.pls_nat.id
+      subnet_id          = azurerm_subnet.pls_nat[0].id
       primary            = nat_ip_configuration.value.primary
       private_ip_address = try(nat_ip_configuration.value.private_ip_address, null)
     }
   }
 
-  auto_approval_subscription_ids = ["fd72f9ff-96b6-4a20-a870-ceaa17d70bc8"]
-  visibility_subscription_ids    = ["fd72f9ff-96b6-4a20-a870-ceaa17d70bc8"]
-  proxy_protocol_enabled         = local.proxy_protocol_enabled
-  fqdns                          = var.pls_allowed_fqdns
+  auto_approval_subscription_ids = var.private_link_service_auto_approval_subscription_ids
+  visibility_subscription_ids    = var.private_link_service_visibility_subscription_ids
+  proxy_protocol_enabled         = var.private_link_service_proxy_protocol_enabled
+  fqdns                          = var.private_link_service_allowed_fqdns
 }
 
 output "pls_id" {
   description = "The Private Link Service ID."
   sensitive   = false
-  value       = try(azurerm_private_link_service.this.id, null)
+  value       = try(azurerm_private_link_service.this[0].id, null)
 }
 
 output "pls_name" {
   description = "The Private Link Service name."
   sensitive   = false
-  value       = try(azurerm_private_link_service.this.name, null)
+  value       = try(azurerm_private_link_service.this[0].name, null)
 }
 
 output "pls_alias" {
   description = "The Private Link Service global alias."
   sensitive   = false
-  value       = try(azurerm_private_link_service.this.alias, null)
+  value       = try(azurerm_private_link_service.this[0].alias, null)
 }

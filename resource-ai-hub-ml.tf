@@ -86,7 +86,7 @@ module "aihub" {
     }
   }
   serverless_compute = var.deploy_private_endpoints ? {
-    subnet_id = azurerm_subnet.mlhub.id
+    subnet_id = azurerm_subnet.mlhub[0].id
   } : null
   lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
     kind = "CanNotDelete"
