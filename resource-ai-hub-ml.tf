@@ -7,6 +7,8 @@ locals {
 }
 
 resource "azurerm_subnet" "mlhub" {
+  count = var.deploy_private_endpoints ? 1 : 0
+
   name                 = "machine-learning"
   resource_group_name  = module.environment_resource_group.resource.name
   virtual_network_name = azurerm_virtual_network.this.name
