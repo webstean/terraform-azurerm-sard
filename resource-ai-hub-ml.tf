@@ -118,9 +118,3 @@ output "ai_hub_id" {
   sensitive   = false
   value       = module.aihub.resource_id
 }
-
-output "ai_hub_name" {
-  description = "The description of the AI Hub workspace."
-  sensitive   = false
-  value       = module.aihub.resource.name
-}
