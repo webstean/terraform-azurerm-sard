@@ -10,7 +10,7 @@ locals {
   vmss_spot_instances                 = false
   vmss_ultra_ssd_support              = false
   vmss_hibernate_enabled              = var.vmss_hibernation_enabled
-  vmss_enable_standby_pool            = false
+  vmss_enable_standby_pool            = false    ## To be true, this needs special permissions setup: https://learn.microsoft.com/en-us/azure/virtual-machine-scale-sets/standby-pools-configure-permissions
   vmss_patching_mode                  = "Manual" ## "Automatic"
   vmss_subnet_id                      = azurerm_subnet.outbound.id
 }
@@ -674,7 +674,7 @@ data "azapi_resource_action" "test" {
 ## https://learn.microsoft.com/en-us/azure/virtual-machine-scale-sets/standby-pools-configure-permissions
 ## Standby Pool Resource Provider
 resource "azurerm_role_assignment" "standby_pool_permission1" {
-  count = local.vmss_enable_standby_pool ? 1 : 0
+  #count = local.vmss_enable_standby_pool ? 1 : 0
 
   scope                = module.environment_resource_group.resource_id
   role_definition_name = "Virtual Machine Contributor"
@@ -682,7 +682,7 @@ resource "azurerm_role_assignment" "standby_pool_permission1" {
   description          = local.iac_message
 }
 resource "azurerm_role_assignment" "standby_pool_permission2" {
-  count = local.vmss_enable_standby_pool ? 1 : 0
+  #count = local.vmss_enable_standby_pool ? 1 : 0
 
   scope                = module.environment_resource_group.resource_id
   role_definition_name = "Network Contributor"
@@ -690,7 +690,7 @@ resource "azurerm_role_assignment" "standby_pool_permission2" {
   description          = local.iac_message
 }
 resource "azurerm_role_assignment" "standby_pool_permission3" {
-  count = local.vmss_enable_standby_pool ? 1 : 0
+  #count = local.vmss_enable_standby_pool ? 1 : 0
 
   scope                = module.environment_resource_group.resource_id
   role_definition_name = "Managed Identity Contributor"
@@ -698,7 +698,7 @@ resource "azurerm_role_assignment" "standby_pool_permission3" {
   description          = local.iac_message
 }
 resource "azurerm_role_assignment" "standby_pool_permission4" {
-  count = local.vmss_enable_standby_pool ? 1 : 0
+  #count = local.vmss_enable_standby_pool ? 1 : 0
 
   scope                = module.environment_resource_group.resource_id
   role_definition_name = "Compute Gallery Sharing Admin"
@@ -706,7 +706,7 @@ resource "azurerm_role_assignment" "standby_pool_permission4" {
   description          = local.iac_message
 }
 resource "azurerm_role_assignment" "standby_pool_permission5" {
-  count = local.vmss_enable_standby_pool ? 1 : 0
+  #count = local.vmss_enable_standby_pool ? 1 : 0
 
   scope                = module.environment_resource_group.resource_id
   role_definition_name = "Compute Gallery Artifacts Publisher"
