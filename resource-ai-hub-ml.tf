@@ -83,9 +83,9 @@ module "aihub" {
       description                      = local.iac_message
     }
   }
-  serverless_compute = {
+  serverless_compute = var.deploy_private_endpoints ? {
     subnet_id = azurerm_subnet.mlhub.id
-  }
+  } : null
   lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
     kind = "CanNotDelete"
   } : null
