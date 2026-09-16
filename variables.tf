@@ -87,6 +87,24 @@ DESC
 // +===========================================================================================================+
 // have defaults
 
+variable "ai_free_search_id" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The ID of the AI Free Search resource to be used.
+DESC
+  default     = null
+}
+
+variable "ai_free_search_principal_id" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The principal ID of the AI Free Search resource to be used.
+DESC
+  default     = null
+}
+
 variable "aca_consumption_gpu_enabled" {
   type        = bool
   sensitive   = false
