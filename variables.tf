@@ -9,27 +9,6 @@ The name of the customer (free-text)
 DESC
 }
 
-variable "prefix" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-A short name (typically 3-8 characters, lowercase) for the customer, used as a prefix for all Azure resource names to ensure global uniqueness.
-DESC
-}
-
-variable "subscription_id" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-The single Azure subscription ID in which the resources will be deployed.
-DESC
-
-  validation {
-    condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.subscription_id)))
-    error_message = "subscription_id must be a valid GUID."
-  }
-}
-
 variable "owner_email" {
   type        = string
   sensitive   = false
@@ -41,6 +20,14 @@ DESC
     condition     = can(regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", trimspace(var.owner_email)))
     error_message = "The variable 'owner_email' must be a valid email address."
   }
+}
+
+variable "owner_entra_display_name" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+Display name of the owner in Entra ID for RBAC role assignment and resource access control.
+DESC
 }
 
 variable "owner_entra_object_id" {
@@ -55,11 +42,20 @@ DESC
     error_message = "The variable 'owner_entra_object_id' must be a valid GUID."
   }
 }
-variable "owner_entra_display_name" {
+
+variable "prefix" {
   type        = string
   sensitive   = false
   description = <<DESC
-Display name of the owner in Entra ID for RBAC role assignment and resource access control.
+A short name (typically 3-8 characters, lowercase) for the customer, used as a prefix for all Azure resource names to ensure global uniqueness.
+DESC
+}
+
+variable "sql_administrator_group_display_name" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+Entra ID display name for the user or group that will have SQL Server administrator permissions.
 DESC
 }
 
@@ -75,51 +71,106 @@ DESC
   }
 }
 
-variable "sql_administrator_group_display_name" {
+variable "subscription_id" {
   type        = string
   sensitive   = false
   description = <<DESC
-Entra ID display name for the user or group that will have SQL Server administrator permissions.
+The single Azure subscription ID in which the resources will be deployed.
 DESC
+
+  validation {
+    condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.subscription_id)))
+    error_message = "subscription_id must be a valid GUID."
+  }
 }
 
 // +===========================================================================================================+
 // have defaults
 
-variable "security_perimeter_inbound_public_ips" {
-  type        = list(string)
-  sensitive   = false
-  description = <<DESC
-Allowed inbound addresses for the Azure Security Perimeter.
-DESC
-  default     = ["0.0.0.0/0"]
-}
-
-variable "security_perimeter_outbound_fqdns" {
-  type        = list(string)
-  sensitive   = false
-  description = <<DESC
-Allowed outbound FQDNs for the Azure Security Perimeter.
-DESC
-  default     = ["*"]
-}
-
-variable "vmss_number_of_instances" {
-  type        = number
-  sensitive   = false
-  description = <<DESC
-The number of instances in the Virtual Machine Scale Set.
-DESC
-  default     = 0 ## Anything but zero, cost money :-)
-}
-
-variable "vmss_autoscale_enabled" {
+variable "aca_consumption_gpu_enabled" {
   type        = bool
   sensitive   = false
   description = <<DESC
-Whether autoscale is enabled for the Virtual Machine Scale Set.
+If true, adds a Consumption GPU workload profile to the Azure Container Apps environment.
 DESC
-  default     = true
+  default     = false
+}
+
+variable "aca_consumption_gpu_max_count" {
+  type        = number
+  sensitive   = false
+  description = <<DESC
+Maximum replica count for the ACA Consumption GPU workload profile.
+DESC
+  default     = 1
+
+  validation {
+    condition     = var.aca_consumption_gpu_max_count == null || var.aca_consumption_gpu_min_count == null || var.aca_consumption_gpu_max_count >= var.aca_consumption_gpu_min_count
+    error_message = "aca_consumption_gpu_max_count must be null or greater than or equal to aca_consumption_gpu_min_count (when both are set)."
+  }
+}
+
+variable "aca_consumption_gpu_min_count" {
+  type        = number
+  sensitive   = false
+  description = <<DESC
+Minimum replica count for the ACA Consumption GPU workload profile.
+DESC
+  default     = 0
+
+  validation {
+    condition     = var.aca_consumption_gpu_min_count >= 0
+    error_message = "aca_consumption_gpu_min_count must be 0 or greater."
+  }
+}
+
+variable "aca_consumption_gpu_profile_type" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+Consumption GPU workload profile type for Azure Container Apps (e.g., Consumption-GPU-NC8as-T4 for NVIDIA T4 GPUs).
+DESC
+  default     = "Consumption-GPU-NC8as-T4"
+
+  validation {
+    condition     = can(regex("^Consumption-GPU-[A-Za-z0-9-]+$", var.aca_consumption_gpu_profile_type))
+    error_message = "aca_consumption_gpu_profile_type must start with 'Consumption-GPU-' (for example: Consumption-GPU-NC8as-T4)."
+  }
+}
+
+variable "aca_enable_dapr" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+If true, enables Dapr for the Azure Container Apps environment. If false, does not enable Dapr.
+DESC
+  default     = false
+}
+
+variable "automation_account_id" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The ID of the Azure Automation Account to be used.
+DESC
+  default     = null
+}
+
+variable "bastion_premium_private_deployment" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+If true, deploys a Premium Bastion with private deployment (no public IP). If false, deploys a Premium Bastion with public deployment.
+DESC
+  default     = false
+
+  ## https://learn.microsoft.com/en-us/azure/bastion/bastion-sku-comparison
+  validation {
+    condition = (
+      var.bastion_sku != "Premium" || var.bastion_premium_private_deployment == false
+    )
+    error_message = "The variable 'bastion_premium_private_deployment' can only be set to true if 'bastion_sku' is Premium."
+  }
 }
 
 variable "bastion_sku" {
@@ -139,293 +190,40 @@ DESC
   }
 }
 
-variable "location" {
+variable "container_registry_id" {
   type        = string
   sensitive   = false
   description = <<DESC
-The Azure region where resources will be deployed.
+The ID of the Azure Container Registry to be used.
 DESC
-  default     = "australiaeast"
-  validation {
-    condition     = contains(["australiasoutheast", "australiaeast", "australiacentral", "australiacentral2", "perth", "centralindia", "westus3"], lower(trimspace(var.location)))
-    error_message = "location must be one of the currently defined regions in the locals.tf (regions)."
-  }
+  default     = null
 }
 
-variable "enable_telemetry" {
-  type        = bool
-  sensitive   = false
-  description = <<DESC
-This variable controls whether or not the AVM (Azure Verified Modules) telemetry is enabled for the module.
-For more information see <https://aka.ms/avm/telemetryinfo>.
-If it is set to false, then no telemetry will be collected.
-DESC
-  default     = false
-}
-
-variable "data_pii" {
-  type        = bool
-  sensitive   = false
-  description = <<DESC
-If true, this environment contains PII (Personally Identifiable Information) so deploy additional security controls. If false, deploys a non-PII environment.
-DESC
-  default     = false
-}
-
-variable "data_phi" {
-  type        = bool
-  sensitive   = false
-  description = <<DESC
-If true, this environment contains PHI (Protected Health Information) so deploy additional security controls. If false, deploys a non-PHI environment.
-DESC
-  default     = false
-}
-
-variable "deploy_sql_failover" {
-  type        = bool
-  sensitive   = false
-  description = <<DESC
-If true, deploys a Microsoft SQL failover environment in the linked region. If false, deploys a single SQL instance.
-DESC
-  default     = false
-}
-
-variable "support_free_sql_database" {
-  type        = bool
-  sensitive   = false
-  description = <<DESC
-If true, support the totally Free SQL Server. Failover must be disabled and the SQL Server cannot have an alias.
-DESC
-  default     = true
-  validation {
-    condition     = !var.support_free_sql_database || !var.deploy_sql_failover
-    error_message = "The variable 'support_free_sql_database' can only be true when 'deploy_sql_failover' is false."
-  }
-}
-
-## not implemented - yet
-variable "sql_connectivity_type" {
+variable "container_registry_login_server" {
   type        = string
   sensitive   = false
   description = <<DESC
-Connectivity mode for the SQL Server endpoint: 'PRIVATE' (VNet via Private Endpoint), or 'PUBLIC' (internet-facing).
+The login server of the Azure Container Registry to be used.
 DESC
-  default     = "PRIVATE"
-
-  validation {
-    condition     = contains(["PRIVATE", "PUBLIC"], var.sql_connectivity_type)
-    error_message = "sql_connectivity_type must be one of 'PRIVATE' or 'PUBLIC'."
-  }
+  default     = null
 }
 
-variable "deploy_private_endpoints" {
-  type        = bool
-  sensitive   = false
-  description = <<DESC
-If true, deploys private endpoints for secure access to Azure services. If false, does not deploy private endpoints.
-DESC
-  default     = false
-}
-
-variable "inbound_access" {
+variable "container_registry_name" {
   type        = string
   sensitive   = false
   description = <<DESC
-Specifies the type of inbound access to the environment via the Internet. Options are: 'None' (free), 'App-Gateway' ($$), 'FrontDoor' ($$).
+The name of the Azure Container Registry to be used.
 DESC
-  default     = "None"
-
-  validation {
-    condition = (
-      contains(["None", "App-Gateway", "FrontDoor"], var.inbound_access)
-    )
-    error_message = "The variable 'inbound_access' must be one of: 'None', 'App-Gateway', 'FrontDoor'."
-  }
+  default     = null
 }
 
-variable "outbound_access" {
+variable "cosmos_db_free_account_resource_id" {
   type        = string
   sensitive   = false
   description = <<DESC
-Specifies the type of outbound access to the environment via the Internet. Options are: 'Direct' (free), 'Nat-Gateway' ($$), 'Hub-and-Spoke-with-Nat-Gateway' ($$$).
-Note: that 'Direct' does not allowed Virtual Machine Scale Sets to have any OutBound Internet access, you need to use a Nat-Gateway or Hub-and-Spoke
+The resource ID of the Cosmos DB free account to be used.
 DESC
-  default     = "Direct"
-
-  validation {
-    condition = (
-      contains(["Direct", "Nat-Gateway", "Hub-and-Spoke-with-Nat-Gateway"], var.outbound_access)
-    )
-    error_message = "The variable 'outbound_access' must be one of: 'Direct', 'Nat-Gateway', 'Hub-and-Spoke-with-Nat-Gateway'."
-  }
-}
-
-variable "frontdoor_sku" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-Specifies the SKU for Azure Front Door. Options are: 'Standard' or 'Premium'.
-DESC
-  default     = "Standard"
-
-  validation {
-    condition = (
-      contains(["Standard", "Premium"], var.frontdoor_sku)
-    )
-    error_message = "The variable 'frontdoor_sku' must be one of: 'Standard' or 'Premium'."
-  }
-}
-
-/*
-variable "container_app_fqdn" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-The Azure Container App ingress FQDN that Application Gateway routes traffic to (for example: myapp.orangecliff-123456.australiaeast.azurecontainerapps.io).
-DESC
-  default     = "myapp.orangecliff-123456.australiaeast.azurecontainerapps.io"
-  validation {
-    condition     = length(trimspace(var.container_app_fqdn)) > 0
-    error_message = "container_app_fqdn must be set to a non-empty Container App ingress FQDN."
-  }
-  validation {
-    condition     = !can(regex("^(https?://)", lower(trimspace(var.container_app_fqdn))))
-    error_message = "container_app_fqdn must not start with http:// or https://."
-  }
-}
-*/
-
-variable "bastion_premium_private_deployment" {
-  type        = bool
-  sensitive   = false
-  description = <<DESC
-If true, deploys a Premium Bastion with private deployment (no public IP). If false, deploys a Premium Bastion with public deployment.
-DESC
-  default     = false
-
-  ## https://learn.microsoft.com/en-us/azure/bastion/bastion-sku-comparison
-  validation {
-    condition = (
-      var.bastion_sku != "Premium" || var.bastion_premium_private_deployment == false
-    )
-    error_message = "The variable 'bastion_premium_private_deployment' can only be set to true if 'bastion_sku' is Premium."
-  }
-}
-
-variable "deploy_ai_embeddings" {
-  type        = bool
-  sensitive   = false
-  description = <<DESC
-If true, deploys AI embeddings for the environment. If false, does not deploy AI embeddings.
-DESC
-  default     = false
-}
-
-variable "aca_enable_dapr" {
-  type        = bool
-  sensitive   = false
-  description = <<DESC
-If true, enables Dapr for the Azure Container Apps environment. If false, does not enable Dapr.
-DESC
-  default     = false
-}
-
-variable "aca_consumption_gpu_enabled" {
-  type        = bool
-  sensitive   = false
-  description = <<DESC
-If true, adds a Consumption GPU workload profile to the Azure Container Apps environment.
-DESC
-  default     = false
-}
-
-variable "aca_consumption_gpu_profile_type" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-Consumption GPU workload profile type for Azure Container Apps (e.g., Consumption-GPU-NC8as-T4 for NVIDIA T4 GPUs).
-DESC
-  default     = "Consumption-GPU-NC8as-T4"
-
-  validation {
-    condition     = can(regex("^Consumption-GPU-[A-Za-z0-9-]+$", var.aca_consumption_gpu_profile_type))
-    error_message = "aca_consumption_gpu_profile_type must start with 'Consumption-GPU-' (for example: Consumption-GPU-NC8as-T4)."
-  }
-}
-
-variable "aca_consumption_gpu_min_count" {
-  type        = number
-  sensitive   = false
-  description = <<DESC
-Minimum replica count for the ACA Consumption GPU workload profile.
-DESC
-  default     = 0
-
-  validation {
-    condition     = var.aca_consumption_gpu_min_count >= 0
-    error_message = "aca_consumption_gpu_min_count must be 0 or greater."
-  }
-}
-
-variable "aca_consumption_gpu_max_count" {
-  type        = number
-  sensitive   = false
-  description = <<DESC
-Maximum replica count for the ACA Consumption GPU workload profile.
-DESC
-  default     = 1
-
-  validation {
-    condition     = var.aca_consumption_gpu_max_count == null || var.aca_consumption_gpu_min_count == null || var.aca_consumption_gpu_max_count >= var.aca_consumption_gpu_min_count
-    error_message = "aca_consumption_gpu_max_count must be null or greater than or equal to aca_consumption_gpu_min_count (when both are set)."
-  }
-}
-
-variable "custom_dns_zone_name" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-An active DNS zone name (e.g., example.com) already purchased and configured in the Azure subscription for custom domain configuration.
-DESC
-  default     = "webstean.com"
-  validation {
-    condition     = !can(regex("^(www|app)", lower(try(trimspace(var.custom_dns_zone_name), ""))))
-    error_message = "dns_zone_name must not start with www or app."
-  }
-  validation {
-    condition     = !can(regex("^(https?://)", lower(try(trimspace(var.custom_dns_zone_name), ""))))
-    error_message = "dns_zone_name must not start with http:// or https://."
-  }
-}
-
-variable "custom_dns_azure_tenant_id" {
-  type        = string
-  description = "The Azure tenant ID hosting the DNS zone for Let's Encrypt DNS challenge validation."
-  default     = "fd72f9ff-96b6-4a20-a870-ceaa17d70bc8"
-  validation {
-    condition     = try(trimspace(var.custom_dns_zone_name), "") == "" || try(trimspace(var.custom_dns_azure_tenant_id), "") != ""
-    error_message = "custom_dns_azure_tenant_id cannot be empty when custom_dns_zone_name is set."
-  }
-}
-
-variable "custom_dns_azure_subscription_id" {
-  type        = string
-  description = "The Azure subscription ID hosting the DNS zone for Let's Encrypt DNS challenge validation."
-  default     = "2d2089b6-d701-49aa-9600-bc2e3796d53a"
-  validation {
-    condition     = try(trimspace(var.custom_dns_zone_name), "") == "" || try(trimspace(var.custom_dns_azure_subscription_id), "") != ""
-    error_message = "custom_dns_azure_subscription_id cannot be empty when custom_dns_zone_name is set."
-  }
-}
-
-variable "custom_dns_azure_resource_group" {
-  type        = string
-  description = "The Azure resource group hosting the DNS zone for Let's Encrypt DNS challenge validation."
-  default     = "lscph-global-dns-public-rg"
-  validation {
-    condition     = try(trimspace(var.custom_dns_zone_name), "") == "" || try(trimspace(var.custom_dns_azure_resource_group), "") != ""
-    error_message = "custom_dns_azure_resource_group cannot be empty when custom_dns_zone_name is set."
-  }
+  default     = null
 }
 
 variable "custom_dns_azure_client_id" {
@@ -448,6 +246,26 @@ variable "custom_dns_azure_client_secret" {
   }
 }
 
+variable "custom_dns_azure_resource_group" {
+  type        = string
+  description = "The Azure resource group hosting the DNS zone for Let's Encrypt DNS challenge validation."
+  default     = "lscph-global-dns-public-rg"
+  validation {
+    condition     = try(trimspace(var.custom_dns_zone_name), "") == "" || try(trimspace(var.custom_dns_azure_resource_group), "") != ""
+    error_message = "custom_dns_azure_resource_group cannot be empty when custom_dns_zone_name is set."
+  }
+}
+
+variable "custom_dns_azure_subscription_id" {
+  type        = string
+  description = "The Azure subscription ID hosting the DNS zone for Let's Encrypt DNS challenge validation."
+  default     = "2d2089b6-d701-49aa-9600-bc2e3796d53a"
+  validation {
+    condition     = try(trimspace(var.custom_dns_zone_name), "") == "" || try(trimspace(var.custom_dns_azure_subscription_id), "") != ""
+    error_message = "custom_dns_azure_subscription_id cannot be empty when custom_dns_zone_name is set."
+  }
+}
+
 variable "custom_dns_azure_tenant_auth_method" {
   type        = string
   description = "How to authenticate to the Azure tenant hosting DNS zone for Let's Encrypt DNS challenge validation."
@@ -459,6 +277,157 @@ variable "custom_dns_azure_tenant_auth_method" {
     ##  "oidc" - need federation setup on the Entra ID App Registration or User Assigned Identity with the correct permissions to manage the DNS zone
     ##  "env"  - need a secret defined via AZURE_CLIENT_SECRET that matches what is specified in App Registration (User Assigned Identity is not supported)
     error_message = "custom_dns_azure_tenant_auth_method must be either 'msi', 'oidc', 'wli', 'cli', 'env', or 'pipeline'."
+  }
+}
+
+variable "custom_dns_azure_tenant_id" {
+  type        = string
+  description = "The Azure tenant ID hosting the DNS zone for Let's Encrypt DNS challenge validation."
+  default     = "fd72f9ff-96b6-4a20-a870-ceaa17d70bc8"
+  validation {
+    condition     = try(trimspace(var.custom_dns_zone_name), "") == "" || try(trimspace(var.custom_dns_azure_tenant_id), "") != ""
+    error_message = "custom_dns_azure_tenant_id cannot be empty when custom_dns_zone_name is set."
+  }
+}
+
+variable "custom_dns_zone_name" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+An active DNS zone name (e.g., example.com) already purchased and configured in the Azure subscription for custom domain configuration.
+DESC
+  default     = "webstean.com"
+  validation {
+    condition     = !can(regex("^(www|app)", lower(try(trimspace(var.custom_dns_zone_name), ""))))
+    error_message = "dns_zone_name must not start with www or app."
+  }
+  validation {
+    condition     = !can(regex("^(https?://)", lower(try(trimspace(var.custom_dns_zone_name), ""))))
+    error_message = "dns_zone_name must not start with http:// or https://."
+  }
+}
+
+variable "data_phi" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+If true, this environment contains PHI (Protected Health Information) so deploy additional security controls. If false, deploys a non-PHI environment.
+DESC
+  default     = false
+}
+
+variable "data_pii" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+If true, this environment contains PII (Personally Identifiable Information) so deploy additional security controls. If false, deploys a non-PII environment.
+DESC
+  default     = false
+}
+
+variable "deploy_ai_embeddings" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+If true, deploys AI embeddings for the environment. If false, does not deploy AI embeddings.
+DESC
+  default     = false
+}
+
+variable "deploy_private_endpoints" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+If true, deploys private endpoints for secure access to Azure services. If false, does not deploy private endpoints.
+DESC
+  default     = false
+}
+
+variable "deploy_private_link_service" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+Whether to deploy the Private Link Service.
+DESC
+  default     = false
+}
+
+variable "deploy_sql_failover" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+If true, deploys a Microsoft SQL failover environment in the linked region. If false, deploys a single SQL instance.
+DESC
+  default     = false
+}
+
+variable "enable_telemetry" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+This variable controls whether or not the AVM (Azure Verified Modules) telemetry is enabled for the module.
+For more information see <https://aka.ms/avm/telemetryinfo>.
+If it is set to false, then no telemetry will be collected.
+DESC
+  default     = false
+}
+
+variable "frontdoor_sku" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+Specifies the SKU for Azure Front Door. Options are: 'Standard' or 'Premium'.
+DESC
+  default     = "Standard"
+
+  validation {
+    condition = (
+      contains(["Standard", "Premium"], var.frontdoor_sku)
+    )
+    error_message = "The variable 'frontdoor_sku' must be one of: 'Standard' or 'Premium'."
+  }
+}
+
+variable "github_runner_pat" {
+  type        = string
+  sensitive   = true
+  description = <<DESC
+The personal access token for the GitHub repository.
+DESC
+  default     = null
+}
+
+variable "github_runner_repo_name" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The name of the repository.
+DESC
+  default     = null
+}
+
+variable "github_runner_repo_owner" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The owner of the repository.
+DESC
+  default     = null
+}
+
+variable "inbound_access" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+Specifies the type of inbound access to the environment via the Internet. Options are: 'None' (free), 'App-Gateway' ($$), 'FrontDoor' ($$).
+DESC
+  default     = "None"
+
+  validation {
+    condition = (
+      contains(["None", "App-Gateway", "FrontDoor"], var.inbound_access)
+    )
+    error_message = "The variable 'inbound_access' must be one of: 'None', 'App-Gateway', 'FrontDoor'."
   }
 }
 
@@ -476,355 +445,43 @@ variable "letsencrypt_dns_auth_method" {
   }
 }
 
-
-variable "virtual_wan_id" {
+variable "location" {
   type        = string
   sensitive   = false
   description = <<DESC
-The ID of the existing Virtual WAN. null if not created.
+The Azure region where resources will be deployed.
 DESC
-  default     = null
+  default     = "australiaeast"
+  validation {
+    condition     = contains(["australiasoutheast", "australiaeast", "australiacentral", "australiacentral2", "perth", "centralindia", "westus3"], lower(trimspace(var.location)))
+    error_message = "location must be one of the currently defined regions in the locals.tf (regions)."
+  }
 }
 
-variable "virtual_wan_hub_id" {
+variable "outbound_access" {
   type        = string
   sensitive   = false
   description = <<DESC
-The ID of the Azure Virtual WAN hub to which the route table will be associated.
+Specifies the type of outbound access to the environment via the Internet. Options are: 'Direct' (free), 'Nat-Gateway' ($$), 'Hub-and-Spoke-with-Nat-Gateway' ($$$).
+Note: that 'Direct' does not allowed Virtual Machine Scale Sets to have any OutBound Internet access, you need to use a Nat-Gateway or Hub-and-Spoke
 DESC
-  default     = null ## azurerm_virtual_hub.example.id
+  default     = "Direct"
+
   validation {
     condition = (
-      (try(trimspace(var.virtual_wan_hub_id), "") == "" && try(trimspace(var.virtual_wan_hub_firewall_id), "") == "") ||
-      (try(trimspace(var.virtual_wan_hub_id), "") != "" && try(trimspace(var.virtual_wan_hub_firewall_id), "") != "")
+      contains(["Direct", "Nat-Gateway", "Hub-and-Spoke-with-Nat-Gateway"], var.outbound_access)
     )
-    error_message = "Both variables 'virtual_wan_hub_id' and 'virtual_wan_hub_firewall_id' must either both be set or both be empty."
+    error_message = "The variable 'outbound_access' must be one of: 'Direct', 'Nat-Gateway', 'Hub-and-Spoke-with-Nat-Gateway'."
   }
 }
 
-variable "virtual_wan_hub_firewall_id" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-The ID of the Azure Firewall deployed in the Virtual WAN hub for filtering and routing traffic.
-DESC
-  default     = null ## azurerm_firewall.hub.id
-}
-
-variable "vmss_disk_controller_type" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-Disk controller type for the Virtual Machine Scale Set. Use 'SCSI' for hibernation support; 'NVMe' is faster but does not support hibernation.
-DESC
-  ## Make currently be set to 'SCSI', NVMe does not support hibernation, which we need.
-  default = "SCSI" ## Possible values are 'SCSI' and 'NVMe'. Defaults to 'SCSI'.
-}
-
-variable "vmss_hibernation_enabled" {
-  type        = bool
-  sensitive   = false
-  description = <<DESC
-Whether hibernation is enabled for the Virtual Machine Scale Set. Requires 'vmss_disk_controller_type' to be 'SCSI'.
-DESC
-  default     = true
-
-  validation {
-    condition     = !var.vmss_hibernation_enabled || var.vmss_disk_controller_type == "SCSI"
-    error_message = "The variable 'vmss_hibernation_enabled' can only be true if 'vmss_disk_controller_type' is set to 'SCSI'."
-  }
-}
-
-variable "vmss_sku_name" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-Azure Virtual Machine SKU for the scale set (e.g., Standard_D2s_v5). Determines vCPU, memory, and pricing.
-DESC
-  default     = "Standard_D2s_v5" ## Standard_D2s_v5
-}
-
-variable "vmss_autoscale_min_capacity" {
-  type        = number
-  sensitive   = false
-  description = <<DESC
-Virtual Machine Scale Set: minimum number of instances to maintain at all times.
-DESC
-  default     = 1
-}
-
-variable "vmss_autoscale_weekend_capacity" {
-  type        = number
-  sensitive   = false
-  description = <<DESC
-Virtual Machine Scale Set: fixed instance count to run during the weekend low-usage window.
-DESC
-  default     = 0
-}
-
-variable "vmss_autoscale_default_capacity" {
-  type        = number
-  sensitive   = false
-  description = <<DESC
-Virtual Machine Scale Set: default instance count used during normal business hours.
-DESC
-  default     = 1
-}
-
-variable "vmss_autoscale_max_capacity" {
-  type        = number
-  sensitive   = false
-  description = <<DESC
-Virtual Machine Scale Set: maximum number of instances to scale up to.
-DESC
-  default     = 1
-}
-
-variable "vmss_autoscale_scale_out_cpu_threshold" {
-  type        = number
-  sensitive   = false
-  description = <<DESC
-Virtual Machine Scale Set: average CPU percentage threshold that triggers a scale-out (add instances).
-DESC
-  default     = 70
-
-  validation {
-    condition     = var.vmss_autoscale_scale_out_cpu_threshold >= 20 && var.vmss_autoscale_scale_out_cpu_threshold <= 90
-    error_message = "The variable 'vmss_autoscale_scale_out_cpu_threshold' must be between 20 and 90."
-  }
-}
-
-variable "vmss_autoscale_scale_out_increase_count" {
-  type        = number
-  sensitive   = false
-  description = <<DESC
-Virtual Machine Scale Set: number of instances to add per scale-out event.
-DESC
-  default     = 1
-}
-
-variable "vmss_autoscale_time_window" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-Virtual Machine Scale Set: look-back window for the average CPU calculation in ISO 8601 format (e.g., PT10M for 10 minutes).
-DESC
-  default     = "PT10M"
-}
-
-variable "vmss_autoscale_time_grain" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-Virtual Machine Scale Set: granularity/frequency of metric data points collected in ISO 8601 format (e.g., PT1M for 1 minute intervals).
-DESC
-  default     = "PT1M"
-}
-
-variable "vmss_autoscale_predictive_look_ahead_time" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-Virtual Machine Scale Set: how far ahead predictive autoscale forecasts demand in ISO 8601 format (e.g., PT5M for 5 minutes ahead).
-DESC
-  default     = "PT5M"
-}
-
-variable "vmss_autoscale_cooldown" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-Virtual Machine Scale Set: time to wait after a scale action before scaling again in ISO 8601 format (e.g., PT30M for 30 minutes).
-DESC
-  default     = "PT30M"
-}
-
-variable "vmss_autoscale_business_hours_start" {
-  type        = number
-  sensitive   = false
-  description = <<DESC
-Virtual Machine Scale Set: hour (0-23) each weekday when the CPU-based business-hours autoscale profile activates.
-DESC
-  default     = 16 ## 4pm
-}
-
-variable "vmss_otel_counter_specifiers" {
+variable "private_link_service_allowed_fqdns" {
   type        = list(string)
   sensitive   = false
   description = <<DESC
-Virtual Machine Scale Set: OpenTelemetry system metrics to collect from instances. Defaults to the standard free metrics set.
+FQDNs allowed for the Private Link Service.
 DESC
-  default = [
-    "system.filesystem.usage",
-    "system.disk.io",
-    "system.disk.operation_time",
-    "system.disk.operations",
-    "system.memory.usage",
-    "system.network.io",
-    "system.cpu.time",
-    "system.network.dropped",
-    "system.network.errors",
-    "system.uptime",
-  ]
-}
-
-/*
-variable "automation_account_name" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-Name of the Azure Automation Account.
-DESC
-  default     = null
-}
-
-variable "automation_account_resource_group_name" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-Resource group name of the Azure Automation Account. If omitted, the resource group is inferred from automation_account_id when supplied, otherwise the environment resource group is used.
-DESC
-  default     = null
-}
-*/
-
-variable "automation_account_id" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-The ID of the Azure Automation Account to be used.
-DESC
-  default     = null
-}
-
-variable "container_registry_id" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-The ID of the Azure Container Registry to be used.
-DESC
-  default     = null
-}
-
-variable "container_registry_name" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-The name of the Azure Container Registry to be used.
-DESC
-  default     = null
-}
-
-variable "container_registry_login_server" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-The login server of the Azure Container Registry to be used.
-DESC
-  default     = null
-}
-
-variable "vpn_access_group_object_id" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-The Entra ID object ID for the VPN access group (can be a user or a group)
-DESC
-  validation {
-    condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.vpn_access_group_object_id)))
-    error_message = "The variable 'vpn_access_group_object_id' must be a valid GUID."
-  }
-  default = null
-}
-
-variable "vpn_access_group_display_name" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-Entra ID display name for the user or group that will have VPN access.
-DESC
-  default     = null
-}
-
-variable "ai_free_search_principal_id" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-The principal ID of the Azure AI Search service to be used.
-DESC
-  default     = null
-}
-
-variable "ai_free_search_id" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-The ID of the Azure AI Search service to be used.
-DESC
-  default     = null
-}
-
-variable "cosmos_db_free_account_resource_id" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-The resource ID of the Cosmos DB free account to be used.
-DESC
-  default     = null
-}
-
-variable "role_mssql_db_reader_id" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-The ID of the role for the MSSQL DB reader operations.
-DESC
-  default     = null
-}
-
-variable "role_mssql_db_restore_id" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-The ID of the role for the MSSQL DB restore operations.
-DESC
-  default     = null
-}
-
-variable "github_runner_repo_owner" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-The owner of the repository.
-DESC
-  default     = null
-}
-
-variable "github_runner_repo_name" {
-  type        = string
-  sensitive   = false
-  description = <<DESC
-The name of the repository.
-DESC
-  default     = null
-}
-
-variable "github_runner_pat" {
-  type        = string
-  sensitive   = true
-  description = <<DESC
-The personal access token for the GitHub repository.
-DESC
-  default     = null
-}
-
-variable "deploy_private_link_service" {
-  type        = bool
-  sensitive   = false
-  description = <<DESC
-Whether to deploy the Private Link Service.
-DESC
-  default     = false
+  default     = ["*"]
 }
 
 variable "private_link_service_auto_approval_subscription_ids" {
@@ -832,15 +489,6 @@ variable "private_link_service_auto_approval_subscription_ids" {
   sensitive   = false
   description = <<DESC
 The list of subscription IDs that are auto-approved for the Private Link Service.
-DESC
-  default     = ["fd72f9ff-96b6-4a20-a870-ceaa17d70bc8"]
-}
-
-variable "private_link_service_visibility_subscription_ids" {
-  type        = list(string)
-  sensitive   = false
-  description = <<DESC
-The list of subscription IDs that have visibility to the Private Link Service.
 DESC
   default     = ["fd72f9ff-96b6-4a20-a870-ceaa17d70bc8"]
 }
@@ -886,12 +534,306 @@ DESC
   default     = false
 }
 
-variable "private_link_service_allowed_fqdns" {
+variable "private_link_service_visibility_subscription_ids" {
   type        = list(string)
   sensitive   = false
   description = <<DESC
-FQDNs allowed for the Private Link Service.
+The list of subscription IDs that have visibility to the Private Link Service.
+DESC
+  default     = ["fd72f9ff-96b6-4a20-a870-ceaa17d70bc8"]
+}
+
+variable "role_mssql_db_reader_id" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The ID of the role for the MSSQL DB reader operations.
+DESC
+  default     = null
+}
+
+variable "role_mssql_db_restore_id" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The ID of the role for the MSSQL DB restore operations.
+DESC
+  default     = null
+}
+
+variable "security_perimeter_inbound_public_ips" {
+  type        = list(string)
+  sensitive   = false
+  description = <<DESC
+Allowed inbound addresses for the Azure Security Perimeter.
+DESC
+  default     = ["0.0.0.0/0"]
+}
+
+variable "security_perimeter_outbound_fqdns" {
+  type        = list(string)
+  sensitive   = false
+  description = <<DESC
+Allowed outbound FQDNs for the Azure Security Perimeter.
 DESC
   default     = ["*"]
+}
+
+variable "sql_connectivity_type" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+Connectivity mode for the SQL Server endpoint: 'PRIVATE' (VNet via Private Endpoint), or 'PUBLIC' (internet-facing).
+DESC
+  default     = "PRIVATE"
+
+  validation {
+    condition     = contains(["PRIVATE", "PUBLIC"], var.sql_connectivity_type)
+    error_message = "sql_connectivity_type must be one of 'PRIVATE' or 'PUBLIC'."
+  }
+}
+
+variable "support_free_sql_database" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+If true, support the totally Free SQL Server. Failover must be disabled and the SQL Server cannot have an alias.
+DESC
+  default     = true
+  validation {
+    condition     = !var.support_free_sql_database || !var.deploy_sql_failover
+    error_message = "The variable 'support_free_sql_database' can only be true when 'deploy_sql_failover' is false."
+  }
+}
+
+variable "virtual_wan_hub_firewall_id" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The ID of the Azure Firewall deployed in the Virtual WAN hub for filtering and routing traffic.
+DESC
+  default     = null ## azurerm_firewall.hub.id
+}
+
+variable "virtual_wan_hub_id" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The ID of the Azure Virtual WAN hub to which the route table will be associated.
+DESC
+  default     = null ## azurerm_virtual_hub.example.id
+  validation {
+    condition = (
+      (try(trimspace(var.virtual_wan_hub_id), "") == "" && try(trimspace(var.virtual_wan_hub_firewall_id), "") == "") ||
+      (try(trimspace(var.virtual_wan_hub_id), "") != "" && try(trimspace(var.virtual_wan_hub_firewall_id), "") != "")
+    )
+    error_message = "Both variables 'virtual_wan_hub_id' and 'virtual_wan_hub_firewall_id' must either both be set or both be empty."
+  }
+}
+
+variable "virtual_wan_id" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The ID of the existing Virtual WAN. null if not created.
+DESC
+  default     = null
+}
+
+variable "vmss_autoscale_business_hours_start" {
+  type        = number
+  sensitive   = false
+  description = <<DESC
+Virtual Machine Scale Set: hour (0-23) each weekday when the CPU-based business-hours autoscale profile activates.
+DESC
+  default     = 16 ## 4pm
+}
+
+variable "vmss_autoscale_cooldown" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+Virtual Machine Scale Set: time to wait after a scale action before scaling again in ISO 8601 format (e.g., PT30M for 30 minutes).
+DESC
+  default     = "PT30M"
+}
+
+variable "vmss_autoscale_default_capacity" {
+  type        = number
+  sensitive   = false
+  description = <<DESC
+Virtual Machine Scale Set: default instance count used during normal business hours.
+DESC
+  default     = 2
+}
+
+variable "vmss_autoscale_enabled" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+Whether autoscale is enabled for the Virtual Machine Scale Set.
+DESC
+  default     = true
+}
+
+variable "vmss_autoscale_max_capacity" {
+  type        = number
+  sensitive   = false
+  description = <<DESC
+Virtual Machine Scale Set: maximum number of instances to scale up to.
+DESC
+  default     = 1
+}
+
+variable "vmss_autoscale_min_capacity" {
+  type        = number
+  sensitive   = false
+  description = <<DESC
+Virtual Machine Scale Set: minimum number of instances to maintain at all times.
+DESC
+  default     = 1
+}
+
+variable "vmss_autoscale_predictive_look_ahead_time" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+Virtual Machine Scale Set: how far ahead predictive autoscale forecasts demand in ISO 8601 format (e.g., PT5M for 5 minutes ahead).
+DESC
+  default     = "PT5M"
+}
+
+variable "vmss_autoscale_scale_out_cpu_threshold" {
+  type        = number
+  sensitive   = false
+  description = <<DESC
+Virtual Machine Scale Set: average CPU percentage threshold that triggers a scale-out (add instances).
+DESC
+  default     = 70
+
+  validation {
+    condition     = var.vmss_autoscale_scale_out_cpu_threshold >= 20 && var.vmss_autoscale_scale_out_cpu_threshold <= 90
+    error_message = "The variable 'vmss_autoscale_scale_out_cpu_threshold' must be between 20 and 90."
+  }
+}
+
+variable "vmss_autoscale_scale_out_increase_count" {
+  type        = number
+  sensitive   = false
+  description = <<DESC
+Virtual Machine Scale Set: number of instances to add per scale-out event.
+DESC
+  default     = 1
+}
+
+variable "vmss_autoscale_time_grain" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+Virtual Machine Scale Set: granularity/frequency of metric data points collected in ISO 8601 format (e.g., PT1M for 1 minute intervals).
+DESC
+  default     = "PT1M"
+}
+
+variable "vmss_autoscale_time_window" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+Virtual Machine Scale Set: look-back window for the average CPU calculation in ISO 8601 format (e.g., PT10M for 10 minutes).
+DESC
+  default     = "PT10M"
+}
+
+variable "vmss_autoscale_weekend_capacity" {
+  type        = number
+  sensitive   = false
+  description = <<DESC
+Virtual Machine Scale Set: fixed instance count to run during the weekend low-usage window.
+DESC
+  default     = 0
+}
+
+variable "vmss_disk_controller_type" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+Disk controller type for the Virtual Machine Scale Set. Use 'SCSI' for hibernation support; 'NVMe' is faster but does not support hibernation.
+DESC
+  ## Make currently be set to 'SCSI', NVMe does not support hibernation, which we need.
+  default = "SCSI" ## Possible values are 'SCSI' and 'NVMe'. Defaults to 'SCSI'.
+}
+
+variable "vmss_hibernation_enabled" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+Whether hibernation is enabled for the Virtual Machine Scale Set. Requires 'vmss_disk_controller_type' to be 'SCSI'.
+DESC
+  default     = true
+
+  validation {
+    condition     = !var.vmss_hibernation_enabled || var.vmss_disk_controller_type == "SCSI"
+    error_message = "The variable 'vmss_hibernation_enabled' can only be true if 'vmss_disk_controller_type' is set to 'SCSI'."
+  }
+}
+
+variable "vmss_number_of_instances" {
+  type        = number
+  sensitive   = false
+  description = <<DESC
+The number of instances in the Virtual Machine Scale Set.
+DESC
+  default     = 0 ## Anything but zero, cost money :-)
+}
+
+variable "vmss_otel_counter_specifiers" {
+  type        = list(string)
+  sensitive   = false
+  description = <<DESC
+Virtual Machine Scale Set: OpenTelemetry system metrics to collect from instances. Defaults to the standard free metrics set.
+DESC
+  default = [
+    "system.filesystem.usage",
+    "system.disk.io",
+    "system.disk.operation_time",
+    "system.disk.operations",
+    "system.memory.usage",
+    "system.network.io",
+    "system.cpu.time",
+    "system.network.dropped",
+    "system.network.errors",
+    "system.uptime",
+  ]
+}
+
+variable "vmss_sku_name" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+Azure Virtual Machine SKU for the scale set (e.g., Standard_D2s_v5). Determines vCPU, memory, and pricing.
+DESC
+  default     = "Standard_D2s_v5" ## Standard_D2s_v5
+}
+
+variable "vpn_access_group_display_name" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+Entra ID display name for the user or group that will have VPN access.
+DESC
+  default     = null
+}
+
+variable "vpn_access_group_object_id" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The Entra ID object ID for the VPN access group (can be a user or a group)
+DESC
+  validation {
+    condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.vpn_access_group_object_id)))
+    error_message = "The variable 'vpn_access_group_object_id' must be a valid GUID."
+  }
+  default = null
 }
 
