@@ -700,7 +700,7 @@ variable "vmss_autoscale_max_capacity" {
   description = <<DESC
 Virtual Machine Scale Set: maximum number of instances to scale up to.
 DESC
-  default     = 1
+  default     = 5
 }
 
 variable "vmss_autoscale_min_capacity" {
@@ -710,6 +710,15 @@ variable "vmss_autoscale_min_capacity" {
 Virtual Machine Scale Set: minimum number of instances to maintain at all times.
 DESC
   default     = 1
+
+  validation {
+    condition     = var.vmss_autoscale_min_capacity >= 0
+    error_message = "The variable 'vmss_autoscale_min_capacity' must be greater than or equal to 0."
+  }
+  validation {
+    condition     = var.vmss_autoscale_min_capacity <= var.vmss_autoscale_max_capacity
+    error_message = "The variable 'vmss_autoscale_min_capacity' must be less than or equal to 'vmss_autoscale_max_capacity'."
+  }
 }
 
 variable "vmss_autoscale_predictive_look_ahead_time" {
@@ -727,7 +736,7 @@ variable "vmss_autoscale_scale_out_cpu_threshold" {
   description = <<DESC
 Virtual Machine Scale Set: average CPU percentage threshold that triggers a scale-out (add instances).
 DESC
-  default     = 70
+  default     = 65
 
   validation {
     condition     = var.vmss_autoscale_scale_out_cpu_threshold >= 20 && var.vmss_autoscale_scale_out_cpu_threshold <= 90
@@ -750,7 +759,7 @@ variable "vmss_autoscale_time_grain" {
   description = <<DESC
 Virtual Machine Scale Set: granularity/frequency of metric data points collected in ISO 8601 format (e.g., PT1M for 1 minute intervals).
 DESC
-  default     = "PT1M"
+  default     = "PT2M"
 }
 
 variable "vmss_autoscale_time_window" {
