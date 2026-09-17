@@ -71,6 +71,16 @@ module "helloworld_container_app" {
           value = "Production"
         }
       ]
+      volume_mounts = [
+        {
+          name = azurerm_storage_share.containerappenv_logs.name
+          path = "/mnt/logs"
+        },
+        {
+          name = azurerm_storage_share.containerappenv_shared.name
+          path = "/mnt/shared"
+        }
+      ]
     }]
   }
 
