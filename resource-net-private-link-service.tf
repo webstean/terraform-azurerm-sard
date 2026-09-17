@@ -37,6 +37,7 @@ module "pls_load_balancer" {
   resource_group_name = module.environment_resource_group.resource.name
   location            = module.environment_resource_group.resource.location
   sku                 = "Standard"
+  sku_tier            = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
 
   frontend_ip_configurations = {
     pls_frontend = {
