@@ -11,6 +11,13 @@ locals {
   public_access_allowed = data.azurerm_subscription.current.tags["hasPublicIP"] == "Yes" ? true : false
 }
 
+data "azuread_application" "easyauth" {
+  object_id = "04f39977-2502-4de9-bc32-3ab1af3070d6"
+}
+data "azuread_service_principal" "easyauth" {
+  object_id = "04f39977-2502-4de9-bc32-3ab1af3070d6"
+}
+
 /*
 data "azuread_user" "andreww" {
   user_principal_name = "Andrew.Webster@unisys.com"
@@ -126,7 +133,7 @@ resource "azuread_service_principal" "microsoft365" { ## what the portal calls "
 ## azuread_service_principal.microsoft365.client_id
 
 resource "azuread_service_principal" "microsoft365_admin" {
-  client_id    = "00b41c95-dab0-4487-9791-b9d2c32c80f2" ## Office 365 Management 
+  client_id    = "00b41c95-dab0-4487-9791-b9d2c32c80f2" ## Office 365 Management
   use_existing = true
 }
 ## azuread_service_principal.microsoft365_admin.client_id
@@ -228,7 +235,7 @@ resource "azuread_service_principal" "microsoft_graph_cli" {
 ## azuread_service_principal.microsoft_graph_client_id
 
 resource "azuread_service_principal" "azure_resource_manager" {
-  client_id    = "797f4846-ba00-4fd7-ba43-dac1f8f63013" // Microsoft Azure Management 
+  client_id    = "797f4846-ba00-4fd7-ba43-dac1f8f63013" // Microsoft Azure Management
   use_existing = true
 }
 ## azuread_service_principal.azure_resource_manager.client_id
