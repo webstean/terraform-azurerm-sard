@@ -89,6 +89,9 @@ resource "azurerm_private_link_service" "this" {
     module.pls_load_balancer[0].resource.frontend_ip_configuration[0].id,
   ]
 
+  # Destination IP address for direct routing
+  destination_ip_address = "10.0.1.100"
+
   dynamic "nat_ip_configuration" {
     for_each = var.private_link_service_nat_ip_configurations
     content {

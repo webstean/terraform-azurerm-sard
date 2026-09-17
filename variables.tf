@@ -561,7 +561,7 @@ variable "private_link_service_port" {
   description = <<DESC
 The port on which the Private Link Service will listen.
 DESC
-  default     = 80
+  default     = 8080
 }
 
 variable "private_link_service_proxy_protocol_enabled" {

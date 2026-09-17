@@ -149,7 +149,8 @@ resource "azurerm_subnet_route_table_association" "subnet01_kms_route" {
   route_table_id = azurerm_route_table.this.id
 }
 
-resource "azurerm_network_security_group" "general" { ## designed to be associated to NIC or subnets or both!
+
+resource "azurerm_network_security_group" "secure" { ## designed to be associated to NIC or subnets or both!
   name                = "nsg-general-access-${lower(module.environment_resource_group.resource.location)}"
   resource_group_name = module.environment_resource_group.resource.name
   location            = module.environment_resource_group.resource.location
@@ -176,7 +177,7 @@ resource "azurerm_network_security_group" "general" { ## designed to be associat
     access                     = "Allow"
     protocol                   = "*"
     source_port_range          = "*"
-    destination_port_ranges    = ["53", "80", "443"]
+    destination_port_ranges    = ["53", "67", "68", "80", "443", "546", "547"]
     source_address_prefix      = "VirtualNetwork"
     destination_address_prefix = "168.63.129.16" ## Service Tag: "AzurePlatformDNS"  but can only be used on deny rule
     description                = "Allow access to WireServer for DHCP, DNS, extension, load balancer probes, and internal Azure DNS service (for lookups)"
@@ -622,9 +623,43 @@ resource "azurerm_network_security_group" "general" { ## designed to be associat
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
-resource "azurerm_subnet_network_security_group_association" "general1" {
+resource "azurerm_network_security_group" "any2any" {
+  name                = "any2any"
+  resource_group_name = module.environment_resource_group.resource.name
+  location            = module.environment_resource_group.resource.location
+
+  security_rule {
+    name                       = "Allow-All-Inbound"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+    description                = "Allow all inbound traffic"
+  }
+
+  security_rule {
+    name                       = "Allow-All-Outbound"
+    priority                   = 101
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+    description                = "Allow all outbound traffic"
+  }
+
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_subnet_network_security_group_association" "outbound" {
   subnet_id                 = azurerm_subnet.outbound.id
-  network_security_group_id = azurerm_network_security_group.general.id
+  network_security_group_id = (tobool(var.data_pii) || tobool(var.data_phi)) ? azurerm_network_security_group.secure.id : azurerm_network_security_group.any2any.id
 }
 
 /*

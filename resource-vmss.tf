@@ -430,7 +430,7 @@ module "virtualmachinescaleset" {
   network_api_version = "2022-11-01" ##"2023-06-01"
   network_interface = [{
     name                      = "VMSS-NIC"
-    network_security_group_id = azurerm_network_security_group.general.id
+    network_security_group_id = (tobool(var.data_pii) || tobool(var.data_phi)) ? azurerm_network_security_group.secure.id : azurerm_network_security_group.any2any.id
     ip_configuration = [{
       name      = "VMSS-IPConfig"
       subnet_id = local.vmss_subnet_id
