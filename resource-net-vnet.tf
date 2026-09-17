@@ -628,7 +628,7 @@ resource "azurerm_network_security_group" "secure" { ## designed to be associate
 }
 
 resource "azurerm_network_security_group" "any2any" {
-  name                = "any2any"
+  name                = "nsg-any2any-access-${lower(module.environment_resource_group.resource.location)}"
   resource_group_name = module.environment_resource_group.resource.name
   location            = module.environment_resource_group.resource.location
 
