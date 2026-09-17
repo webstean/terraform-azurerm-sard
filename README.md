@@ -200,7 +200,8 @@ Next steps here
 | [azurerm_subnet.pls_nat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.private_endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.sqlserver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
-| [azurerm_subnet_nat_gateway_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_nat_gateway_association) | resource |
+| [azurerm_subnet_nat_gateway_association.containerappenv](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_nat_gateway_association) | resource |
+| [azurerm_subnet_nat_gateway_association.vmss](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_nat_gateway_association) | resource |
 | [azurerm_subnet_network_security_group_association.general1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_network_security_group_association) | resource |
 | [azurerm_subnet_route_table_association.subnet01_kms_route](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
 | [azurerm_user_assigned_identity.environment](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
@@ -272,6 +273,7 @@ Next steps here
 | <a name="input_data_phi"></a> [data\_phi](#input\_data\_phi) | If true, this environment contains PHI (Protected Health Information) so deploy additional security controls. If false, deploys a non-PHI environment. | `bool` | `false` | no |
 | <a name="input_data_pii"></a> [data\_pii](#input\_data\_pii) | If true, this environment contains PII (Personally Identifiable Information) so deploy additional security controls. If false, deploys a non-PII environment. | `bool` | `false` | no |
 | <a name="input_deploy_ai_embeddings"></a> [deploy\_ai\_embeddings](#input\_deploy\_ai\_embeddings) | If true, deploys AI embeddings for the environment. If false, does not deploy AI embeddings. | `bool` | `false` | no |
+| <a name="input_deploy_nat_gateway"></a> [deploy\_nat\_gateway](#input\_deploy\_nat\_gateway) | If true, deploys a NAT Gateway for the environment. If false, does not deploy a NAT Gateway. | `bool` | `true` | no |
 | <a name="input_deploy_private_endpoints"></a> [deploy\_private\_endpoints](#input\_deploy\_private\_endpoints) | If true, deploys private endpoints for secure access to Azure services. If false, does not deploy private endpoints. | `bool` | `false` | no |
 | <a name="input_deploy_private_link_service"></a> [deploy\_private\_link\_service](#input\_deploy\_private\_link\_service) | Whether to deploy the Private Link Service. | `bool` | `false` | no |
 | <a name="input_deploy_sql_failover"></a> [deploy\_sql\_failover](#input\_deploy\_sql\_failover) | If true, deploys a Microsoft SQL failover environment in the linked region. If false, deploys a single SQL instance. | `bool` | `false` | no |
@@ -360,7 +362,7 @@ Next steps here
 | <a name="output_logs_otel_dce_id"></a> [logs\_otel\_dce\_id](#output\_logs\_otel\_dce\_id) | The ID of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_logs_ingestion_endpoint"></a> [logs\_otel\_logs\_ingestion\_endpoint](#output\_logs\_otel\_logs\_ingestion\_endpoint) | The OTEL logs ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_metrics_ingestion_endpoint"></a> [logs\_otel\_metrics\_ingestion\_endpoint](#output\_logs\_otel\_metrics\_ingestion\_endpoint) | The OTEL metrics ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
-| <a name="output_pls_alias"></a> [pls\_alias](#output\_pls\_alias) | The Private Link Service global alias that customers can use to connect to this service<br/> from anywhere. |
+| <a name="output_pls_alias"></a> [pls\_alias](#output\_pls\_alias) | The Private Link Service global alias that customers can use to connect to this service |
 | <a name="output_pls_id"></a> [pls\_id](#output\_pls\_id) | The Private Link Service ID. - that customers can connect to |
 | <a name="output_pls_name"></a> [pls\_name](#output\_pls\_name) | The Private Link Service name - that customers can connect to |
 | <a name="output_portal_link"></a> [portal\_link](#output\_portal\_link) | The SARD Azure Portal url |
