@@ -1053,13 +1053,18 @@ function Start-PsPingServer {
     [CmdletBinding()]
     param(
         [string]$IPAddress,
-        [int]$Port = 8443,
+        [int]$Port = 8443
     )
 
-    Test-PsPingAvailable
+    if (-not (Test-PsPingAvailable)) {
+        return
+    }
 
     if (-not $IPAddress) {
         $IPAddress = Get-LocalIPAddress
+        if ($null -eq $IPAddress) {
+            return
+        }
     }
 
     $psArgs = @()
@@ -1088,6 +1093,10 @@ function Wait-PsPingServerReady {
         [int]$TimeoutSeconds = 120,
         [int]$PollIntervalSeconds = 2
     )
+
+    if (-not (Test-PsPingAvailable)) {
+        return
+    }
 
     $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
     do {
@@ -1126,8 +1135,13 @@ function Invoke-PsPingTest {
         [int]$WaitTimeoutSeconds = 120
     )
 
-    Test-PsPingAvailable
-    Wait-PsPingServerReady -ServerIp $ServerIp -Port $Port -TimeoutSeconds $WaitTimeoutSeconds | Out-Null
+    if (-not (Test-PsPingAvailable)) {
+        return
+    }
+
+    if (Test-PsPingAvailable) {
+        Wait-PsPingServerReady -ServerIp $ServerIp -Port $Port -TimeoutSeconds $WaitTimeoutSeconds | Out-Null
+    }
 
     $psArgs = @()
     if ($Bandwidth) { $psArgs += '-b' }
@@ -1140,9 +1154,9 @@ function Invoke-PsPingTest {
     & psping @psArgs
 }
 
-if (Test-PsPingAvailable) {
-    Write-Host 'PsPing is available.' -ForegroundColor Green
-    Start-PsPingServer
-}
+#if (Test-PsPingAvailable) {
+#    Write-Host 'PsPing is available.' -ForegroundColor Green
+#    Start-PsPingServer
+#}
 
 exit 0
