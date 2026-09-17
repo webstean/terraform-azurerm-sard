@@ -108,7 +108,7 @@ resource "azurerm_private_link_service" "this" {
 
 output "pls_id" {
   description = <<DESC
-The Private Link Service ID.
+The Private Link Service ID. - that customers can connect to
 DESC
   sensitive   = false
   value       = try(azurerm_private_link_service.this[0].id, null)
@@ -116,7 +116,7 @@ DESC
 
 output "pls_name" {
   description = <<DESC
-The Private Link Service name.
+The Private Link Service name - that customers can connect to
 DESC
   sensitive   = false
   value       = try(azurerm_private_link_service.this[0].name, null)
@@ -124,13 +124,15 @@ DESC
 
 output "pls_alias" {
   description = <<DESC
-The Private Link Service global alias that can be used to connect to the service from anywhere.
+The Private Link Service global alias that customers can use to connect to this service
+ from anywhere.
 DESC
   sensitive   = false
   value       = try(azurerm_private_link_service.this[0].alias, null)
 }
 
 /*
+## at destination
 resource "azurerm_private_endpoint" "to_partner_pls" {
   name                = "pe-partner-service"
   location            = var.location
