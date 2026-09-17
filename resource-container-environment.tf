@@ -26,6 +26,11 @@ resource "azurerm_subnet" "containerappenv" {
   }
 }
 
+resource "azurerm_subnet_network_security_group_association" "containerappenv" {
+  subnet_id                 = azurerm_subnet.containerappenv.id
+  network_security_group_id = (tobool(var.data_pii) || tobool(var.data_phi)) ? azurerm_network_security_group.secure.id : azurerm_network_security_group.any2any.id
+}
+
 resource "azurerm_storage_share" "containerappenv_logs" {
   name               = "logs-${local.aca_env_name}"
   storage_account_id = azurerm_storage_account.this.id
