@@ -15,7 +15,7 @@ resource "azurerm_subnet" "containerappenv" {
   private_link_service_network_policies_enabled = false
   ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
   ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
-  private_endpoint_network_policies = "Enabled"
+  private_endpoint_network_policies = tobool(var.deploy_private_endpoints) ? "Enabled" : "Disabled"
 
   delegation {
     name = "azure-container-apps-delegation"
@@ -25,6 +25,28 @@ resource "azurerm_subnet" "containerappenv" {
     }
   }
 }
+
+resource "azurerm_subnet" "aca_sandbox" {
+  name                                          = "aca_sandbox"
+  resource_group_name                           = module.environment_resource_group.resource.name
+  virtual_network_name                          = azurerm_virtual_network.this.name
+  address_prefixes                              = [format("10.%s.20.0/24", local.regions[var.location].location_number)]
+  default_outbound_access_enabled               = true
+  service_endpoints                             = local.service_endpoints
+  private_link_service_network_policies_enabled = false
+  ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
+  ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
+  private_endpoint_network_policies = tobool(var.deploy_private_endpoints) ? "Enabled" : "Disabled"
+
+  delegation {
+    name = "azure-container-apps-delegation"
+    service_delegation {
+      name    = "Microsoft.App/environments"
+      actions = local.delegation-actions
+    }
+  }
+}
+
 
 resource "azurerm_subnet_network_security_group_association" "containerappenv" {
   subnet_id                 = azurerm_subnet.containerappenv.id

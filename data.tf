@@ -11,12 +11,14 @@ locals {
   public_access_allowed = data.azurerm_subscription.current.tags["hasPublicIP"] == "Yes" ? true : false
 }
 
+/*
 data "azuread_application" "easyauth" {
   object_id = "04f39977-2502-4de9-bc32-3ab1af3070d6"
 }
 data "azuread_service_principal" "easyauth" {
   object_id = "04f39977-2502-4de9-bc32-3ab1af3070d6"
 }
+*/
 
 /*
 data "azuread_user" "andreww" {

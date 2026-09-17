@@ -388,6 +388,16 @@ DESC
   default     = false
 }
 
+variable "easyauth_client_id" {
+  type        = string
+  sensitive   = false
+  description = <<DESC
+The client ID for the EasyAuth application.
+DESC
+  default     = null
+}
+
+
 variable "enable_telemetry" {
   type        = bool
   sensitive   = false

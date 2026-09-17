@@ -56,7 +56,7 @@ resource "azurerm_subnet" "outbound" {
   service_endpoints                             = var.deploy_private_endpoints ? null : local.service_endpoints
   private_link_service_network_policies_enabled = false
   ## Possible values are Disabled, Enabled, NetworkSecurityGroupEnabled and RouteTableEnabled.
-  private_endpoint_network_policies = "Enabled"
+  private_endpoint_network_policies = tobool(var.deploy_private_endpoints) ? "Enabled" : "Disabled"
   #service_endpoint_policy_ids = [
   #  azurerm_subnet_service_endpoint_storage_policy.storage.id
   #]

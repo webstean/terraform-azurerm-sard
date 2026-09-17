@@ -122,15 +122,15 @@ resource "azapi_resource" "helloworld_auth" {
           enabled = true
 
           registration = {
-            clientId = azuread_application.helloworld.client_id
+            clientId = var.easyauth_client_id
 
             openIdIssuer = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/v2.0"
           }
 
           validation = {
             allowedAudiences = [
-              azuread_application.helloworld.client_id,
-              "api://${azuread_application.helloworld.client_id}"
+              var.easyauth_client_id,
+              "api://${var.easyauth_client_id}"
             ]
           }
         }
