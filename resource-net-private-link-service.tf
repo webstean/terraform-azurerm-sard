@@ -135,8 +135,8 @@ resource "azurerm_private_endpoint" "to_partner_pls" {
   private_service_connection {
     name                              = "psc-partner-service"
     is_manual_connection              = true                     # true = cross-tenant/manual approval flow
-    private_connection_resource_alias = "pls-name.<guid>.<region>.azure.privatelinkservice"
-    request_message                   = "Requesting access from <your org/subscription>"
+    private_connection_resource_alias = azurerm_private_link_service.this[0].alias
+    request_message                   = "Requesting access from ${data.azurerm_subscription.current.display_name}"
   }
 }
 */
