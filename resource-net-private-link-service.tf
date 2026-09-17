@@ -55,7 +55,7 @@ resource "azurerm_lb_probe" "pls" {
   name            = "pls-probe"
   loadbalancer_id = azurerm_lb.pls[0].id
   protocol        = "Tcp"
-  port            = 80
+  port            = var.private_link_service_port
 }
 
 resource "azurerm_lb_rule" "pls" {
@@ -64,8 +64,8 @@ resource "azurerm_lb_rule" "pls" {
   name                           = "pls-rule"
   loadbalancer_id                = azurerm_lb.pls[0].id
   protocol                       = "Tcp"
-  frontend_port                  = 80
-  backend_port                   = 80
+  frontend_port                  = var.private_link_service_port
+  backend_port                   = var.private_link_service_port
   frontend_ip_configuration_name = azurerm_lb.pls[0].frontend_ip_configuration[0].name
   backend_address_pool_ids       = [azurerm_lb_backend_address_pool.pls[0].id]
   probe_id                       = azurerm_lb_probe.pls[0].id
