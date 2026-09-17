@@ -125,7 +125,6 @@ DESC
 output "pls_alias" {
   description = <<DESC
 The Private Link Service global alias that customers can use to connect to this service
- from anywhere.
 DESC
   sensitive   = false
   value       = try(azurerm_private_link_service.this[0].alias, null)

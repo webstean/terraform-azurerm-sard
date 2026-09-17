@@ -352,6 +352,15 @@ DESC
   default     = false
 }
 
+variable "deploy_nat_gateway" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+If true, deploys a NAT Gateway for the environment. If false, does not deploy a NAT Gateway.
+DESC
+  default     = true
+}
+
 variable "deploy_private_endpoints" {
   type        = bool
   sensitive   = false

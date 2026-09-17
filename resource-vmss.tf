@@ -24,7 +24,7 @@ locals {
 }
 
 module "nat_gateway" {
-  count = var.vmss_number_of_instances == 0 || var.vmss_autoscale_enabled == false ? 0 : 1
+  count = var.deploy_nat_gateway ? 1 : 0
 
   source           = "Azure/avm-res-network-natgateway/azurerm"
   version          = "~>0.0, < 1.0"
@@ -84,10 +84,17 @@ resource "azurerm_monitor_diagnostic_setting" "pip_logs" {
 }
 */
 
-resource "azurerm_subnet_nat_gateway_association" "this" {
-  count = var.vmss_number_of_instances == 0 || var.vmss_autoscale_enabled == false ? 0 : 1
+resource "azurerm_subnet_nat_gateway_association" "vmss" {
+  count = var.deploy_nat_gateway ? 1 : 0
 
   subnet_id      = local.vmss_subnet_id
+  nat_gateway_id = module.nat_gateway[0].resource_id
+}
+
+resource "azurerm_subnet_nat_gateway_association" "containerappenv" {
+  count = var.deploy_nat_gateway ? 1 : 0
+
+  subnet_id      = azurerm_subnet.containerappenv.id
   nat_gateway_id = module.nat_gateway[0].resource_id
 }
 

@@ -25,14 +25,6 @@ resource "azurerm_subnet" "containerappenv" {
     }
   }
 }
-/*
-resource "azurerm_subnet_nat_gateway_association" "containerappenv" {
-  count = var.deploy_nat_gateway ? 1 : 0
-
-  subnet_id      = azurerm_subnet.containerappenv.id
-  nat_gateway_id = azurerm_nat_gateway.this[0].id
-}
-*/
 
 resource "azurerm_storage_share" "containerappenv_logs" {
   name               = "logs-${local.aca_env_name}"
