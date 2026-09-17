@@ -1003,15 +1003,15 @@ if (Test-Path "${BIN}\config.bgi") {
 #    Write-StepSummary -type 'error' "Error retrieving network adapter RDMA information: $($_.Exception.Message)"
 #}
 
-function Ensure-PsPingAvailable {
+function Test-PsPingAvailable {
     [CmdletBinding()]
     param()
 
-    if (-not (Get-Command psping.exe -ErrorAction SilentlyContinue) -and
-        -not (Get-Command psping -ErrorAction SilentlyContinue)) {
-        throw 'psping.exe not found on PATH. Download PsTools from ' +
-        'https://learn.microsoft.com/sysinternals/downloads/psping ' +
-        'and copy psping.exe onto your PATH, then retry.'
+    try {
+        return $null -ne (Get-Command psping.exe -ErrorAction SilentlyContinue) -or
+        $null -ne (Get-Command psping -ErrorAction SilentlyContinue)
+    } catch {
+        return $false
     }
 }
 
@@ -1030,7 +1030,8 @@ function Get-LocalIPAddress {
     Select-Object -First 1 -ExpandProperty IPAddress
 
     if (-not $ip) {
-        throw 'Could not auto-detect a local IPv4 address. Pass -IPAddress explicitly.'
+        ## 'Could not auto-detect a local IPv4 address. Pass -IPAddress explicitly.'
+        return $null
     }
     return $ip
 }
@@ -1046,9 +1047,6 @@ function Start-PsPingServer {
     .PARAMETER Port
         Port to listen on. Defaults to 8443.
 
-    .PARAMETER OpenFirewall
-        Passes -f to psping so it opens the local firewall for the run's duration.
-
     .EXAMPLE
         Start-PsPingServer -Port 8443 -OpenFirewall
     #>
@@ -1056,10 +1054,9 @@ function Start-PsPingServer {
     param(
         [string]$IPAddress,
         [int]$Port = 8443,
-        [switch]$OpenFirewall
     )
 
-    Ensure-PsPingAvailable
+    Test-PsPingAvailable
 
     if (-not $IPAddress) {
         $IPAddress = Get-LocalIPAddress
@@ -1129,7 +1126,7 @@ function Invoke-PsPingTest {
         [int]$WaitTimeoutSeconds = 120
     )
 
-    Ensure-PsPingAvailable
+    Test-PsPingAvailable
     Wait-PsPingServerReady -ServerIp $ServerIp -Port $Port -TimeoutSeconds $WaitTimeoutSeconds | Out-Null
 
     $psArgs = @()
@@ -1143,6 +1140,9 @@ function Invoke-PsPingTest {
     & psping @psArgs
 }
 
-
+if (Test-PsPingAvailable) {
+    Write-Host 'PsPing is available.' -ForegroundColor Green
+    Start-PsPingServer
+}
 
 exit 0
