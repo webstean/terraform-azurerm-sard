@@ -360,9 +360,9 @@ Next steps here
 | <a name="output_logs_otel_dce_id"></a> [logs\_otel\_dce\_id](#output\_logs\_otel\_dce\_id) | The ID of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_logs_ingestion_endpoint"></a> [logs\_otel\_logs\_ingestion\_endpoint](#output\_logs\_otel\_logs\_ingestion\_endpoint) | The OTEL logs ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_metrics_ingestion_endpoint"></a> [logs\_otel\_metrics\_ingestion\_endpoint](#output\_logs\_otel\_metrics\_ingestion\_endpoint) | The OTEL metrics ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
-| <a name="output_pls_alias"></a> [pls\_alias](#output\_pls\_alias) | The Private Link Service global alias that can be used to connect to the service from anywhere. |
-| <a name="output_pls_id"></a> [pls\_id](#output\_pls\_id) | The Private Link Service ID. |
-| <a name="output_pls_name"></a> [pls\_name](#output\_pls\_name) | The Private Link Service name. |
+| <a name="output_pls_alias"></a> [pls\_alias](#output\_pls\_alias) | The Private Link Service global alias that customers can use to connect to this service<br/> from anywhere. |
+| <a name="output_pls_id"></a> [pls\_id](#output\_pls\_id) | The Private Link Service ID. - that customers can connect to |
+| <a name="output_pls_name"></a> [pls\_name](#output\_pls\_name) | The Private Link Service name - that customers can connect to |
 | <a name="output_portal_link"></a> [portal\_link](#output\_portal\_link) | The SARD Azure Portal url |
 | <a name="output_relay_mssql_public_ip"></a> [relay\_mssql\_public\_ip](#output\_relay\_mssql\_public\_ip) | The public IP address of the relay load balancer. |
 | <a name="output_security_perimeter_inbound_public_ips"></a> [security\_perimeter\_inbound\_public\_ips](#output\_security\_perimeter\_inbound\_public\_ips) | List of public IPs allowed for inbound traffic to the security perimeter |
