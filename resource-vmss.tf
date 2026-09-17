@@ -33,7 +33,7 @@ module "nat_gateway" {
   name      = "nat-${local.nat_name_location}"
   parent_id = module.environment_resource_group.resource.id
   location  = module.environment_resource_group.resource.location
-  sku_name  = "Standard"
+  sku_name  = "StandardV2"
 
   public_ips = {
     main = {
@@ -441,7 +441,7 @@ module "virtualmachinescaleset" {
       #}]
       application_gateway_backend_address_pool_ids = var.inbound_access == "App-Gateway" ? "${azurerm_application_gateway.this[0].backend_address_pool[*].id}" : [] # (Optional) A set of Backend Address Pools IDs from a Application Gateway which this Orchestrated Virtual Machine Scale Set should be connected to.
       application_security_group_ids               = []                                                                                                             # (Optional) A set of Application Security Group IDs which this Orchestrated Virtual Machine Scale Set should be connected to.
-      load_balancer_backend_address_pool_ids       = []                                                                                                             # (Optional) A set of Backend Address Pools IDs from a Load Balancer which this Orchestrated Virtual Machine Scale Set should be connected to. > Note: When using this field you'll also need to configure a Rule for the Load Balancer, and use a depends_on between this resource and the Load Balancer Rule.
+      load_balancer_backend_address_pool_ids       = var.deploy_private_link_service ? [module.pls_load_balancer[0].azurerm_lb_backend_address_pool["pls"].id] : [] # (Optional) A set of Backend Address Pools IDs from a Load Balancer which this Orchestrated Virtual Machine Scale Set should be connected to. > Note: When using this field you'll also need to configure a Rule for the Load Balancer, and use a depends_on between this resource and the Load Balancer Rule.
     }]
     enable_accelerated_networking = local.vmss_accelerated_networking_enabled
     #domain_name_label                           = local.vmss_name_hostname
@@ -510,6 +510,7 @@ module "virtualmachinescaleset" {
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [
     module.vm_x64_skus,
+    module.pls_load_balancer,
     azurerm_user_assigned_identity.environment
   ]
 }
