@@ -36,6 +36,7 @@ resource "azurerm_lb" "pls" {
     subnet_id                     = azurerm_subnet.pls_nat[0].id
     private_ip_address_allocation = "Dynamic"
   }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_lb_backend_address_pool" "pls" {
@@ -97,22 +98,45 @@ resource "azurerm_private_link_service" "this" {
   visibility_subscription_ids    = var.private_link_service_visibility_subscription_ids
   proxy_protocol_enabled         = var.private_link_service_proxy_protocol_enabled
   fqdns                          = var.private_link_service_allowed_fqdns
+  tags                           = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 output "pls_id" {
-  description = "The Private Link Service ID."
+  description = <<DESC
+The Private Link Service ID.
+DESC
   sensitive   = false
   value       = try(azurerm_private_link_service.this[0].id, null)
 }
 
 output "pls_name" {
-  description = "The Private Link Service name."
+  description = <<DESC
+The Private Link Service name.
+DESC
   sensitive   = false
   value       = try(azurerm_private_link_service.this[0].name, null)
 }
 
 output "pls_alias" {
-  description = "The Private Link Service global alias."
+  description = <<DESC
+The Private Link Service global alias that can be used to connect to the service from anywhere.
+DESC
   sensitive   = false
   value       = try(azurerm_private_link_service.this[0].alias, null)
 }
+
+/*
+resource "azurerm_private_endpoint" "to_partner_pls" {
+  name                = "pe-partner-service"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  subnet_id           = azurerm_subnet.consumer.id
+
+  private_service_connection {
+    name                              = "psc-partner-service"
+    is_manual_connection              = true                     # true = cross-tenant/manual approval flow
+    private_connection_resource_alias = "pls-name.<guid>.<region>.azure.privatelinkservice"
+    request_message                   = "Requesting access from <your org/subscription>"
+  }
+}
+*/

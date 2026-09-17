@@ -508,7 +508,10 @@ variable "private_link_service_auto_approval_subscription_ids" {
   description = <<DESC
 The list of subscription IDs that are auto-approved for the Private Link Service.
 DESC
-  default     = ["fd72f9ff-96b6-4a20-a870-ceaa17d70bc8"]
+  default = [
+    "fd72f9ff-96b6-4a20-a870-ceaa17d70bc8",
+    "8d894c2b-238f-490b-8dd1-d93898c5bf83"
+  ]
 }
 
 variable "private_link_service_nat_ip_configurations" {
@@ -558,7 +561,10 @@ variable "private_link_service_visibility_subscription_ids" {
   description = <<DESC
 The list of subscription IDs that have visibility to the Private Link Service.
 DESC
-  default     = ["fd72f9ff-96b6-4a20-a870-ceaa17d70bc8"]
+  default = [
+    "fd72f9ff-96b6-4a20-a870-ceaa17d70bc8",
+    "8d894c2b-238f-490b-8dd1-d93898c5bf83"
+  ]
 }
 
 variable "role_mssql_db_reader_id" {
