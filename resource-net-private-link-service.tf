@@ -23,52 +23,56 @@ resource "azurerm_subnet" "pls_nat" {
 }
 
 # --- Internal Standard Load Balancer fronting the service ------------------
-resource "azurerm_lb" "pls" {
+# Placeholder backend pool/probe/rule so the LB is functional out of the box.
+# Point the backend pool at your real NICs/VMSS and adjust the probe/rule to
+# match your service's actual port.
+module "pls_load_balancer" {
   count = var.deploy_private_link_service ? 1 : 0
+
+  source           = "Azure/avm-res-network-loadbalancer/azurerm"
+  version          = "~>0.5, < 1.0"
+  enable_telemetry = var.enable_telemetry
 
   name                = "lb-local.${local.pls_name}"
   resource_group_name = module.environment_resource_group.resource.name
   location            = module.environment_resource_group.resource.location
   sku                 = "Standard"
 
-  frontend_ip_configuration {
-    name                          = "pls-frontend"
-    subnet_id                     = azurerm_subnet.pls_nat[0].id
-    private_ip_address_allocation = "Dynamic"
+  frontend_ip_configurations = {
+    pls_frontend = {
+      name                                   = "pls-frontend"
+      frontend_private_ip_subnet_resource_id = azurerm_subnet.pls_nat[0].id
+      frontend_private_ip_address_allocation = "Dynamic"
+    }
   }
+
+  backend_address_pools = {
+    pls = {
+      name = "pls-backend-pool"
+    }
+  }
+
+  lb_probes = {
+    pls = {
+      name     = "pls-probe"
+      protocol = "Tcp"
+      port     = var.private_link_service_port
+    }
+  }
+
+  lb_rules = {
+    pls = {
+      name                              = "pls-rule"
+      frontend_ip_configuration_name    = "pls-frontend"
+      protocol                          = "Tcp"
+      frontend_port                     = var.private_link_service_port
+      backend_port                      = var.private_link_service_port
+      backend_address_pool_object_names = ["pls"]
+      probe_object_name                 = "pls"
+    }
+  }
+
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-}
-
-resource "azurerm_lb_backend_address_pool" "pls" {
-  count = var.deploy_private_link_service ? 1 : 0
-
-  name            = "pls-backend-pool"
-  loadbalancer_id = azurerm_lb.pls[0].id
-}
-
-# Placeholder health probe + rule so the LB is functional out of the box.
-# Point the backend pool at your real NICs/VMSS and adjust the probe/rule to
-# match your service's actual port.
-resource "azurerm_lb_probe" "pls" {
-  count = var.deploy_private_link_service ? 1 : 0
-
-  name            = "pls-probe"
-  loadbalancer_id = azurerm_lb.pls[0].id
-  protocol        = "Tcp"
-  port            = var.private_link_service_port
-}
-
-resource "azurerm_lb_rule" "pls" {
-  count = var.deploy_private_link_service ? 1 : 0
-
-  name                           = "pls-rule"
-  loadbalancer_id                = azurerm_lb.pls[0].id
-  protocol                       = "Tcp"
-  frontend_port                  = var.private_link_service_port
-  backend_port                   = var.private_link_service_port
-  frontend_ip_configuration_name = azurerm_lb.pls[0].frontend_ip_configuration[0].name
-  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.pls[0].id]
-  probe_id                       = azurerm_lb_probe.pls[0].id
 }
 
 # --- Private Link Service ---------------------------------------------------
@@ -81,7 +85,7 @@ resource "azurerm_private_link_service" "this" {
   location            = module.environment_resource_group.resource.location
 
   load_balancer_frontend_ip_configuration_ids = [
-    azurerm_lb.pls[0].frontend_ip_configuration[0].id,
+    module.pls_load_balancer[0].resource.frontend_ip_configuration[0].id,
   ]
 
   dynamic "nat_ip_configuration" {
