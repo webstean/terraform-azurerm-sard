@@ -886,6 +886,33 @@ DESC
   default     = "Standard_D2s_v5" ## Standard_D2s_v5
 }
 
+variable "vmss_port_tcp_external" {
+  type        = number
+  sensitive   = false
+  description = <<DESC
+The port on which the Virtual Machine Scale Set's external load balancer will listen
+DESC
+  default     = 443
+}
+
+variable "vmss_port_tcp_internal" {
+  type        = number
+  sensitive   = false
+  description = <<DESC
+The port on which the internal service will listen.
+DESC
+  default     = 8443
+}
+
+variable "vmss_port_tcp_internal_probe" {
+  type        = number
+  sensitive   = false
+  description = <<DESC
+The port on which the internal service's probe will listen.
+DESC
+  default     = 443
+}
+
 variable "vpn_access_group_display_name" {
   type        = string
   sensitive   = false

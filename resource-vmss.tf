@@ -58,30 +58,37 @@ module "nat_gateway" {
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
-/*
 module "vmss_external_load_balancer" {
-  count = var.deploy_vmss_external_load_balancer
+  count = var.deploy_vmss_external_load_balancer ? 1 : 0
 
   source           = "Azure/avm-res-network-loadbalancer/azurerm"
   version          = "~>0.5, < 1.0"
   enable_telemetry = var.enable_telemetry
 
-  name                = "lb-${local.vmss_name}"
+  name                = "lb-external-${local.vmss_name}"
   resource_group_name = module.environment_resource_group.resource.name
   location            = module.environment_resource_group.resource.location
   sku                 = "Standard"
   sku_tier            = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
 
   frontend_ip_configurations = {
-    pls_frontend = {
-      name                                   = "vmss-internal-frontend"
-      frontend_private_ip_subnet_resource_id = azurerm_subnet.vmss_nat[0].id
-      frontend_private_ip_address_allocation = "Dynamic"
+    vmss_frontend = {
+      name                            = "vmss-external-frontend"
+      public_ip_address_resource_name = "pip-${local.vmss_name}-external"
+      create_public_ip_address        = true
     }
   }
 
+  public_ip_address_configuration = {
+    allocation_method       = "Static"
+    idle_timeout_in_minutes = 30
+    ip_version              = "IPv4"
+    sku                     = "Standard"
+    sku_tier                = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
+  }
+
   backend_address_pools = {
-    pls = {
+    vmss = {
       name = "vmss-backend-pool"
     }
   }
@@ -90,17 +97,17 @@ module "vmss_external_load_balancer" {
     vmss = {
       name     = "vmss-probe"
       protocol = "Tcp"
-      port     = var.private_link_service_port
+      port     = var.vmss_port_tcp_internal_probe
     }
   }
 
   lb_rules = {
     vmss = {
       name                              = "vmss-rule"
-      frontend_ip_configuration_name    = "vmss-frontend"
+      frontend_ip_configuration_name    = "vmss-external-frontend"
       protocol                          = "Tcp"
-      frontend_port                     = var.private_link_service_port
-      backend_port                      = var.private_link_service_port
+      frontend_port                     = var.vmss_port_tcp_external
+      backend_port                      = var.vmss_port_tcp_internal
       backend_address_pool_object_names = ["vmss"]
       probe_object_name                 = "vmss"
     }
@@ -108,7 +115,6 @@ module "vmss_external_load_balancer" {
 
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
-*/
 
 /*
 resource "azurerm_monitor_diagnostic_setting" "pip-metrics" {
@@ -490,9 +496,9 @@ module "virtualmachinescaleset" {
       #  sku_name = "StandardV2"
       #  sku_tier  = "Regional"
       #}]
-      application_gateway_backend_address_pool_ids = var.inbound_access == "App-Gateway" ? "${azurerm_application_gateway.this[0].backend_address_pool[*].id}" : []          # (Optional) A set of Backend Address Pools IDs from a Application Gateway which this Orchestrated Virtual Machine Scale Set should be connected to.
-      application_security_group_ids               = []                                                                                                                      # (Optional) A set of Application Security Group IDs which this Orchestrated Virtual Machine Scale Set should be connected to.
-      load_balancer_backend_address_pool_ids       = var.deploy_private_link_service ? [module.pls_internal_load_balancer[0].azurerm_lb_backend_address_pool["pls"].id] : [] # (Optional) A set of Backend Address Pools IDs from a Load Balancer which this Orchestrated Virtual Machine Scale Set should be connected to. > Note: When using this field you'll also need to configure a Rule for the Load Balancer, and use a depends_on between this resource and the Load Balancer Rule.
+      application_gateway_backend_address_pool_ids = var.inbound_access == "App-Gateway" ? "${azurerm_application_gateway.this[0].backend_address_pool[*].id}" : []                                                                                                                                                   # (Optional) A set of Backend Address Pools IDs from a Application Gateway which this Orchestrated Virtual Machine Scale Set should be connected to.
+      application_security_group_ids               = []                                                                                                                                                                                                                                                               # (Optional) A set of Application Security Group IDs which this Orchestrated Virtual Machine Scale Set should be connected to.
+      load_balancer_backend_address_pool_ids       = concat(var.deploy_private_link_service ? [module.pls_internal_load_balancer[0].azurerm_lb_backend_address_pool["pls"].id] : [], var.deploy_vmss_external_load_balancer ? [module.vmss_external_load_balancer[0].azurerm_lb_backend_address_pool["pls"].id] : []) # (Optional) A set of Backend Address Pools IDs from Load Balancers which this Orchestrated Virtual Machine Scale Set should be connected to.
     }]
     enable_accelerated_networking = local.vmss_accelerated_networking_enabled
     #domain_name_label                           = local.vmss_name_hostname
