@@ -51,7 +51,6 @@ module "nat_gateway" {
       zones                   = local.regions[var.location].zones
     }
   }
-
   lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
     kind = "CanNotDelete"
   } : null
@@ -503,7 +502,8 @@ module "virtualmachinescaleset" {
     sku       = "2025-datacenter-azure-edition-smalldisk"
     version   = "latest"
   }
-
+  zone_balance = true
+  zones        = local.regions[var.location].zones ## Note: Due to a limitation of the Azure API at this time only one Availability Zone can be defined.
   lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
     kind = "CanNotDelete"
   } : null

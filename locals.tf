@@ -43,7 +43,6 @@ locals {
 
 locals {
   regions = {
-    /*
     australiasoutheast = {
       // Freeform name - can be anything
       name               = "Melbourne"
@@ -64,6 +63,8 @@ locals {
       location_shortname                 = "ase"
       zone_redundancy_available          = false
       zones                              = null
+      zones_one                          = ["1"]
+      zones_full                         = ["1", "2", "3"]
       default_rep_location               = "australiaeast"
       sql_maintenance_configuration_name = "SQL_AustraliaSouthEast_DB_1"
       ## Static Web Apps location - limited region support
@@ -84,9 +85,7 @@ locals {
       vnet_bgp_community = null ## The BGP community attribute in format <as-number>:<community-value>.
 
       dns_servers = null ## Azure Internal DNS - https://learn.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
-
     }
-*/
 
     australiaeast = { // needs to be the official Azure region name
       // Freeform name - can be anything
@@ -108,6 +107,8 @@ locals {
       location_shortname                 = "ae"
       zone_redundancy_available          = true
       zones                              = [1, 2, 3]
+      zones_one                          = ["1"]
+      zones_full                         = ["1", "2", "3"]
       default_rep_location               = "australiasoutheast"
       sql_maintenance_configuration_name = "SQL_AustraliaEast_DB_1"
       ## Static Web Apps location - limited region support
@@ -131,7 +132,6 @@ locals {
 
     }
 
-    /*
     australiacentral = { // needs to be the official Azure region name
       // Freeform name - can be anything
       name               = "Canberra1"
@@ -152,6 +152,8 @@ locals {
       location_shortname                 = "acl"
       zone_redundancy_available          = false
       zones                              = null
+      zones_one                          = ["1"]
+      zones_full                         = ["1", "2", "3"]
       default_rep_location               = "australiaeast"
       sql_maintenance_configuration_name = "SQL_AustraliaEast_DB_1"
       ## Static Web Apps location - limited region support
@@ -176,34 +178,35 @@ locals {
 
       ##      lake_containers = local.lake_containers
     }
-*/
-    /*
+
     australiacentral2 = { // needs to be the official Azure region name
       // Freeform name - can be anything
-      name         = "Canberra2"
-      postcode      = "2600"
-      short_name   = "can2"
+      name               = "Canberra2"
+      postcode           = "2600"
+      short_name         = "can2"
       preferred_language = "en"
-      country_code = "AU"
-      data_location = "Australia"
-      timezone = "AUS Eastern Standard Time"
+      country_code       = "AU"
+      data_location      = "Australia"
+      timezone           = "AUS Eastern Standard Time"
       ## for automation schedules
       time_zone_auto = "Australia/Sydney"
 
       // Offical Azure location (region)
       edge_zone                          = null
-      long_name          = "(Asia Pacific) Australia Central 2"
-      region             = "australiacentral2"
-      location           = "australiacentral2"
-      location_shortname = "acl2"
+      long_name                          = "(Asia Pacific) Australia Central 2"
+      region                             = "australiacentral2"
+      location                           = "australiacentral2"
+      location_shortname                 = "acl2"
       zone_redundancy_available          = false
-      zones      = null
-      default_rep_location = "australiaeast"
+      zones                              = null
+      zones_one                          = ["1"]
+      zones_full                         = ["1", "2", "3"]
+      default_rep_location               = "australiaeast"
       sql_maintenance_configuration_name = "SQL_AustraliaEast_DB_1"
       ## Static Web Apps location - limited region support
-      swa_location            = "eastasia" ## "westus2", "centralus", "eastus2", "westeurope", "eastasia"
-      devbox_pool_enabled                = false
-      devbox_serverless_gpu_available    = false
+      swa_location                    = "eastasia" ## "westus2", "centralus", "eastus2", "westeurope", "eastasia"
+      devbox_pool_enabled             = false
+      devbox_serverless_gpu_available = false
 
       // AWS
       aws_region_name = null
@@ -214,14 +217,13 @@ locals {
       ## The vWAN address prefix subnet cannot be smaller than a /24. Azure recommends using a /23.
       vwan_address_space = "10.222.1.0/24"
       ## Needs to be < 255 - use telephone area code
-      location_number = 3
-      vnet_bgp_community       = null ## The BGP community attribute in format <as-number>:<community-value>.
+      location_number    = 3
+      vnet_bgp_community = null ## The BGP community attribute in format <as-number>:<community-value>.
 
-      dns_servers        = null
+      dns_servers = null
 
     }
-*/
-    /*
+
     perth = { // needs to be the official Azure region name
       // Freeform name - can be anything
       name               = "Perth"
@@ -232,7 +234,7 @@ locals {
       data_location      = "Australia"
       timezone           = "AUS Western Standard Time"
       ## for automation schedules
-      time_zone_auto            = "Australia/Perth"
+      time_zone_auto = "Australia/Perth"
 
       // Offical Azure location (region)
       edge_zone                          = "perth"
@@ -242,12 +244,14 @@ locals {
       location_shortname                 = "ae"
       zone_redundancy_available          = true
       zones                              = null
+      zones_one                          = ["1"]
+      zones_full                         = ["1", "2", "3"]
       default_rep_location               = "australiasoutheast"
       sql_maintenance_configuration_name = "SQL_AustraliaEast_DB_1"
       ## Static Web Apps location - limited region support
-      swa_location = "eastasia" ## "westus2", "centralus", "eastus2", "westeurope", "eastasia"
-      devbox_pool_enabled                = false
-      devbox_serverless_gpu_available    = false
+      swa_location                    = "eastasia" ## "westus2", "centralus", "eastus2", "westeurope", "eastasia"
+      devbox_pool_enabled             = false
+      devbox_serverless_gpu_available = false
 
       // AWS
       aws_region_name = "ap-southeast-2"
@@ -258,13 +262,12 @@ locals {
       ## The vWAN address prefix subnet cannot be smaller than a /24. Azure recommends using a /23.
       vwan_address_space = "10.6.1.0/24"
       ## Needs to be < 255 - use telephone area code
-      location_number = 6
-      vnet_bgp_community       = null ## The BGP community attribute in format <as-number>:<community-value>.
+      location_number    = 6
+      vnet_bgp_community = null ## The BGP community attribute in format <as-number>:<community-value>.
 
       dns_servers = null ## Azure Internal DNS - https://learn.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
 
     }
-*/
 
     centralindia = {
       // Freeform name - can be anything
@@ -286,6 +289,8 @@ locals {
       location_shortname                 = "ind"
       zone_redundancy_available          = false
       zones                              = null
+      zones_one                          = ["1"]
+      zones_full                         = ["1", "2", "3"]
       default_rep_location               = "southindia"
       sql_maintenance_configuration_name = "SQL_CentralIndia_DB_1"
       ## Static Web Apps location - limited region support
