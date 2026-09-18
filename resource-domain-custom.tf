@@ -107,7 +107,14 @@ resource "azurerm_container_app_environment_certificate" "this" {
   }
 }
 
-
+resource "azurerm_dns_a_record" "pls" {
+  name                = "pls"
+  resource_group_name = module.environment_resource_group.resource.name
+  zone_name           = azurerm_dns_zone.environment.name
+  records             = [try(azurerm_private_link_service.this[0].destination_ip_address, "0.0.0.0")]
+  ttl                 = 300
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
 
 resource "azurerm_dns_a_record" "testv4" {
   name                = "testv4"

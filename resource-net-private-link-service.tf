@@ -109,6 +109,8 @@ resource "azurerm_private_link_service" "this" {
   tags                           = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
+
+
 output "pls_id" {
   description = <<DESC
 The Private Link Service ID. - that customers can connect to
