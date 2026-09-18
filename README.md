@@ -193,6 +193,7 @@ Next steps here
 | [azurerm_storage_share.containerappenv_logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) | resource |
 | [azurerm_storage_share.containerappenv_shared](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) | resource |
 | [azurerm_storage_share.global](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) | resource |
+| [azurerm_subnet.aca_sandbox](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.app_gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.bastion](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.containerappenv](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
@@ -231,10 +232,8 @@ Next steps here
 | [tls_private_key.letsencrypt](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) | resource |
 | [azapi_client_config.current](https://registry.terraform.io/providers/azure/azapi/latest/docs/data-sources/client_config) | data source |
 | [azapi_resource_list.law_tables](https://registry.terraform.io/providers/azure/azapi/latest/docs/data-sources/resource_list) | data source |
-| [azuread_application.easyauth](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/application) | data source |
 | [azuread_application_published_app_ids.well_known](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/application_published_app_ids) | data source |
 | [azuread_client_config.current](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/client_config) | data source |
-| [azuread_service_principal.easyauth](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/service_principal) | data source |
 | [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
 | [azurerm_dns_zone.specified](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/dns_zone) | data source |
 | [azurerm_network_watcher.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/network_watcher) | data source |
@@ -282,6 +281,7 @@ Next steps here
 | <a name="input_deploy_private_endpoints"></a> [deploy\_private\_endpoints](#input\_deploy\_private\_endpoints) | If true, deploys private endpoints for secure access to Azure services. If false, does not deploy private endpoints. | `bool` | `false` | no |
 | <a name="input_deploy_private_link_service"></a> [deploy\_private\_link\_service](#input\_deploy\_private\_link\_service) | Whether to deploy the Private Link Service. | `bool` | `false` | no |
 | <a name="input_deploy_sql_failover"></a> [deploy\_sql\_failover](#input\_deploy\_sql\_failover) | If true, deploys a Microsoft SQL failover environment in the linked region. If false, deploys a single SQL instance. | `bool` | `false` | no |
+| <a name="input_easyauth_client_id"></a> [easyauth\_client\_id](#input\_easyauth\_client\_id) | The client ID for the EasyAuth application. | `string` | `null` | no |
 | <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry) | This variable controls whether or not the AVM (Azure Verified Modules) telemetry is enabled for the module.<br/>For more information see <https://aka.ms/avm/telemetryinfo>.<br/>If it is set to false, then no telemetry will be collected. | `bool` | `false` | no |
 | <a name="input_frontdoor_sku"></a> [frontdoor\_sku](#input\_frontdoor\_sku) | Specifies the SKU for Azure Front Door. Options are: 'Standard' or 'Premium'. | `string` | `"Standard"` | no |
 | <a name="input_github_runner_pat"></a> [github\_runner\_pat](#input\_github\_runner\_pat) | The personal access token for the GitHub repository. | `string` | `null` | no |
