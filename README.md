@@ -87,8 +87,8 @@ Next steps here
 | [azurerm_dns_a_record.acatest](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
 | [azurerm_dns_a_record.apex_alias](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
 | [azurerm_dns_a_record.ingress_app_gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
-| [azurerm_dns_a_record.pls](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
 | [azurerm_dns_a_record.testv4](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
+| [azurerm_dns_a_record.vmss](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
 | [azurerm_dns_aaaa_record.testv6](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_aaaa_record) | resource |
 | [azurerm_dns_caa_record.aca_allowed_certs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_caa_record) | resource |
 | [azurerm_dns_caa_record.main_allowed_certs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_caa_record) | resource |
@@ -324,6 +324,9 @@ Next steps here
 | <a name="input_vmss_hibernation_enabled"></a> [vmss\_hibernation\_enabled](#input\_vmss\_hibernation\_enabled) | Whether hibernation is enabled for the Virtual Machine Scale Set. Requires 'vmss\_disk\_controller\_type' to be 'SCSI'. | `bool` | `true` | no |
 | <a name="input_vmss_number_of_instances"></a> [vmss\_number\_of\_instances](#input\_vmss\_number\_of\_instances) | The number of instances in the Virtual Machine Scale Set. | `number` | `0` | no |
 | <a name="input_vmss_otel_counter_specifiers"></a> [vmss\_otel\_counter\_specifiers](#input\_vmss\_otel\_counter\_specifiers) | Virtual Machine Scale Set: OpenTelemetry system metrics to collect from instances. Defaults to the standard free metrics set. | `list(string)` | <pre>[<br/>  "system.filesystem.usage",<br/>  "system.disk.io",<br/>  "system.disk.operation_time",<br/>  "system.disk.operations",<br/>  "system.memory.usage",<br/>  "system.network.io",<br/>  "system.cpu.time",<br/>  "system.network.dropped",<br/>  "system.network.errors",<br/>  "system.uptime"<br/>]</pre> | no |
+| <a name="input_vmss_port_tcp_external"></a> [vmss\_port\_tcp\_external](#input\_vmss\_port\_tcp\_external) | The port on which the Virtual Machine Scale Set's external load balancer will listen | `number` | `443` | no |
+| <a name="input_vmss_port_tcp_internal"></a> [vmss\_port\_tcp\_internal](#input\_vmss\_port\_tcp\_internal) | The port on which the internal service will listen. | `number` | `8443` | no |
+| <a name="input_vmss_port_tcp_internal_probe"></a> [vmss\_port\_tcp\_internal\_probe](#input\_vmss\_port\_tcp\_internal\_probe) | The port on which the internal service's probe will listen. | `number` | `443` | no |
 | <a name="input_vmss_sku_name"></a> [vmss\_sku\_name](#input\_vmss\_sku\_name) | Azure Virtual Machine SKU for the scale set (e.g., Standard\_D2s\_v5). Determines vCPU, memory, and pricing.<br/>Set to null, for a SKU to be randomly selected by the system. | `string` | `"Standard_D2s_v5"` | no |
 | <a name="input_vpn_access_group_display_name"></a> [vpn\_access\_group\_display\_name](#input\_vpn\_access\_group\_display\_name) | Entra ID display name for the user or group that will have VPN access. | `string` | `null` | no |
 | <a name="input_vpn_access_group_object_id"></a> [vpn\_access\_group\_object\_id](#input\_vpn\_access\_group\_object\_id) | The Entra ID object ID for the VPN access group (can be a user or a group) | `string` | `null` | no |
@@ -429,6 +432,7 @@ Next steps here
 | <a name="module_virtualmachinescaleset"></a> [virtualmachinescaleset](#module\_virtualmachinescaleset) | Azure/avm-res-compute-virtualmachinescaleset/azurerm | ~>0.0, < 1.0 |
 | <a name="module_vm_x64_skus"></a> [vm\_x64\_skus](#module\_vm\_x64\_skus) | Azure/avm-utl-sku-finder/azapi | ~>0.0, < 1.0 |
 | <a name="module_vmss_autoscale_setting"></a> [vmss\_autoscale\_setting](#module\_vmss\_autoscale\_setting) | Azure/avm-res-insights-autoscalesetting/azurerm | ~>0.0, < 1.0 |
+| <a name="module_vmss_external_load_balancer"></a> [vmss\_external\_load\_balancer](#module\_vmss\_external\_load\_balancer) | Azure/avm-res-network-loadbalancer/azurerm | ~>0.5, < 1.0 |
 | <a name="module_vmss_keyvault"></a> [vmss\_keyvault](#module\_vmss\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
 
 # Footer goes here
