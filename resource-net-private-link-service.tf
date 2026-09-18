@@ -95,7 +95,7 @@ resource "azurerm_private_link_service" "this" {
       name               = nat_ip_configuration.value.name
       subnet_id          = azurerm_subnet.pls_nat[0].id
       primary            = nat_ip_configuration.value.primary
-      private_ip_address = try(nat_ip_configuration.value.private_ip_address, null)
+      private_ip_address = try(nat_ip_configuration.value.private_ip_address, "0.0.0.0")
     }
   }
 
