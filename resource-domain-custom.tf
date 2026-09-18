@@ -276,16 +276,6 @@ resource "azurerm_dns_ns_record" "aca" {
   records             = azurerm_dns_zone.aca.name_servers
   tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
-resource "azurerm_dns_a_record" "aca" { ## establish domain ownership
-  name                = "*"
-  resource_group_name = module.environment_resource_group.resource.name
-  zone_name           = azurerm_dns_zone.aca.name
-  records = [
-    azurerm_container_app_environment.this.static_ip_address,
-  ]
-  ttl  = 300
-  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-}
 resource "azurerm_dns_a_record" "acatest" {
   name                = "t"
   resource_group_name = module.environment_resource_group.resource.name
@@ -294,9 +284,19 @@ resource "azurerm_dns_a_record" "acatest" {
   ttl                 = 300
   tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
+resource "azurerm_dns_a_record" "aca" { ## establish domain ownership
+  name                = "*.${azurerm_dns_zone.aca.name}"
+  resource_group_name = module.environment_resource_group.resource.name
+  zone_name           = azurerm_dns_zone.aca.name
+  records = [
+    azurerm_container_app_environment.this.static_ip_address,
+  ]
+  ttl  = 300
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
 resource "azurerm_dns_txt_record" "aca" { ## establish domain ownership
 
-  name                = "asuid" ## .${each.value}.${var.custom_dns_zone_name}"
+  name                = "asuid"
   zone_name           = azurerm_dns_zone.aca.name
   resource_group_name = module.environment_resource_group.resource.name
   record {
