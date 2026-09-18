@@ -11,7 +11,7 @@ locals {
   vmss_ultra_ssd_support              = false
   vmss_hibernate_enabled              = var.vmss_hibernation_enabled
   vmss_enable_standby_pool            = false    ## To be true, this needs special permissions setup: https://learn.microsoft.com/en-us/azure/virtual-machine-scale-sets/standby-pools-configure-permissions
-  vmss_patching_mode                  = "Manual" ## "Automatic"
+  vmss_patching_mode                  = "Manual" ## "Rolling", "Automatic", "Manual"
   vmss_subnet_id                      = azurerm_subnet.outbound.id
 }
 
