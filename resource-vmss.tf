@@ -59,6 +59,58 @@ module "nat_gateway" {
 }
 
 /*
+module "vmss_external_load_balancer" {
+  count = var.deploy_vmss_external_load_balancer
+
+  source           = "Azure/avm-res-network-loadbalancer/azurerm"
+  version          = "~>0.5, < 1.0"
+  enable_telemetry = var.enable_telemetry
+
+  name                = "lb-${local.vmss_name}"
+  resource_group_name = module.environment_resource_group.resource.name
+  location            = module.environment_resource_group.resource.location
+  sku                 = "Standard"
+  sku_tier            = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
+
+  frontend_ip_configurations = {
+    pls_frontend = {
+      name                                   = "vmss-internal-frontend"
+      frontend_private_ip_subnet_resource_id = azurerm_subnet.vmss_nat[0].id
+      frontend_private_ip_address_allocation = "Dynamic"
+    }
+  }
+
+  backend_address_pools = {
+    pls = {
+      name = "vmss-backend-pool"
+    }
+  }
+
+  lb_probes = {
+    vmss = {
+      name     = "vmss-probe"
+      protocol = "Tcp"
+      port     = var.private_link_service_port
+    }
+  }
+
+  lb_rules = {
+    vmss = {
+      name                              = "vmss-rule"
+      frontend_ip_configuration_name    = "vmss-frontend"
+      protocol                          = "Tcp"
+      frontend_port                     = var.private_link_service_port
+      backend_port                      = var.private_link_service_port
+      backend_address_pool_object_names = ["vmss"]
+      probe_object_name                 = "vmss"
+    }
+  }
+
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
+*/
+
+/*
 resource "azurerm_monitor_diagnostic_setting" "pip-metrics" {
   count = var.vmss_number_of_instances == 0 || var.vmss_autoscale_enabled == false ? 0 : 1
 
@@ -438,9 +490,9 @@ module "virtualmachinescaleset" {
       #  sku_name = "StandardV2"
       #  sku_tier  = "Regional"
       #}]
-      application_gateway_backend_address_pool_ids = var.inbound_access == "App-Gateway" ? "${azurerm_application_gateway.this[0].backend_address_pool[*].id}" : [] # (Optional) A set of Backend Address Pools IDs from a Application Gateway which this Orchestrated Virtual Machine Scale Set should be connected to.
-      application_security_group_ids               = []                                                                                                             # (Optional) A set of Application Security Group IDs which this Orchestrated Virtual Machine Scale Set should be connected to.
-      load_balancer_backend_address_pool_ids       = var.deploy_private_link_service ? [module.pls_load_balancer[0].azurerm_lb_backend_address_pool["pls"].id] : [] # (Optional) A set of Backend Address Pools IDs from a Load Balancer which this Orchestrated Virtual Machine Scale Set should be connected to. > Note: When using this field you'll also need to configure a Rule for the Load Balancer, and use a depends_on between this resource and the Load Balancer Rule.
+      application_gateway_backend_address_pool_ids = var.inbound_access == "App-Gateway" ? "${azurerm_application_gateway.this[0].backend_address_pool[*].id}" : []          # (Optional) A set of Backend Address Pools IDs from a Application Gateway which this Orchestrated Virtual Machine Scale Set should be connected to.
+      application_security_group_ids               = []                                                                                                                      # (Optional) A set of Application Security Group IDs which this Orchestrated Virtual Machine Scale Set should be connected to.
+      load_balancer_backend_address_pool_ids       = var.deploy_private_link_service ? [module.pls_internal_load_balancer[0].azurerm_lb_backend_address_pool["pls"].id] : [] # (Optional) A set of Backend Address Pools IDs from a Load Balancer which this Orchestrated Virtual Machine Scale Set should be connected to. > Note: When using this field you'll also need to configure a Rule for the Load Balancer, and use a depends_on between this resource and the Load Balancer Rule.
     }]
     enable_accelerated_networking = local.vmss_accelerated_networking_enabled
     #domain_name_label                           = local.vmss_name_hostname
@@ -510,7 +562,7 @@ module "virtualmachinescaleset" {
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [
     module.vm_x64_skus,
-    module.pls_load_balancer,
+    module.pls_internal_load_balancer,
     azurerm_user_assigned_identity.environment
   ]
 }

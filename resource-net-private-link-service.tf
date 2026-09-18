@@ -26,7 +26,7 @@ resource "azurerm_subnet" "pls_nat" {
 # Placeholder backend pool/probe/rule so the LB is functional out of the box.
 # Point the backend pool at your real NICs/VMSS and adjust the probe/rule to
 # match your service's actual port.
-module "pls_load_balancer" {
+module "pls_internal_load_balancer" {
   count = var.deploy_private_link_service ? 1 : 0
 
   source           = "Azure/avm-res-network-loadbalancer/azurerm"
@@ -41,7 +41,7 @@ module "pls_load_balancer" {
 
   frontend_ip_configurations = {
     pls_frontend = {
-      name                                   = "pls-frontend"
+      name                                   = "pls-internal-frontend"
       frontend_private_ip_subnet_resource_id = azurerm_subnet.pls_nat[0].id
       frontend_private_ip_address_allocation = "Dynamic"
     }
@@ -86,7 +86,7 @@ resource "azurerm_private_link_service" "this" {
   location            = module.environment_resource_group.resource.location
 
   load_balancer_frontend_ip_configuration_ids = [
-    module.pls_load_balancer[0].resource.frontend_ip_configuration[0].id,
+    module.pls_internal_load_balancer[0].resource.frontend_ip_configuration[0].id,
   ]
 
   dynamic "nat_ip_configuration" {
@@ -105,8 +105,6 @@ resource "azurerm_private_link_service" "this" {
   fqdns                          = var.private_link_service_allowed_fqdns
   tags                           = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
-
-
 
 output "pls_id" {
   description = <<DESC
@@ -130,6 +128,22 @@ The Private Link Service global alias that customers can use to connect to this 
 DESC
   sensitive   = false
   value       = try(azurerm_private_link_service.this[0].alias, null)
+}
+
+output "pls_public_ip" {
+  description = <<DESC
+The Public IP address of the Private Link Service. Since the Private Link Service should not be public, this should be 0.0.0.0.
+DESC
+  sensitive   = false
+  value       = try(module.pls_internal_load_balancer[0].resource.public_ip_address, "0.0.0.0")
+}
+
+output "pls_private_ip" {
+  description = <<DESC
+The private IP address of the Private Link Service
+DESC
+  sensitive   = false
+  value       = try(module.pls_internal_load_balancer[0].resource.frontend_ip_configuration[0].private_ip_address, null)
 }
 
 /*

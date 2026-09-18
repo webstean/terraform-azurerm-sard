@@ -379,6 +379,15 @@ DESC
   default     = false
 }
 
+variable "deploy_vmss_external_load_balancer" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+If true, deploys an external load balancer for the VMSS. If false, does not deploy an external load balancer.
+DESC
+  default     = false
+}
+
 variable "deploy_sql_failover" {
   type        = bool
   sensitive   = false
