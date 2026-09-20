@@ -110,6 +110,9 @@ module "vmss_external_load_balancer" {
       backend_port                      = var.vmss_port_tcp_internal
       backend_address_pool_object_names = ["vmss"]
       probe_object_name                 = "vmss"
+      load_distribution                 = "SourceIPProtocol"
+      enable_floating_ip                = true
+      disable_outbound_snat             = true
     }
   }
 
