@@ -223,6 +223,7 @@ Next steps here
 | [azurerm_web_application_firewall_policy.gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/web_application_firewall_policy) | resource |
 | [azurerm_web_pubsub.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/web_pubsub) | resource |
 | [local_file.homepage](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
+| [random_integer.random_region_zone](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) | resource |
 | [random_integer.vm_x64_sku_pick](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) | resource |
 | [random_string.cog_random_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 | [random_string.environment](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
