@@ -6,13 +6,13 @@ locals {
   automation_account_resource_group_name = try(local.automation_account_id_parts[3], module.environment_resource_group.resource.name)
 }
 
-resource "azurerm_automation_variable_string" "user_assigned_identity" {
-  name                    = "${upper(var.prefix)}_USER_ASSIGNED_IDENTITY_PRINCIPAL_ID"
+resource "azurerm_automation_variable_string" "user_assigned_identity_client_id" {
+  name                    = "${upper(var.prefix)}_USER_ASSIGNED_IDENTITY_CLIENT_ID"
   resource_group_name     = local.automation_account_resource_group_name
   automation_account_name = local.automation_account_name
   encrypted               = (tobool(var.data_pii) == true || tobool(var.data_phi) == true) ? true : false
 
-  value       = azurerm_user_assigned_identity.environment.principal_id
+  value       = azurerm_user_assigned_identity.environment.client_id
   description = local.iac_message
   depends_on  = [azurerm_user_assigned_identity.environment]
 }
@@ -118,18 +118,18 @@ function Get-AzResourceGroupInfo {
         Write-Output "Gathering information..."
 
         if (-not (Get-AzContext)) {
-            ## Get the user-assigned identity principal ID from Automation Variable
+            ## Get the user-assigned identity Client ID from Automation Variable
             $principalIdVarName = "${lower(azurerm_automation_variable_string.user_assigned_identity.name)}"
-            $principalId = Get-AutomationVariable -Name $principalIdVarName -ErrorAction SilentlyContinue
+            $clientId = Get-AutomationVariable -Name $principalIdVarName -ErrorAction SilentlyContinue
 
-            if ([string]::IsNullOrWhiteSpace($principalId)) {
-                throw "Automation Variable '$principalIdVarName' not found or empty. Please set the user-assigned identity principal ID."
+            if ([string]::IsNullOrWhiteSpace($clientId)) {
+                throw "Automation Variable '$principalIdVarName' not found or empty. Please set the user-assigned identity client ID."
             }
 
             ## Authenticate using the user-assigned identity
-            Connect-AzAccount -Identity -AccountId $principalId | Out-Null
+            Connect-AzAccount -Identity -AccountId $clientId | Out-Null
             if (-not (Get-AzContext)) {
-                throw "Connect-AzAccount -Identity failed for principal ID: '$principalId'. Confirm the managed identity is properly configured."
+                throw "Connect-AzAccount -Identity failed for client ID: '$clientId'. Confirm the managed identity is properly configured."
             }
         }
 
