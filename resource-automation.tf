@@ -119,7 +119,7 @@ function Get-AzResourceGroupInfo {
 
         if (-not (Get-AzContext)) {
             ## Get the user-assigned identity Client ID from Automation Variable
-            $principalIdVarName = "${lower(azurerm_automation_variable_string.user_assigned_identity.name)}"
+            $principalIdVarName = "${lower(azurerm_automation_variable_string.user_assigned_identity_client_id.name)}"
             $clientId = Get-AutomationVariable -Name $principalIdVarName -ErrorAction SilentlyContinue
 
             if ([string]::IsNullOrWhiteSpace($clientId)) {
