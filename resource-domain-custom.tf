@@ -107,11 +107,11 @@ resource "azurerm_container_app_environment_certificate" "this" {
   }
 }
 
-resource "azurerm_dns_a_record" "vmss" {
-  name                = "vmss"
+resource "azurerm_dns_a_record" "external-nlb" {
+  name                = "external-nlb"
   resource_group_name = module.environment_resource_group.resource.name
   zone_name           = azurerm_dns_zone.environment.name
-  records             = [try(module.vmss_external_load_balancer.ip_address, "0.0.0.0")]
+  records             = [try(module.vmss_external_load_balancer.azurerm_public_ip, "0.0.0.0")]
   ttl                 = 300
   tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
