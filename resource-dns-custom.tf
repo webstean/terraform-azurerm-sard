@@ -120,7 +120,6 @@ resource "azurerm_dns_a_record" "vmss_external_reverse_fqdn" {
   count = var.deploy_vmss_external_load_balancer ? 1 : 0
 
   name                = "${local.vmss_name}${random_string.environment.result}"
-  .${azurerm_dns_zone.environment.name}"
   resource_group_name = module.environment_resource_group.resource.name
   zone_name           = azurerm_dns_zone.environment.name
   records             = [azurerm_public_ip.vmss_external[0].ip_address]
