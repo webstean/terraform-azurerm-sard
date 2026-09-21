@@ -339,6 +339,7 @@ Next steps here
 
 | Name | Description |
 |------|-------------|
+| <a name="output_aca_certificate_subject_name"></a> [aca\_certificate\_subject\_name](#output\_aca\_certificate\_subject\_name) | The subject name of the Container App Environment. |
 | <a name="output_aca_env_custom_domain_verification_id"></a> [aca\_env\_custom\_domain\_verification\_id](#output\_aca\_env\_custom\_domain\_verification\_id) | The custom domain verification ID of the Container App Environment. |
 | <a name="output_aca_env_default_domain"></a> [aca\_env\_default\_domain](#output\_aca\_env\_default\_domain) | The default domain of the Container App Environment. |
 | <a name="output_aca_env_id"></a> [aca\_env\_id](#output\_aca\_env\_id) | The ID of the Container App Environment. |
