@@ -75,7 +75,8 @@ module "vmss_external_load_balancer" {
     vmss_frontend = {
       name                          = "vmss-external-frontend"
       public_ip_address_resource_id = azurerm_public_ip.vmss_external[0].id
-      zones                         = local.regions[var.location].zones
+      ## Azure rejects zones on a frontend config that references a public IP; zones come from the public IP itself.
+      zones = ["None"]
     }
   }
 
