@@ -1,0 +1,140 @@
+# Example: Azure Container Apps Job that copies data into Azure Blob Storage
+# using azcopy, authenticating via a user-assigned managed identity (no keys/SAS).
+#
+# Prerequisites assumed to already exist (reference via data sources or vars
+# in your real config): the Container App Environment, the ACR the azcopy
+# image lives in, and the destination (and optionally source) storage accounts.
+
+# --- Identity the job runs as -------------------------------------------------
+
+resource "azurerm_user_assigned_identity" "azcopy_job" {
+  name                = "id-azcopy-datacopy-job"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+}
+
+# Grant it write access to the destination storage account.
+resource "azurerm_role_assignment" "azcopy_job_dest_write" {
+  scope                = var.destination_storage_account_id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_user_assigned_identity.azcopy_job.principal_id
+}
+
+# If the source is also an Azure storage account (as opposed to an on-prem/
+# external HTTP source), grant read access there too.
+resource "azurerm_role_assignment" "azcopy_job_source_read" {
+  count                = var.source_storage_account_id != null ? 1 : 0
+  scope                = var.source_storage_account_id
+  role_definition_name = "Storage Blob Data Reader"
+  principal_id         = azurerm_user_assigned_identity.azcopy_job.principal_id
+}
+
+# --- The Container Apps Job ---------------------------------------------------
+
+resource "azurerm_container_app_job" "azcopy_datacopy" {
+  name                         = "job-azcopy-datacopy"
+  resource_group_name          = var.resource_group_name
+  location                     = var.location
+  container_app_environment_id = var.container_app_environment_id
+
+  replica_timeout_in_seconds = 1800 # 30 min ceiling per run; raise for large copies
+  replica_retry_limit        = 1
+
+  # Runs on a schedule. Swap this block for `manual_trigger_config` if you'd
+  # rather trigger it on demand (az containerapp job start / from a pipeline).
+  schedule_trigger_config {
+    cron_expression          = "0 3 * * *" # daily at 03:00 UTC
+    parallelism               = 1
+    replica_completion_count  = 1
+  }
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.azcopy_job.id]
+  }
+
+  template {
+    container {
+      name   = "azcopy"
+      image  = var.azcopy_image # e.g. "${var.acr_login_server}/azcopy-runner:latest" - see Dockerfile below
+      cpu    = 0.5
+      memory = "1Gi"
+
+      # Logs in with the job's managed identity, then copies. --recursive for
+      # directories/containers; drop it for a single blob/file.
+      command = ["/bin/sh", "-c"]
+      args = [
+        <<-EOT
+        azcopy login --identity --identity-client-id=${azurerm_user_assigned_identity.azcopy_job.client_id} &&
+        azcopy copy "${var.source_url}" "${var.destination_url}" --recursive
+        EOT
+      ]
+
+      env {
+        name  = "AZCOPY_AUTO_LOGIN_TYPE"
+        value = "MSI"
+      }
+    }
+  }
+}
+
+# --- Variables ------------------------------------------------------------
+
+variable "resource_group_name" {
+  type = string
+}
+
+variable "location" {
+  type = string
+}
+
+variable "container_app_environment_id" {
+  type = string
+}
+
+variable "azcopy_image" {
+  type        = string
+  description = "Container image containing the azcopy binary. See Dockerfile note below."
+}
+
+variable "destination_storage_account_id" {
+  type = string
+}
+
+variable "source_storage_account_id" {
+  type    = string
+  default = null
+}
+
+variable "source_url" {
+  type        = string
+  description = "e.g. https://sourceacct.blob.core.windows.net/container/path"
+}
+
+variable "destination_url" {
+  type        = string
+  description = "e.g. https://destacct.blob.core.windows.net/container/path"
+}
+
+# --- Dockerfile for var.azcopy_image (build & push to your ACR separately) ---
+#
+# FROM mcr.microsoft.com/azurelinux/base/core:3.0
+# RUN tdnf install -y ca-certificates tar wget azure-cli azcopy && tdnf clean all
+# ENTRYPOINT ["/bin/sh", "-c"]
+
+# FROM mcr.microsoft.com/azurelinux/base/core:3.0
+# RUN tdnf install -y ca-certificates tar wget azure-cli azcopy
+# ENV AZCOPY_AUTO_LOGIN_TYPE=MSI AZCOPY_MSI_CLIENT_ID={<clientId>}
+# ENTRYPOINT ["/bin/sh"]
+# ARGS = ["/bin/sh", "-c", "azcopy copy \"${var.source_url}\" \"${var.destination_url}\" --recursive"]
+
+# FROM mcr.microsoft.com/cbl-mariner/base/core:2.0
+# RUN tdnf install -y ca-certificates tar wget && \
+#     wget -O azcopy.tar.gz https://aka.ms/downloadazcopy-v10-linux && \
+#     tar -xzf azcopy.tar.gz --strip-components=1 -C /usr/local/bin --wildcards '*/azcopy' && \
+#     chmod +x /usr/local/bin/azcopy && \
+#     rm azcopy.tar.gz
+# ENTRYPOINT ["/bin/sh"]
+#
+# Build & push (no Docker needed locally, ACR builds remotely):
+#   az acr build --registry <acrName> --image azcopy-runner:latest .
