@@ -761,6 +761,18 @@ DisableInbuiltDNS
 DisableQUIC
 DisableNetBIOS
 
+function Set-NetworkProfilesToPrivate {
+    # Make all the network connection profiles private
+    $networks = Get-NetConnectionProfile
+    foreach ($net in $networks) {
+        Write-Host "Changing '$($net.Name)' from $($net.NetworkCategory) to Private..."
+        Set-NetConnectionProfile -InterfaceIndex $net.InterfaceIndex -NetworkCategory Private
+    }
+    ## Verify
+    Get-NetConnectionProfile
+}
+Set-NetworkProfilesToPrivate
+
 try {
     if (Test-CommandExists -Name 'powercfg') {
         # High performance; avoid Balanced on server workloads when supported.
@@ -992,6 +1004,11 @@ if (Test-Path "${BIN}\config.bgi") {
     & ${BIN}\bginfo.exe ${BIN}\config.bgi /timer:0
 }
 
+function Set-Firewall {
+    New-NetFirewallRule -DisplayName 'Allow TCP 8443 Inbound' -Direction Inbound -Protocol TCP -LocalPort 8443 -Action Allow -Enabled True
+}
+Set-Firewall
+
 #try {
 #    if (Get-NetAdapterRdma | Where-Object { $_.Enabled -eq $true }) {
 #        Write-StepSummary -type 'info' 'RDMA capable network adapter found.'
@@ -1034,46 +1051,6 @@ function Get-LocalIPAddress {
         return $null
     }
     return $ip
-}
-
-function Start-PsPingServer {
-    <#
-    .SYNOPSIS
-        Starts a psping server listening on a local IP and port.
-
-    .PARAMETER IPAddress
-        Local IP to bind to. Auto-detected if omitted. Use "0.0.0.0" to bind all interfaces.
-
-    .PARAMETER Port
-        Port to listen on. Defaults to 8443.
-
-    .EXAMPLE
-        Start-PsPingServer -Port 8443 -OpenFirewall
-    #>
-    [CmdletBinding()]
-    param(
-        [string]$IPAddress,
-        [int]$Port = 8443
-    )
-
-    if (-not (Test-PsPingAvailable)) {
-        return
-    }
-
-    if (-not $IPAddress) {
-        $IPAddress = Get-LocalIPAddress
-        if ($null -eq $IPAddress) {
-            return
-        }
-    }
-
-    $psArgs = @()
-    $psArgs += '-f'
-    $psArgs += '-s'
-    $psArgs += "${IPAddress}:${Port}"
-
-    Write-Host "Starting psping server on ${IPAddress}:${Port} (Ctrl+C to stop)..."
-    & psping @psArgs
 }
 
 function Wait-PsPingServerReady {
@@ -1158,5 +1135,65 @@ function Invoke-PsPingTest {
 #    Write-Host 'PsPing is available.' -ForegroundColor Green
 #    Start-PsPingServer
 #}
+
+function Start-PsPingServer {
+    <#
+    .SYNOPSIS
+        Starts a psping server listening on a local IP and port.
+
+    .PARAMETER IPAddress
+        Local IP to bind to. Auto-detected if omitted. Use "0.0.0.0" to bind all interfaces.
+
+    .PARAMETER Port
+        Port to listen on. Defaults to 8443.
+
+    .EXAMPLE
+        Start-PsPingServer -Port 8443 -OpenFirewall
+    #>
+    [CmdletBinding()]
+    param(
+        [string]$IPAddress,
+        [int]$Port = 8443
+    )
+
+    if (-not (Test-PsPingAvailable)) {
+        return
+    }
+
+    if (-not $IPAddress) {
+        $IPAddress = Get-LocalIPAddress
+        if ($null -eq $IPAddress) {
+            return
+        }
+    }
+
+    $psArgs = @()
+    $psArgs += '-f'
+    $psArgs += '-s'
+    $psArgs += "${IPAddress}:${Port}"
+
+    Write-Host "Starting psping server on ${IPAddress}:${Port} (Ctrl+C to stop)..."
+    & C:\bin\psping @psArgs
+}
+
+
+function Get-TCPInboundStatus {
+    Get-NetFirewallRule | Get-NetFirewallPortFilter | Where-Object LocalPort -In 443, 8443
+    Get-NetTCPConnection -LocalPort 443, 8443 -State Listen |
+    Select-Object LocalAddress, LocalPort, OwningProcess |
+    ForEach-Object {
+        [PSCustomObject]@{
+            LocalAddress = $_.LocalAddress
+            LocalPort    = $_.LocalPort
+            PID          = $_.OwningProcess
+            ProcessName  = (Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue).ProcessName
+        }
+    }
+    # Is there actually an HTTPS binding configured?
+    Get-WebBinding | Where-Object { $_.bindingInformation -match ':443:|:8443:' }
+
+    # Is the World Wide Web Publishing Service even running?
+    Get-Service W3SVC | Select-Object Status, StartType
+}
 
 exit 0

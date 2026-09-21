@@ -100,6 +100,7 @@ module "vmss_external_load_balancer" {
       name     = "vmss-probe"
       protocol = "Tcp"
       port     = var.vmss_port_tcp_internal_probe
+      #request_path = "/index.html" only for HTTP/HTTPS probes
     }
   }
 

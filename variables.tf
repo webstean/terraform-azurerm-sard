@@ -910,7 +910,7 @@ variable "vmss_port_tcp_internal_probe" {
   description = <<DESC
 The port on which the internal service's probe will listen.
 DESC
-  default     = 443
+  default     = 80
 }
 
 variable "vpn_access_group_display_name" {
