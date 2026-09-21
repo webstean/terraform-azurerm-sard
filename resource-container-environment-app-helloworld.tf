@@ -73,7 +73,7 @@ module "helloworld_container_app" {
         ## test
         {
           name  = "EXTERNAL_NLB_IP"
-          value = try(module.vmss_external_load_balancer.azurerm_public_ip, "0.0.0.0")
+          value = try(azurerm_public_ip.vmss_external[0].ip_address, "0.0.0.0")
         },
         {
           name  = "PII"

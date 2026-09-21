@@ -73,9 +73,8 @@ module "vmss_external_load_balancer" {
 
   frontend_ip_configurations = {
     vmss_frontend = {
-      name                            = "vmss-external-frontend"
-      public_ip_address_resource_name = "pip-${local.vmss_name}-external"
-      create_public_ip_address        = true
+      name                          = "vmss-external-frontend"
+      public_ip_address_resource_id = azurerm_public_ip.vmss_external[0].id
     }
   }
 
@@ -86,7 +85,6 @@ module "vmss_external_load_balancer" {
     sku                     = "Standard"
     sku_tier                = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
     domain_name_label       = "vmss-external-${local.vmss_name}"
-    reverse_fqdn            = "vmss-external-${local.vmss_name}.${azurerm_dns_zone.environment.name}"
   }
 
   backend_address_pools = {
@@ -119,6 +117,47 @@ module "vmss_external_load_balancer" {
   }
 
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+
+  depends_on = [azapi_update_resource.vmss_external_reverse_fqdn]
+}
+
+moved {
+  from = module.vmss_external_load_balancer[0].azurerm_public_ip.this["vmss_frontend"]
+  to   = azurerm_public_ip.vmss_external[0]
+}
+
+resource "azurerm_public_ip" "vmss_external" {
+  count = var.deploy_vmss_external_load_balancer ? 1 : 0
+
+  name                    = "pip-${local.vmss_name}-external"
+  resource_group_name     = module.environment_resource_group.resource.name
+  location                = module.environment_resource_group.resource.location
+  allocation_method       = "Static"
+  domain_name_label       = "vmss-external-${local.vmss_name}"
+  idle_timeout_in_minutes = 30
+  ip_version              = "IPv4"
+  sku                     = "Standard"
+  sku_tier                = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
+  zones                   = ["1", "2", "3"]
+  tags                    = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+
+  lifecycle {
+    ignore_changes = [reverse_fqdn]
+  }
+}
+
+resource "azapi_update_resource" "vmss_external_reverse_fqdn" {
+  count = var.deploy_vmss_external_load_balancer ? 1 : 0
+
+  type        = "Microsoft.Network/publicIPAddresses@2024-05-01"
+  resource_id = azurerm_public_ip.vmss_external[0].id
+  body = {
+    properties = {
+      reverseFqdn = "vmss-external-${local.vmss_name}.${azurerm_dns_zone.environment.name}"
+    }
+  }
+
+  depends_on = [azurerm_dns_a_record.vmss_external_reverse_fqdn]
 }
 
 /*

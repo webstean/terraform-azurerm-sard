@@ -111,7 +111,18 @@ resource "azurerm_dns_a_record" "external-nlb" {
   name                = "external-nlb"
   resource_group_name = module.environment_resource_group.resource.name
   zone_name           = azurerm_dns_zone.environment.name
-  records             = [try(module.vmss_external_load_balancer.azurerm_public_ip, "0.0.0.0")]
+  records             = [try(azurerm_public_ip.vmss_external[0].ip_address, "0.0.0.0")]
+  ttl                 = 300
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
+
+resource "azurerm_dns_a_record" "vmss_external_reverse_fqdn" {
+  count = var.deploy_vmss_external_load_balancer ? 1 : 0
+
+  name                = "vmss-external-${local.vmss_name}"
+  resource_group_name = module.environment_resource_group.resource.name
+  zone_name           = azurerm_dns_zone.environment.name
+  records             = [azurerm_public_ip.vmss_external[0].ip_address]
   ttl                 = 300
   tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
