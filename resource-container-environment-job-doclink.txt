@@ -1,8 +1,7 @@
 locals {
-  doclink_name   = "doclink"
-  docklink_image = "doclink-worker:latest"
+  doclink_name  = "doclink"
+  doclink_image = "doclink-worker:latest"
 }
-
 
 resource "azurerm_storage_container" "doclink" {
   name                  = local.doclink_name
@@ -16,7 +15,7 @@ resource "azurerm_storage_queue" "doclink" {
 }
 
 resource "azurerm_container_app_job" "docling" {
-  name                         = "job-docling-${random_string.suffix.result}"
+  name                         = "job-docling-${random_string.environment.result}"
   location                     = module.environment_resource_group.resource.location
   resource_group_name          = module.environment_resource_group.resource.name
   container_app_environment_id = azurerm_container_app_environment.this.id
@@ -26,16 +25,21 @@ resource "azurerm_container_app_job" "docling" {
 
   identity {
     type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.job.id]
+    identity_ids = [azurerm_user_assigned_identity.environment.id]
+  }
+
+  registry {
+    server   = "${var.container_registry_id}.azurecr.io"
+    identity = azurerm_user_assigned_identity.environment.id
   }
 
   event_trigger_config {
     parallelism              = 1
     replica_completion_count = 1
     scale {
-      min_executions = 0
-      max_executions = 10
-      #polling_interval = 30
+      min_executions              = 0
+      max_executions              = 10
+      polling_interval_in_seconds = 30
 
       rules {
         name             = "queue"
@@ -63,7 +67,7 @@ resource "azurerm_container_app_job" "docling" {
   template {
     container {
       name   = "docling-worker"
-      image  = "${azurerm_container_registry.this.login_server}/${local.docklink_image}"
+      image  = "${var.container_registry_id}.azurecr.io/${local.doclink_image}"
       cpu    = 2
       memory = "4Gi"
 
@@ -95,9 +99,20 @@ resource "azurerm_container_app_job" "docling" {
         name  = "QUEUE_NAME"
         value = azurerm_storage_queue.doclink.name
       }
+
+      env {
+        name  = "PII"
+        value = var.data_pii
+      }
+
+      env {
+        name  = "PHI"
+        value = var.data_phi
+      }
     }
   }
-   depends_on = [
+
+  depends_on = [
     azurerm_container_app_environment.this,
     azurerm_container_app_environment_storage.logs,
     azurerm_container_app_environment_storage.shared,

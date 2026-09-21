@@ -67,7 +67,15 @@ module "aspire_container_app" {
         {
           name  = "ASPNETCORE_ENVIRONMENT"
           value = "Production"
-        }
+        },
+                {
+          name  = "PII"
+          value = var.data_pii
+        },
+        {
+          name  = "PHI"
+          value = var.data_phi
+        },
       ]
     }]
   }

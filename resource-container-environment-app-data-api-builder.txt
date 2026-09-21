@@ -49,7 +49,15 @@ module "dab_container_app" {
         {
           name  = "AZURE_APP_CONFIGURATION_ID"
           value = module.appconfiguration.endpoint
-        }
+        },
+        {
+          name  = "PII"
+          value = var.data_pii
+        },
+        {
+          name  = "PHI"
+          value = var.data_phi
+        },
       ]
       volume_mounts = [
         {

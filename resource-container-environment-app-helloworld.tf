@@ -70,6 +70,7 @@ module "helloworld_container_app" {
           name  = "ASPNETCORE_ENVIRONMENT"
           value = "Production"
         },
+        ## test
         {
           name  = "EXTERNAL_NLB_IP"
           value = try(module.vmss_external_load_balancer.azurerm_public_ip, "0.0.0.0")
