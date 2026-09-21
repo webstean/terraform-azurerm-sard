@@ -107,6 +107,12 @@ resource "azurerm_container_app_environment_certificate" "this" {
   }
 }
 
+output "aca_certificate_subject_name" {
+  description = "The subject name of the Container App Environment."
+  sensitive   = false
+  value       = azurerm_container_app_environment_certificate.this.subject_name
+}
+
 resource "azurerm_dns_a_record" "external-nlb" {
   name                = "external-nlb"
   resource_group_name = module.environment_resource_group.resource.name

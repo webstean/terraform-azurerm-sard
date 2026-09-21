@@ -283,3 +283,4 @@ output "aca_portal_url" {
   sensitive   = false
   value       = "https://containerapps.azure.com/"
 }
+
