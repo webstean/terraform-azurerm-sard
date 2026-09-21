@@ -112,11 +112,10 @@ module "vmss_external_load_balancer" {
       frontend_port                     = var.vmss_port_tcp_external
       backend_port                      = var.vmss_port_tcp_internal
       backend_address_pool_object_names = ["vmss"]
-      probe_object_name                 = "vmss"
+      probe_object_name                 = "vmss-health-probe"
       load_distribution                 = "SourceIPProtocol"
-      #enable_floating_ip                = true
-      floating_ip_enabled   = true
-      disable_outbound_snat = true
+      floating_ip_enabled               = true
+      disable_outbound_snat             = true
     }
   }
 
