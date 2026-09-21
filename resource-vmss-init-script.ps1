@@ -762,8 +762,18 @@ DisableQUIC
 DisableNetBIOS
 
 function Set-NetworkProfilesToPrivate {
+    if (-not (Test-CommandExists -Name 'Get-NetConnectionProfile')) {
+        Write-Warning 'Skipping network profile configuration because Get-NetConnectionProfile is unavailable.'
+        return
+    }
+
+    if (-not (Test-CommandExists -Name 'Set-NetConnectionProfile')) {
+        Write-Warning 'Skipping network profile configuration because Set-NetConnectionProfile is unavailable.'
+        return
+    }
+
     # Make all the network connection profiles private
-    $networks = Get-NetConnectionProfile
+    $networks = Get-NetConnectionProfile -ErrorAction SilentlyContinue
     foreach ($net in $networks) {
         Write-Host "Changing '$($net.Name)' from $($net.NetworkCategory) to Private..."
         Set-NetConnectionProfile -InterfaceIndex $net.InterfaceIndex -NetworkCategory Private
@@ -1005,7 +1015,19 @@ if (Test-Path "${BIN}\config.bgi") {
 }
 
 function Set-Firewall {
-    New-NetFirewallRule -DisplayName 'Allow TCP 8443 Inbound' -Direction Inbound -Protocol TCP -LocalPort 8443 -Action Allow -Enabled True
+    $ruleName = 'Allow TCP 8443 Inbound'
+
+    if ((Test-CommandExists -Name 'Get-NetFirewallRule') -and (Get-NetFirewallRule -DisplayName $ruleName -ErrorAction SilentlyContinue)) {
+        Write-Output "Firewall rule '$ruleName' already exists. Skipping creation."
+        return
+    }
+
+    if (-not (Test-CommandExists -Name 'New-NetFirewallRule')) {
+        Write-Warning 'Skipping firewall rule setup because New-NetFirewallRule is unavailable.'
+        return
+    }
+
+    New-NetFirewallRule -DisplayName $ruleName -Direction Inbound -Protocol TCP -LocalPort 8443 -Action Allow -Enabled True
 }
 Set-Firewall
 
@@ -1176,6 +1198,164 @@ function Start-PsPingServer {
     & C:\bin\psping @psArgs
 }
 
+<#
+.SYNOPSIS
+    PsPing server, fixed to run reliably as a Scheduled Task at machine
+    startup, plus the registration function to set that task up.
+#>
+
+$script:PsPingLogPath = 'C:\ProgramData\PsPing\psping-server.log'
+$script:PsPingExePath = 'C:\bin\psping.exe'
+
+function Write-PsPingLog {
+    param([string]$Message)
+    $logDir = Split-Path $script:PsPingLogPath -Parent
+    if (-not (Test-Path $logDir)) {
+        New-Item -ItemType Directory -Path $logDir -Force | Out-Null
+    }
+    "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')  $Message" |
+    Out-File -FilePath $script:PsPingLogPath -Append -Encoding utf8
+}
+
+function Test-PsPingAvailable {
+    if (-not (Test-Path $script:PsPingExePath)) {
+        Write-PsPingLog "psping.exe not found at $script:PsPingExePath"
+        return $false
+    }
+    return $true
+}
+
+function Get-LocalIPAddress {
+    [CmdletBinding()]
+    param(
+        [string[]]$InterfaceAlias = @('Ethernet*', 'Wi-Fi*')
+    )
+
+    $ip = Get-NetIPAddress -AddressFamily IPv4 |
+    Where-Object {
+        $_.InterfaceAlias -like $InterfaceAlias[0] -or
+        ($InterfaceAlias.Count -gt 1 -and $_.InterfaceAlias -like $InterfaceAlias[1])
+    } |
+    Where-Object { $_.IPAddress -notlike '169.254.*' -and $_.IPAddress -ne '127.0.0.1' } |
+    Select-Object -First 1 -ExpandProperty IPAddress
+
+    if (-not $ip) {
+        Write-PsPingLog 'Could not auto-detect a local IPv4 address.'
+        return $null
+    }
+    return $ip
+}
+
+function Start-PsPingServer {
+    <#
+    .SYNOPSIS
+        Starts a psping server listening on a local IP and port. Designed to
+        be launched unattended (Scheduled Task at startup) - never throws,
+        logs to $script:PsPingLogPath instead of the console, and blocks
+        forever (psping -s never returns on its own).
+
+    .PARAMETER IPAddress
+        Local IP to bind to. Auto-detected if omitted. Use "0.0.0.0" to bind
+        all interfaces.
+
+    .PARAMETER Port
+        Port to listen on. Defaults to 8443.
+
+    .PARAMETER OpenFirewall
+        Passes -f to psping. Note: this only opens the firewall for as long
+        as the psping process is running - since this process is meant to
+        run forever until reboot, that's effectively permanent, but if you
+        want the rule to persist independently of this process, create it
+        with New-NetFirewallRule instead and drop this switch.
+
+    .EXAMPLE
+        Start-PsPingServer -Port 8443 -OpenFirewall
+    #>
+    [CmdletBinding()]
+    param(
+        [string]$IPAddress,
+        [int]$Port = 8443,
+        [switch]$OpenFirewall
+    )
+
+    if (-not (Test-PsPingAvailable)) {
+        return
+    }
+
+    if (-not $IPAddress) {
+        $IPAddress = Get-LocalIPAddress
+        if ($null -eq $IPAddress) {
+            return
+        }
+    }
+
+    $psArgs = @()
+    if ($OpenFirewall) { $psArgs += '-f' }
+    $psArgs += '-s'
+    $psArgs += "${IPAddress}:${Port}"
+
+    Write-PsPingLog "Starting psping server on ${IPAddress}:${Port}"
+    try {
+        & $script:PsPingExePath @psArgs *>> $script:PsPingLogPath
+    } catch {
+        Write-PsPingLog "psping exited/failed: $($_.Exception.Message)"
+    }
+    Write-PsPingLog 'psping server process ended.'
+}
+
+function Register-PsPingServerStartupTask {
+    <#
+    .SYNOPSIS
+        Registers a Scheduled Task that runs Start-PsPingServer at every
+        machine startup, running as SYSTEM regardless of whether anyone logs
+        in, and with the default 72-hour execution time limit disabled so
+        Task Scheduler doesn't kill the indefinitely-running listener.
+
+    .PARAMETER Port
+        Port for the server to listen on. Defaults to 8443.
+
+    .PARAMETER OpenFirewall
+        Also open the firewall for this port when the server starts.
+
+    .EXAMPLE
+        Register-PsPingServerStartupTask -Port 8443 -OpenFirewall
+    #>
+    [CmdletBinding()]
+    param(
+        [int]$Port = 8443,
+        [switch]$OpenFirewall
+    )
+
+    $taskName = 'PsPingServer-Startup'
+    $scriptPath = $PSCommandPath # this file, so the scheduled task re-dot-sources the same functions
+
+    $openFirewallArg = if ($OpenFirewall) { ' -OpenFirewall' } else { '' }
+    $command = ". '$scriptPath'; Start-PsPingServer -Port $Port$openFirewallArg"
+
+    $action = New-ScheduledTaskAction -Execute 'powershell.exe' `
+        -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -Command `"$command`""
+
+    $trigger = New-ScheduledTaskTrigger -AtStartup
+
+    # -ExecutionTimeLimit 0 disables Task Scheduler's default 72h kill switch,
+    # which would otherwise terminate this indefinitely-running listener.
+    $settings = New-ScheduledTaskSettingsSet `
+        -ExecutionTimeLimit ([TimeSpan]::Zero) `
+        -RestartCount 3 `
+        -RestartInterval (New-TimeSpan -Minutes 1) `
+        -MultipleInstances IgnoreNew `
+        -StartWhenAvailable `
+        -AllowStartIfOnBatteries `
+        -DontStopIfGoingOnBatteries
+
+    $principal = New-ScheduledTaskPrincipal -UserId 'SYSTEM' -LogonType ServiceAccount -RunLevel Highest
+
+    Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger `
+        -Settings $settings -Principal $principal -Force | Out-Null
+
+    Write-Host "Registered scheduled task '$taskName' - will run at every startup as SYSTEM."
+}
+Register-PsPingServerStartupTask
 
 function Get-TCPInboundStatus {
     Get-NetFirewallRule | Get-NetFirewallPortFilter | Where-Object LocalPort -In 443, 8443
