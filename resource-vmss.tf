@@ -75,6 +75,7 @@ module "vmss_external_load_balancer" {
     vmss_frontend = {
       name                          = "vmss-external-frontend"
       public_ip_address_resource_id = azurerm_public_ip.vmss_external[0].id
+      zones                         = ["None"]
     }
   }
 
