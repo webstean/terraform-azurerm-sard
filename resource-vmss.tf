@@ -85,6 +85,8 @@ module "vmss_external_load_balancer" {
     ip_version              = "IPv4"
     sku                     = "Standard"
     sku_tier                = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
+    domain_name_label       = "vmss-external-${local.vmss_name}"
+    reverse_fqdn            = "vmss-external-${local.vmss_name}.${azurerm_dns_zone.environment.name}"
   }
 
   backend_address_pools = {
