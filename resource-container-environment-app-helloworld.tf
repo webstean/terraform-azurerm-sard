@@ -69,7 +69,21 @@ module "helloworld_container_app" {
         {
           name  = "ASPNETCORE_ENVIRONMENT"
           value = "Production"
-        }
+        },
+        {
+          name  = "EXTERNAL_NLB_IP"
+          value = try(module.vmss_external_load_balancer.azurerm_public_ip, "0.0.0.0")
+        },
+        {
+          name  = "PII"
+          value = var.data_pii
+        },
+        {
+          name  = "PHI"
+          value = var.data_phi
+        },
+
+
       ]
       volume_mounts = [
         {
