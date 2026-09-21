@@ -84,9 +84,9 @@ module "vmss_external_load_balancer" {
     allocation_method       = "Static"
     idle_timeout_in_minutes = 30
     ip_version              = "IPv4"
-    sku                     = "Standard"
+    sku                     = "Standard" ## "StandardV2" is NOT supported
     sku_tier                = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
-    domain_name_label       = "vmss-external-${local.vmss_name}"
+    domain_name_label       = "${local.vmss_name}${random_string.environment.result}"
   }
 
   backend_address_pools = {
@@ -135,7 +135,7 @@ resource "azurerm_public_ip" "vmss_external" {
   resource_group_name     = module.environment_resource_group.resource.name
   location                = module.environment_resource_group.resource.location
   allocation_method       = "Static"
-  domain_name_label       = "vmss-external-${local.vmss_name}"
+  domain_name_label       = "${local.vmss_name}${random_string.environment.result}"
   idle_timeout_in_minutes = 30
   ip_version              = "IPv4"
   sku                     = "Standard"
@@ -155,7 +155,7 @@ resource "azapi_update_resource" "vmss_external_reverse_fqdn" {
   resource_id = azurerm_public_ip.vmss_external[0].id
   body = {
     properties = {
-      reverseFqdn = "vmss-external-${local.vmss_name}.${azurerm_dns_zone.environment.name}"
+      reverseFqdn = "${local.vmss_name}${random_string.environment.result}.${azurerm_dns_zone.environment.name}"
     }
   }
 
