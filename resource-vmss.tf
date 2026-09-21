@@ -75,7 +75,7 @@ module "vmss_external_load_balancer" {
     vmss_frontend = {
       name                          = "vmss-external-frontend"
       public_ip_address_resource_id = azurerm_public_ip.vmss_external[0].id
-      zones                         = ["None"]
+      zones                         = local.regions[var.location].zones
     }
   }
 
@@ -139,7 +139,7 @@ resource "azurerm_public_ip" "vmss_external" {
   ip_version              = "IPv4"
   sku                     = "Standard"
   sku_tier                = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
-  zones                   = ["1", "2", "3"]
+  zones                   = local.regions[var.location].zones
   tags                    = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 
   lifecycle {

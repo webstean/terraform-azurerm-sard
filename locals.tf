@@ -62,9 +62,9 @@ locals {
       location                           = "australiasoutheast"
       location_shortname                 = "ase"
       zone_redundancy_available          = false
-      zones                              = null
-      zones_one                          = ["1"]
-      zones_full                         = ["1", "2", "3"]
+      zones                              = ["None"]
+      zones_one                          = ["None"]
+      zones_full                         = ["None"]
       default_rep_location               = "australiaeast"
       sql_maintenance_configuration_name = "SQL_AustraliaSouthEast_DB_1"
       ## Static Web Apps location - limited region support
@@ -134,6 +134,7 @@ locals {
 
     australiacentral = { // needs to be the official Azure region name
       // Freeform name - can be anything
+      // Note: access-restricted, reserved for specific customer scenarios like government/disaster recovery
       name               = "Canberra1"
       postcode           = "2600"
       short_name         = "can1"
@@ -151,9 +152,9 @@ locals {
       location                           = "australiacentral"
       location_shortname                 = "acl"
       zone_redundancy_available          = false
-      zones                              = null
-      zones_one                          = ["1"]
-      zones_full                         = ["1", "2", "3"]
+      zones                              = ["None"]
+      zones_one                          = ["None"]
+      zones_full                         = ["None"]
       default_rep_location               = "australiaeast"
       sql_maintenance_configuration_name = "SQL_AustraliaEast_DB_1"
       ## Static Web Apps location - limited region support
@@ -181,6 +182,7 @@ locals {
 
     australiacentral2 = { // needs to be the official Azure region name
       // Freeform name - can be anything
+      // Note: access-restricted, reserved for specific customer scenarios like government/disaster recovery
       name               = "Canberra2"
       postcode           = "2600"
       short_name         = "can2"
@@ -198,9 +200,9 @@ locals {
       location                           = "australiacentral2"
       location_shortname                 = "acl2"
       zone_redundancy_available          = false
-      zones                              = null
-      zones_one                          = ["1"]
-      zones_full                         = ["1", "2", "3"]
+      zones                              = ["None"]
+      zones_one                          = ["None"]
+      zones_full                         = ["None"]
       default_rep_location               = "australiaeast"
       sql_maintenance_configuration_name = "SQL_AustraliaEast_DB_1"
       ## Static Web Apps location - limited region support
@@ -221,7 +223,6 @@ locals {
       vnet_bgp_community = null ## The BGP community attribute in format <as-number>:<community-value>.
 
       dns_servers = null
-
     }
 
     perth = { // needs to be the official Azure region name
@@ -243,9 +244,9 @@ locals {
       location                           = "australiaeast"
       location_shortname                 = "ae"
       zone_redundancy_available          = true
-      zones                              = null
-      zones_one                          = ["1"]
-      zones_full                         = ["1", "2", "3"]
+      zones                              = ["None"]
+      zones_one                          = ["None"]
+      zones_full                         = ["None"]
       default_rep_location               = "australiasoutheast"
       sql_maintenance_configuration_name = "SQL_AustraliaEast_DB_1"
       ## Static Web Apps location - limited region support
@@ -266,7 +267,6 @@ locals {
       vnet_bgp_community = null ## The BGP community attribute in format <as-number>:<community-value>.
 
       dns_servers = null ## Azure Internal DNS - https://learn.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
-
     }
 
     centralindia = {
@@ -287,8 +287,8 @@ locals {
       region                             = "centralindia"
       location                           = "centralindia"
       location_shortname                 = "ind"
-      zone_redundancy_available          = false
-      zones                              = null
+      zone_redundancy_available          = true
+      zones                              = ["1", "2", "3"]
       zones_one                          = ["1"]
       zones_full                         = ["1", "2", "3"]
       default_rep_location               = "southindia"
@@ -333,7 +333,9 @@ locals {
       location                           = "westus3"
       location_shortname                 = "wus3"
       zone_redundancy_available          = false
-      zones                              = null
+      zones                              = ["1", "2", "3"]
+      zones_one                          = ["1"]
+      zones_full                         = ["1", "2", "3"]
       default_rep_location               = null
       sql_maintenance_configuration_name = "SQL_WestUS3_DB_1"
       ## Static Web Apps location - limited region support
