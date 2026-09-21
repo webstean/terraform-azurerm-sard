@@ -153,7 +153,6 @@ resource "azurerm_subnet_route_table_association" "subnet02_kms_route" {
   route_table_id = azurerm_route_table.this.id
 }
 
-
 resource "azurerm_network_security_group" "secure" { ## designed to be associated to NIC or subnets or both!
   name                = "nsg-general-access-${lower(module.environment_resource_group.resource.location)}"
   resource_group_name = module.environment_resource_group.resource.name
