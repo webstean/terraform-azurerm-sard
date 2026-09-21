@@ -120,18 +120,33 @@ locals {
 
 ## data.azurerm_subscription.current.display_name
 
-resource "azurerm_private_dns_zone" "privatelink-dns1" {
+module "private_dns_zones" {
   for_each = tobool(var.deploy_private_endpoints) ? toset(local.privatednszones) : toset([])
 
-  name                = lower(each.value)
-  resource_group_name = module.environment_resource_group.resource.name
+  source           = "Azure/avm-res-network-privatednszone/azurerm"
+  version          = "~>0.0, < 1.0"
+  enable_telemetry = var.enable_telemetry
 
-  soa_record {
-    email = "hostmaster.${each.value}"
-    ttl   = 3600
-    tags  = local.dns_tags_private
+  domain_name = lower(each.key)
+  parent_id   = module.environment_resource_group.resource.id
+
+  virtual_network_links = {
+    "${azurerm_virtual_network.this.name}" = {
+      vnetlinkname                           = "${azurerm_virtual_network.this.name}-${replace(lower(each.key), ".", "-")}"
+      name                                   = "${azurerm_virtual_network.this.name}-${replace(lower(each.key), ".", "-")}"
+      virtual_network_id                     = azurerm_virtual_network.this.id
+      autoregistration                       = true
+      registration_enabled                   = true
+      private_dns_zone_supports_private_link = true
+      resolution_policy                      = "Default"
+      tags                                   = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+    }
   }
+
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
+    kind = "CanNotDelete"
+  } : null
 }
 
 ## region specific DNS privatelink zones
