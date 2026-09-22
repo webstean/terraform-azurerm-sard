@@ -64,7 +64,7 @@ DOCKERFILE
 resource "azurerm_role_assignment" "registry_push" {
   scope                = var.container_registry_id
   role_definition_name = "ACRPush"
-  principal_id         = azurerm_user_assigned_identity.environment.id
+  principal_id         = azurerm_user_assigned_identity.environment.principal_id
   description          = local.iac_message
 }
 
