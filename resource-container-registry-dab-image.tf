@@ -10,25 +10,25 @@ locals {
   dab_entrypoint_script = <<-BASH
 #!/usr/bin/env bash
 set -euo pipefail
-echo "Starting Azure Database API Builder  ($var.prefix)..."
+echo "Starting Azure Database API Builder  (${var.customer}-${var.prefix})..."
 if [ -z "$${DATABASE_CONNECTION_STRING:-}" ]; then
   echo "FAILED:Environment variable: 'DATABASE_CONNECTION_STRING' is not set"
   exit 1
 fi
-if [ ! -f "${var.prefix}.json" ]; then
-  echo "WARNING:Configuration file '${var.prefix}.json' was not found, Generating it now..."
-  dab auto-config ${var.prefix} \
+if [ ! -f "${var.customer}-${var.prefix}.json" ]; then
+  echo "WARNING:Configuration file '${var.customer}-${var.prefix}.json' was not found, Generating it now..."
+  dab auto-config ${var.customer}-${var.prefix} \
 	--template.rest.enabled true \
 	--template.graphql.enabled true \
 	--template.cache.enabled true \
 	--template.cache.ttl-seconds 30 \
 	--template.cache.level L1L2 \
  	--permissions "anonymous:read"
-  exec DAB_ENVIRONMENT=${var.prefix} dab start
+  exec DAB_ENVIRONMENT=${var.customer}-${var.prefix} dab start
   exit 0
 else
-  echo "INFO:Configuration file '${var.prefix}.json' found"
-  exec DAB_ENVIRONMENT=${var.prefix} dab start
+  echo "INFO:Configuration file '${var.customer}-${var.prefix}.json' found"
+  exec DAB_ENVIRONMENT=${var.customer}-${var.prefix} dab start
 fi
 BASH
 
