@@ -115,7 +115,7 @@ module "vmss_external_load_balancer" {
       probe_object_name                 = "vmss"
       load_distribution                 = "SourceIPProtocol"
       floating_ip_enabled               = true
-      disable_outbound_snat             = true
+      disable_outbound_snat             = var.deploy_nat_gateway ? false : true ## Allow NLB to provide outboud Internet if no NAT Gateway
     }
   }
 
