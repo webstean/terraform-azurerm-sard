@@ -15,8 +15,8 @@ if [ -z "$${DATABASE_CONNECTION_STRING:-}" ]; then
   echo "FAILED:Environment variable: 'DATABASE_CONNECTION_STRING' is not set"
   exit 1
 fi
-if [ ! -f "dab-config.json" ]; then
-  echo "WARNING:Configuration file 'dab-config.json' is not found, Generating it now..."
+if [ ! -f "${var.prefix}.json" ]; then
+  echo "WARNING:Configuration file '${var.prefix}.json' was not found, Generating it now..."
   dab auto-config ${var.prefix} \
 	--template.rest.enabled true \
 	--template.graphql.enabled true \
@@ -27,17 +27,16 @@ if [ ! -f "dab-config.json" ]; then
   exec DAB_ENVIRONMENT=${var.prefix} dab start
   exit 0
 else
-  echo "INFO:Configuration file dab-config.json found"
+  echo "INFO:Configuration file '${var.prefix}.json' found"
   exec DAB_ENVIRONMENT=${var.prefix} dab start
 fi
 BASH
 
+  #COPY ${var.prefix}.json /App/dab-config.json
   dab_dockerfile = <<-DOCKERFILE
 ARG BASE_IMAGE=mcr.microsoft.com/azure-databases/data-api-builder:latest
 FROM $${BASE_IMAGE}
 ENV DATABASE_CONNECTION_STRING=${local.sql_database_connection_free_encrypted}
-COPY dab-config.json /App/dab-config.json
-RUN
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod 0755 /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
