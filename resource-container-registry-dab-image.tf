@@ -34,7 +34,7 @@ BASH
   dab_dockerfile = <<-DOCKERFILE
 ARG BASE_IMAGE=mcr.microsoft.com/azure-databases/data-api-builder:latest
 FROM $${BASE_IMAGE}
-ENV DATABASE_CONNECTION_STRING=${local.sql_database_connection_free_encrypted}
+ENV DATABASE_CONNECTION_STRING="${local.sql_database_connection_free_encrypted}"
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod 0755 /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
@@ -54,7 +54,7 @@ DOCKERFILE
       },
       {
         push = ["${local.dab_image_repository}:{{.Run.ID}}", "${local.dab_image_repository}:latest"]
-      }
+      },
     ]
   })
 }
