@@ -79,7 +79,8 @@ resource "azurerm_container_registry_task" "dab_build" {
   }
 
   platform {
-    os = "Linux"
+    os           = "Linux"
+    architecture = "amd64"
   }
 
   encoded_step {
@@ -111,6 +112,16 @@ resource "azurerm_container_registry_task_schedule_run_now" "dab_build_now" {
   lifecycle {
     replace_triggered_by = [terraform_data.dab_build_apply_trigger]
   }
+}
+
+output "container_registry_dab_broker_image" {
+  description = <<DESC
+The DAB broker image reference for Docker or Podman.
+Run the DAB broker image using Podman
+podman run "$(terraform output -raw container_registry_dab_broker_image)"
+DESC
+  sensitive   = false
+  value       = "${local.dab_image_repository}:latest"
 }
 
 /*
