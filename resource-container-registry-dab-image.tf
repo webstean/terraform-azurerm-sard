@@ -1,5 +1,5 @@
-# Builds an AzCopy runner entirely within ACR. The Dockerfile and task YAML
-# are Terraform locals so no external Git context or access token is required.
+# Builds an DAB broker entirely within ACR.
+# The Dockerfile and task YAML are Terraform locals so no external Git context or access token is required.
 locals {
   dab_image_repository = "${var.container_registry_login_server}/dab-broker"
 
@@ -69,7 +69,7 @@ resource "azurerm_role_assignment" "registry_push" {
 }
 
 resource "azurerm_container_registry_task" "dab_build" {
-  name                  = "build-azcopy-runner"
+  name                  = "dab-broker-build"
   container_registry_id = var.container_registry_id
 
   enabled = true
