@@ -4,9 +4,7 @@ locals {
   dab_image_repository = "${var.container_registry_login_server}/dab-broker"
 
   ## Environment variables:
-  ##   dab_MSI_CLIENT_ID must be defined
-  ##   SOURCE_URL must be defined, can be Blob or Azure Files
-  ##   DESTINATION_URL must be defined can be Blob or Azure Files
+  ##   DATABASE_CONNECTION_STRING must be defined
   dab_entrypoint_script = <<-BASH
 #!/usr/bin/env bash
 set -euo pipefail
