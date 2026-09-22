@@ -95,6 +95,23 @@ resource "azurerm_dns_a_record" "external-nlb" {
   tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
+resource "azurerm_dns_cname_record" "vmss" {
+  name                = local.vmss_name
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
+  record              = azurerm_dns_a_record.external-nlb.name
+  ttl                 = 30
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
+resource "azurerm_dns_cname_record" "nlb" {
+  name                = "nlb"
+  zone_name           = azurerm_dns_zone.environment.name
+  resource_group_name = module.environment_resource_group.resource.name
+  record              = azurerm_dns_a_record.external-nlb.name
+  ttl                 = 30
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
+
 resource "azurerm_dns_a_record" "vmss_external_reverse_fqdn" {
   count = var.deploy_vmss_external_load_balancer ? 1 : 0
 
