@@ -10,7 +10,7 @@ locals {
   dab_entrypoint_script = <<-BASH
 #!/usr/bin/env bash
 set -euo pipefail
-echo "Starting Azure Database API Builder..."
+echo "Starting Azure Database API Builder  ($var.prefix)..."
 if [ -z "$${DATABASE_CONNECTION_STRING:-}" ]; then
   echo "FAILED:Environment variable: 'DATABASE_CONNECTION_STRING' is not set"
   exit 1
