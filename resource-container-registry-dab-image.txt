@@ -1,7 +1,7 @@
 # Builds an AzCopy runner entirely within ACR. The Dockerfile and task YAML
 # are Terraform locals so no external Git context or access token is required.
 locals {
-  dab_image_repository = "${module.containerregistry.login_server}/dab-broker"
+  dab_image_repository = "${var.container_registry_login_server}/dab-broker"
 
   ## Environment variables:
   ##   dab_MSI_CLIENT_ID must be defined
@@ -12,17 +12,18 @@ locals {
 set -euo pipefail
 echo "Starting Azure Database API Builder..."
 if [ -z "$${DATABASE_CONNECTION_STRING:-}" ]; then
-  echo "FAILED:Environment variable: DATABASE_CONNECTION_STRING is not set"
+  echo "FAILED:Environment variable: 'DATABASE_CONNECTION_STRING' is not set"
   exit 1
 fi
 if [ ! -f "dab-config.json" ]; then
-  echo "WARNING:Configuration file dab-config.json is not found"
+  echo "WARNING:Configuration file 'dab-config.json' is not found"
   dab auto-config ${var.prefix} \
 	--template.rest.enabled true \
 	--template.graphql.enabled true \
 	--template.cache.enabled true \
 	--template.cache.ttl-seconds 30 \
-	--template.cache.level L1L2
+	--template.cache.level L1L2 \
+ 	--permissions "anonymous:read"
   exec DAB_ENVIRONMENT=${var.prefix} dab start
   exit 0
 else
@@ -34,7 +35,7 @@ BASH
   dab_dockerfile = <<-DOCKERFILE
 ARG BASE_IMAGE=mcr.microsoft.com/azure-databases/data-api-builder:latest
 FROM $${BASE_IMAGE}
-ENV DATABASE_CONNECTION_STRING=${local.local.sql_database_connection_free_encrypted}
+ENV DATABASE_CONNECTION_STRING=${local.sql_database_connection_free_encrypted}
 COPY dab-config.json /App/dab-config.json
 RUN
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
@@ -60,15 +61,23 @@ DOCKERFILE
     ]
   })
 }
+
+resource "azurerm_role_assignment" "registry_push" {
+  scope                = var.container_registry_id
+  role_definition_name = "ACRPush"
+  principal_id         = azurerm_user_assigned_identity.environment.id
+  description          = local.iac_message
+}
+
 resource "azurerm_container_registry_task" "dab_build" {
   name                  = "build-azcopy-runner"
-  container_registry_id = module.containerregistry.resource_id
+  container_registry_id = var.container_registry_id
 
   enabled = true
   identity {
     type = "UserAssigned"
     identity_ids = [
-      module.global_user_managed_identity.resource_id
+      azurerm_user_assigned_identity.environment.id
     ]
   }
 
@@ -88,7 +97,10 @@ resource "azurerm_container_registry_task" "dab_build" {
   }
 
   timeout_in_seconds = 900
-  tags               = { for key, value in module.global_resource_group.resource.tags : key => value if lower(key) != "created" }
+  tags               = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  depends_on = [
+    azurerm_role_assignment.registry_push
+  ]
 }
 
 # Changes on every plan so the immediate-run resource is recreated on every apply.
