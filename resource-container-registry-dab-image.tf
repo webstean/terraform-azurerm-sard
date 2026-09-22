@@ -16,7 +16,7 @@ if [ -z "$${DATABASE_CONNECTION_STRING:-}" ]; then
   exit 1
 fi
 if [ ! -f "dab-config.json" ]; then
-  echo "WARNING:Configuration file 'dab-config.json' is not found"
+  echo "WARNING:Configuration file 'dab-config.json' is not found, Generating it now..."
   dab auto-config ${var.prefix} \
 	--template.rest.enabled true \
 	--template.graphql.enabled true \
