@@ -1,21 +1,23 @@
 locals {
-  storage_friendly_name      = "Storage Accounts"
-  storage_name               = "st-${var.prefix}"
-  storage_name_location      = lower("${local.storage_name}-${lower(var.location)}")
-  storage_random_suffix      = substr(random_string.environment.result, 0, 6)
-  storage_name_hostname      = lower(substr(replace("c${local.storage_random_suffix}${local.storage_name_location}", "-", ""), 0, 24))
-  diag_storage_name          = "dia-${var.prefix}"
-  diag_storage_name_location = lower("${local.diag_storage_name}-${lower(var.location)}")
-  diag_storage_random_suffix = substr(random_string.environment.result, 0, 6)
-  diag_storage_name_hostname = lower(substr(replace("d${local.diag_storage_random_suffix}${local.diag_storage_name_location}", "-", ""), 0, 24))
+  storage_friendly_name       = "Storage Accounts"
+  storage_name                = "st-${var.prefix}"
+  storage_name_location       = lower("${local.storage_name}-${lower(var.location)}")
+  storage_random_suffix       = substr(random_string.environment.result, 0, 6)
+  storage_name_hostname       = lower(substr(replace("c${local.storage_random_suffix}${local.storage_name_location}", "-", ""), 0, 24))
+  diag_storage_name           = "dia-${var.prefix}"
+  diag_storage_name_location  = lower("${local.diag_storage_name}-${lower(var.location)}")
+  diag_storage_random_suffix  = substr(random_string.environment.result, 0, 6)
+  diag_storage_name_hostname  = lower(substr(replace("d${local.diag_storage_random_suffix}${local.diag_storage_name_location}", "-", ""), 0, 24))
+  default_account_tier        = "Standard"
+  default_account_replication = "LRS"
 }
 
 resource "azurerm_storage_account" "this" {
   name                            = local.storage_name_hostname
   resource_group_name             = module.environment_resource_group.resource.name
   location                        = module.environment_resource_group.resource.location
-  account_tier                    = "Standard"
-  account_replication_type        = "LRS"
+  account_tier                    = local.default_account_tier
+  account_replication_type        = local.default_account_replication
   account_kind                    = "StorageV2"
   min_tls_version                 = "TLS1_2"
   shared_access_key_enabled       = true ## still needed for compatbility, such ACA and Azure Data Box Gateway, and Azure File Sync, and Azure Backup, and Azure Site Recovery, and Azure Storage Explorer, and AzCopy, and Microsoft SQL Server, and Windows Server 2012 R2 or later, and Windows 8.1 or later, and Windows PowerShell 5.1 or later, and Windows PowerShell Core 6.0 or later, and Windows PowerShell Core 7.0 or later, and Windows PowerShell Core 7.1 or later, and Windows PowerShell Core 7.2 or later, and Windows PowerShell Core 7.3 or later, and Windows PowerShell Core 7.4 or later
@@ -174,8 +176,8 @@ resource "azurerm_storage_account" "diag" {
   name                            = local.diag_storage_name_hostname
   resource_group_name             = module.environment_resource_group.resource.name
   location                        = module.environment_resource_group.resource.location
-  account_tier                    = "Standard"
-  account_replication_type        = "LRS"
+  account_tier                    = local.default_account_tier
+  account_replication_type        = local.default_account_replication
   account_kind                    = "StorageV2"
   min_tls_version                 = "TLS1_2"
   shared_access_key_enabled       = true
