@@ -292,6 +292,7 @@ Next steps here
 | <a name="input_deploy_private_endpoints"></a> [deploy\_private\_endpoints](#input\_deploy\_private\_endpoints) | If true, deploys private endpoints for secure access to Azure services. If false, does not deploy private endpoints. | `bool` | `false` | no |
 | <a name="input_deploy_private_link_service"></a> [deploy\_private\_link\_service](#input\_deploy\_private\_link\_service) | Whether to deploy the Private Link Service. | `bool` | `false` | no |
 | <a name="input_deploy_sql_failover"></a> [deploy\_sql\_failover](#input\_deploy\_sql\_failover) | If true, deploys a Microsoft SQL failover environment in the linked region. If false, deploys a single SQL instance. | `bool` | `false` | no |
+| <a name="input_deploy_sql_private_endpoints"></a> [deploy\_sql\_private\_endpoints](#input\_deploy\_sql\_private\_endpoints) | If true, deploys private endpoints for secure access to Azure SQL services. If false, does not deploy private endpoints for SQL. | `bool` | `false` | no |
 | <a name="input_deploy_vmss_external_load_balancer"></a> [deploy\_vmss\_external\_load\_balancer](#input\_deploy\_vmss\_external\_load\_balancer) | If true, deploys an external load balancer for the VMSS. If false, does not deploy an external load balancer. | `bool` | `false` | no |
 | <a name="input_easyauth_client_id"></a> [easyauth\_client\_id](#input\_easyauth\_client\_id) | The client ID for the EasyAuth application. | `string` | `null` | no |
 | <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry) | This variable controls whether or not the AVM (Azure Verified Modules) telemetry is enabled for the module.<br/>For more information see <https://aka.ms/avm/telemetryinfo>.<br/>If it is set to false, then no telemetry will be collected. | `bool` | `false` | no |
@@ -443,6 +444,7 @@ Next steps here
 | <a name="module_pls_internal_load_balancer"></a> [pls\_internal\_load\_balancer](#module\_pls\_internal\_load\_balancer) | Azure/avm-res-network-loadbalancer/azurerm | ~>0.5, < 1.0 |
 | <a name="module_private_dns_zones"></a> [private\_dns\_zones](#module\_private\_dns\_zones) | Azure/avm-res-network-privatednszone/azurerm | ~>0.0, < 1.0 |
 | <a name="module_private_endpoint_sqlserver"></a> [private\_endpoint\_sqlserver](#module\_private\_endpoint\_sqlserver) | Azure/avm-res-network-privateendpoint/azurerm | ~>0.0, < 1.0 |
+| <a name="module_sql_private_dns_zones"></a> [sql\_private\_dns\_zones](#module\_sql\_private\_dns\_zones) | Azure/avm-res-network-privatednszone/azurerm | ~>0.0, < 1.0 |
 | <a name="module_virtualmachinescaleset"></a> [virtualmachinescaleset](#module\_virtualmachinescaleset) | Azure/avm-res-compute-virtualmachinescaleset/azurerm | ~>0.0, < 1.0 |
 | <a name="module_vm_x64_skus"></a> [vm\_x64\_skus](#module\_vm\_x64\_skus) | Azure/avm-utl-sku-finder/azapi | ~>0.0, < 1.0 |
 | <a name="module_vmss_autoscale_setting"></a> [vmss\_autoscale\_setting](#module\_vmss\_autoscale\_setting) | Azure/avm-res-insights-autoscalesetting/azurerm | ~>0.0, < 1.0 |
