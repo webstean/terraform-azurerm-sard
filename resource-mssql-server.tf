@@ -291,7 +291,7 @@ resource "azurerm_mssql_server" "this" {
 }
 
 module "private_endpoint_sqlserver" {
-  count = tobool(var.deploy_private_endpoints) ? 1 : 0
+  count = tobool(var.deploy_sql_private_endpoints) || tobool(var.deploy_private_endpoints) ? 1 : 0
 
   source           = "Azure/avm-res-network-privateendpoint/azurerm"
   version          = "~>0.0, < 1.0"

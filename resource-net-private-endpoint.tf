@@ -43,9 +43,9 @@ module "private_endpoint_keyvault" {
 */
 
 locals {
-  privatednszones = toset([
+  nosql_privatednszones = toset([
     #        "privatelink.azure-automation.net",
-    "privatelink.database.windows.net",
+    #"privatelink.database.windows.net",
     #        "privatelink.sql.azuresynapse.net",
     #        "privatelink.dev.azuresynapse.net",
     #        "privatelink.azuresynapse.net",
@@ -121,7 +121,7 @@ locals {
 ## data.azurerm_subscription.current.display_name
 
 module "private_dns_zones" {
-  for_each = tobool(var.deploy_private_endpoints) ? toset(local.privatednszones) : toset([])
+  for_each = tobool(var.deploy_private_endpoints) ? toset(local.nosql_privatednszones) : toset([])
 
   source           = "Azure/avm-res-network-privatednszone/azurerm"
   version          = "~>0.0, < 1.0"
@@ -134,6 +134,35 @@ module "private_dns_zones" {
     "${azurerm_virtual_network.this.name}" = {
       vnetlinkname                           = "${azurerm_virtual_network.this.name}-${replace(lower(each.key), ".", "-")}"
       name                                   = "${azurerm_virtual_network.this.name}-${replace(lower(each.key), ".", "-")}"
+      virtual_network_id                     = azurerm_virtual_network.this.id
+      autoregistration                       = true
+      registration_enabled                   = true
+      private_dns_zone_supports_private_link = true
+      resolution_policy                      = "Default"
+      tags                                   = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+    }
+  }
+
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
+    kind = "CanNotDelete"
+  } : null
+}
+
+module "sql_private_dns_zones" {
+  count = tobool(var.deploy_sql_private_endpoints) ? 1 : 0
+
+  source           = "Azure/avm-res-network-privatednszone/azurerm"
+  version          = "~>0.0, < 1.0"
+  enable_telemetry = var.enable_telemetry
+
+  domain_name = "privatelink.database.windows.net"
+  parent_id   = module.environment_resource_group.resource.id
+
+  virtual_network_links = {
+    "${azurerm_virtual_network.this.name}" = {
+      vnetlinkname                           = "${azurerm_virtual_network.this.name}-privatelink-database-windows-net"
+      name                                   = "${azurerm_virtual_network.this.name}-privatelink-database-windows-net"
       virtual_network_id                     = azurerm_virtual_network.this.id
       autoregistration                       = true
       registration_enabled                   = true

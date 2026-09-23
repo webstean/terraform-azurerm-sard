@@ -370,6 +370,15 @@ DESC
   default     = false
 }
 
+variable "deploy_sql_private_endpoints" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+If true, deploys private endpoints for secure access to Azure SQL services. If false, does not deploy private endpoints for SQL.
+DESC
+  default     = false
+}
+
 variable "deploy_private_link_service" {
   type        = bool
   sensitive   = false
