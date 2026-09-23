@@ -364,6 +364,7 @@ Next steps here
 | <a name="output_bastion_id"></a> [bastion\_id](#output\_bastion\_id) | Bastion Host ID |
 | <a name="output_comms_email_domain"></a> [comms\_email\_domain](#output\_comms\_email\_domain) | The email domain for the Communication Service. |
 | <a name="output_comms_email_sender_username"></a> [comms\_email\_sender\_username](#output\_comms\_email\_sender\_username) | The email sender username for the Communication Service. |
+| <a name="output_container_registry_dab_broker_image"></a> [container\_registry\_dab\_broker\_image](#output\_container\_registry\_dab\_broker\_image) | The DAB broker image reference for Docker or Podman.<br/>Run the DAB broker image using Podman<br/>podman run "$(terraform output -raw container\_registry\_dab\_broker\_image)" |
 | <a name="output_databox_gateway_id"></a> [databox\_gateway\_id](#output\_databox\_gateway\_id) | The ID of the Databox Edge Gateway device. |
 | <a name="output_databox_gateway_properties"></a> [databox\_gateway\_properties](#output\_databox\_gateway\_properties) | The properties of the Databox Edge Gateway device. |
 | <a name="output_environment_diag_storage_account_name"></a> [environment\_diag\_storage\_account\_name](#output\_environment\_diag\_storage\_account\_name) | The name of the main storage account for this environment. |
