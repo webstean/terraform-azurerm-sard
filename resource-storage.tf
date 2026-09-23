@@ -50,11 +50,11 @@ resource "azurerm_storage_account" "this" {
   ##  }
 
   share_properties {
-    smb {
+    smb { ## compatible with Azure Container Apps (ACA)
       versions                        = ["SMB2.1", "SMB3.0", "SMB3.1.1"]
       kerberos_ticket_encryption_type = ["AES-256"] ## AES-256, RC4-HMAC
       channel_encryption_type         = ["AES-128-CCM", "AES-128-GCM", "AES-256-GCM"]
-      authentication_types            = ["Kerberos", "NTLMv2"] ## NTLMv2 is needed for ACA
+      authentication_types            = ["Kerberos", "NTLMv2"] ## NTLMv2 is needed for ACA (otherwise the container fails to start)
     }
   }
 
