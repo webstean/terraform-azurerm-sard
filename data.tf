@@ -5,6 +5,9 @@ data "azurerm_subscriptions" "available" {}
 data "azuread_client_config" "current" {}
 data "azapi_client_config" "current" {}
 data "azuread_application_published_app_ids" "well_known" {}
+data "azurerm_location" "current" {
+  location = var.location
+}
 
 locals {
   ## Unisys policy
