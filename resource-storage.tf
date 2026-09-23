@@ -119,6 +119,27 @@ resource "azurerm_role_assignment" "umi_storage_table_data_reader_role" {
   description          = local.iac_message
 }
 
+resource "azurerm_role_assignment" "this_storage_blob_full_access" {
+  scope                = azurerm_storage_account.this.id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id         = azurerm_user_assigned_identity.environment.principal_id
+  description          = local.iac_message
+}
+
+resource "azurerm_role_assignment" "this_storage_queue_full_access" {
+  scope                = azurerm_storage_account.this.id
+  role_definition_name = "Storage Queue Data Contributor"
+  principal_id         = azurerm_user_assigned_identity.environment.principal_id
+  description          = local.iac_message
+}
+
+resource "azurerm_role_assignment" "this_storage_table_full_access" {
+  scope                = azurerm_storage_account.this.id
+  role_definition_name = "Storage Table Data Contributor"
+  principal_id         = azurerm_user_assigned_identity.environment.principal_id
+  description          = local.iac_message
+}
+
 /*
 resource "azurerm_monitor_diagnostic_setting" "storage_metrics" {
   name                       = "Metrics-${azurerm_storage_account.this.name}-to-Azure-Monitor"
@@ -205,6 +226,26 @@ resource "azurerm_role_assignment" "search_blob_reader" {
 }
 */
 
+resource "azurerm_role_assignment" "diag_storage_blob_full_access" {
+  scope                = azurerm_storage_account.diag.id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id         = azurerm_user_assigned_identity.environment.principal_id
+  description          = local.iac_message
+}
+
+resource "azurerm_role_assignment" "diag_storage_queue_full_access" {
+  scope                = azurerm_storage_account.diag.id
+  role_definition_name = "Storage Queue Data Contributor"
+  principal_id         = azurerm_user_assigned_identity.environment.principal_id
+  description          = local.iac_message
+}
+
+resource "azurerm_role_assignment" "diag_storage_table_full_access" {
+  scope                = azurerm_storage_account.diag.id
+  role_definition_name = "Storage Table Data Contributor"
+  principal_id         = azurerm_user_assigned_identity.environment.principal_id
+  description          = local.iac_message
+}
 
 resource "azurerm_role_assignment" "github_storage_diag_owner_role" {
   scope                = azurerm_storage_account.diag.id
