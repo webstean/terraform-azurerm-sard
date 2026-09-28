@@ -29,8 +29,10 @@ terraform {
     }
     acme = {
       ## ACME for Let's Encrypt
+      ## v3+ required: v2 tries to "recover" a missing cert from the CA and hard-fails with
+      ## "404 :: Certificate not found" once Let's Encrypt purges the certificate URL.
       source  = "vancluever/acme"
-      version = "~>2.0, < 3.0"
+      version = "~>3.0, < 4.0"
     }
   }
 }
