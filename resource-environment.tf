@@ -114,6 +114,15 @@ module "environment_resource_group" {
       principal_type                   = "ServicePrincipal"
       description                      = local.iac_message
     }
+    "sp_roleassignment10" = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Container Apps SandboxGroup Data Owner/${var.owner_entra_object_id}")
+      role_definition_id_or_name       = "Container Apps SandboxGroup Data Owner"
+      principal_id                     = data.azurerm_client_config.current.object_id
+      skip_service_principal_aad_check = true
+      principal_type                   = "ServicePrincipal"
+      description                      = local.iac_message
+    }
+
     ## ==========================================================================================
     "up_roleassignment1" = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Contributor/${var.owner_entra_object_id}")
@@ -133,6 +142,13 @@ module "environment_resource_group" {
     }
     "up_roleassignment3" = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Contributor/${var.owner_entra_object_id}")
+      role_definition_id_or_name       = "Contributor"
+      principal_id                     = var.owner_entra_object_id
+      skip_service_principal_aad_check = false
+      principal_type                   = "User"
+      description                      = local.iac_message
+    }
+    "up_roleassignment4" = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Windows Admin Center Administrator Login/${var.owner_entra_object_id}")
       role_definition_id_or_name       = "Windows Admin Center Administrator Login"
       principal_id                     = var.owner_entra_object_id
@@ -140,7 +156,7 @@ module "environment_resource_group" {
       principal_type                   = "User"
       description                      = local.iac_message
     }
-    "up_roleassignment4" = {
+    "up_roleassignment5" = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Virtual Machine Administrator Login/${var.owner_entra_object_id}")
       role_definition_id_or_name       = "Virtual Machine Administrator Login"
       principal_id                     = var.owner_entra_object_id
@@ -148,7 +164,7 @@ module "environment_resource_group" {
       principal_type                   = "User"
       description                      = local.iac_message
     }
-    "up_roleassignment5" = {
+    "up_roleassignment6" = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Essential Machine Management Administrator/${var.owner_entra_object_id}")
       role_definition_id_or_name       = "Essential Machine Management Administrator"
       principal_id                     = var.owner_entra_object_id
@@ -156,8 +172,16 @@ module "environment_resource_group" {
       principal_type                   = "User"
       description                      = local.iac_message
     }
+    "up_roleassignment7" = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Container Apps SandboxGroup Data Owner/${var.owner_entra_object_id}")
+      role_definition_id_or_name       = "Container Apps SandboxGroup Data Owner"
+      principal_id                     = var.owner_entra_object_id
+      skip_service_principal_aad_check = false
+      principal_type                   = "User"
+      description                      = local.iac_message
+    }
     /*
-    "up_roleassignment3" = {
+    "up_roleassignment8" = {
       role_definition_id_or_name       = "Storage Blob Data Reader"
       principal_id                     = var.owner_entra_object_id
       skip_service_principal_aad_check = false
