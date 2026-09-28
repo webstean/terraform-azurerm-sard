@@ -167,11 +167,6 @@ resource "acme_certificate" "aca_wildcard" {
   ]
 }
 
-import {
-  to = azurerm_key_vault_certificate.letsencrypt-aca
-  id = "${module.cert_keyvault.resource_id}/certificates/cert-wildcard-${lower(replace(acme_certificate.aca_wildcard.certificate_domain, ".", "-"))}"
-}
-
 ## write/update certificate in KeyVault so you can use it in other services
 resource "azurerm_key_vault_certificate" "letsencrypt-aca" {
   name         = "cert-wildcard-${lower(replace(acme_certificate.aca_wildcard.certificate_domain, ".", "-"))}"
