@@ -34,6 +34,11 @@ terraform {
       source  = "vancluever/acme"
       version = "~>3.0, < 4.0"
     }
+    #aca = {
+    #  ## Azure Container Apps (ACA) provider
+    #  source  = "Azure/aca"
+    #  version = "= 0.5.0-preview"
+    #}
   }
 }
 
