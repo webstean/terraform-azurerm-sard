@@ -213,7 +213,6 @@ Next steps here
 | [azurerm_virtual_hub_connection.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_hub_connection) | resource |
 | [azurerm_virtual_hub_routing_intent.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_hub_routing_intent) | resource |
 | [azurerm_virtual_machine_scale_set_standby_pool.hibernated](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_scale_set_standby_pool) | resource |
-| [azurerm_virtual_network.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
 | [azurerm_web_application_firewall_policy.gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/web_application_firewall_policy) | resource |
 | [azurerm_web_pubsub.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/web_pubsub) | resource |
 | [local_file.homepage](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
@@ -293,6 +292,9 @@ Next steps here
 | <a name="input_inbound_access"></a> [inbound\_access](#input\_inbound\_access) | Specifies the type of inbound access to the environment via the Internet. Options are: 'None' (free), 'App-Gateway' ($$), 'FrontDoor' ($$). | `string` | `"None"` | no |
 | <a name="input_letsencrypt_dns_auth_method"></a> [letsencrypt\_dns\_auth\_method](#input\_letsencrypt\_dns\_auth\_method) | How to authenticate to this Azure tenant for creating LetsEncrupt certificates | `string` | `"oidc"` | no |
 | <a name="input_location"></a> [location](#input\_location) | The Azure region where resources will be deployed. | `string` | `"australiaeast"` | no |
+| <a name="input_logging_basic_only"></a> [logging\_basic\_only](#input\_logging\_basic\_only) | Use only basic tables for logging where applicable. | `bool` | `false` | no |
+| <a name="input_logging_enabled"></a> [logging\_enabled](#input\_logging\_enabled) | Enable or disable logging for the environment. | `bool` | `false` | no |
+| <a name="input_logging_retention"></a> [logging\_retention](#input\_logging\_retention) | The number of days to retain logging for the environment. Set to 0 to disable retention. | `number` | `0` | no |
 | <a name="input_outbound_access"></a> [outbound\_access](#input\_outbound\_access) | Specifies the type of outbound access to the environment via the Internet. Options are: 'Direct' (free), 'Nat-Gateway' ($$), 'Hub-and-Spoke-with-Nat-Gateway' ($$$).<br/>Note: that 'Direct' does not allowed Virtual Machine Scale Sets to have any OutBound Internet access, you need to use a Nat-Gateway or Hub-and-Spoke | `string` | `"Direct"` | no |
 | <a name="input_private_link_service_allowed_fqdns"></a> [private\_link\_service\_allowed\_fqdns](#input\_private\_link\_service\_allowed\_fqdns) | FQDNs allowed for the Private Link Service. | `list(string)` | <pre>[<br/>  "*"<br/>]</pre> | no |
 | <a name="input_private_link_service_auto_approval_subscription_ids"></a> [private\_link\_service\_auto\_approval\_subscription\_ids](#input\_private\_link\_service\_auto\_approval\_subscription\_ids) | The list of subscription IDs that are auto-approved for the Private Link Service. | `list(string)` | <pre>[<br/>  "fd72f9ff-96b6-4a20-a870-ceaa17d70bc8",<br/>  "8d894c2b-238f-490b-8dd1-d93898c5bf83"<br/>]</pre> | no |
@@ -432,6 +434,7 @@ Next steps here
 | <a name="module_private_dns_zones"></a> [private\_dns\_zones](#module\_private\_dns\_zones) | Azure/avm-res-network-privatednszone/azurerm | ~>0.0, < 1.0 |
 | <a name="module_private_endpoint_sqlserver"></a> [private\_endpoint\_sqlserver](#module\_private\_endpoint\_sqlserver) | Azure/avm-res-network-privateendpoint/azurerm | ~>0.0, < 1.0 |
 | <a name="module_sql_private_dns_zones"></a> [sql\_private\_dns\_zones](#module\_sql\_private\_dns\_zones) | Azure/avm-res-network-privatednszone/azurerm | ~>0.0, < 1.0 |
+| <a name="module_virtual_network"></a> [virtual\_network](#module\_virtual\_network) | Azure/avm-res-network-virtualnetwork/azurerm | ~> 0.22, < 1.0 |
 | <a name="module_virtualmachinescaleset"></a> [virtualmachinescaleset](#module\_virtualmachinescaleset) | Azure/avm-res-compute-virtualmachinescaleset/azurerm | ~>0.0, < 1.0 |
 | <a name="module_vm_x64_skus"></a> [vm\_x64\_skus](#module\_vm\_x64\_skus) | Azure/avm-utl-sku-finder/azapi | ~>0.0, < 1.0 |
 | <a name="module_vmss_autoscale_setting"></a> [vmss\_autoscale\_setting](#module\_vmss\_autoscale\_setting) | Azure/avm-res-insights-autoscalesetting/azurerm | ~>0.0, < 1.0 |
