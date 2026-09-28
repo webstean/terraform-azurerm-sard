@@ -142,6 +142,20 @@ resource "azurerm_role_assignment" "this_storage_table_full_access" {
   description          = local.iac_message
 }
 
+resource "azurerm_storage_container" "rag_documents" {
+  name                  = "rag-documents"
+  storage_account_id    = azurerm_storage_account.this.id
+  container_access_type = "private"
+}
+resource "azurerm_role_assignment" "search_blob_reader" {
+  count = var.ai_free_search_principal_id != "" ? 1 : 0
+
+  scope                = azurerm_storage_container.rag_documents.id
+  role_definition_name = "Storage Blob Data Reader"
+  principal_id         = var.ai_free_search_principal_id
+}
+
+
 /*
 resource "azurerm_monitor_diagnostic_setting" "storage_metrics" {
   name                       = "Metrics-${azurerm_storage_account.this.name}-to-Azure-Monitor"
@@ -212,19 +226,6 @@ resource "azurerm_monitor_diagnostic_setting" "storage_metrics_diag" {
   enabled_metric {
     category = "AllMetrics"
   }
-}
-*/
-
-resource "azurerm_storage_container" "rag_documents" {
-  name                  = "rag-documents"
-  storage_account_id    = azurerm_storage_account.this.id
-  container_access_type = "private"
-}
-/*
-resource "azurerm_role_assignment" "search_blob_reader" {
-  scope                = azurerm_storage_container.rag_documents.id
-  role_definition_name = "Storage Blob Data Reader"
-  principal_id         = var.ai_search_principal_id
 }
 */
 
