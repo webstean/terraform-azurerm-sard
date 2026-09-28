@@ -114,6 +114,7 @@ module "environment_resource_group" {
       principal_type                   = "ServicePrincipal"
       description                      = local.iac_message
     }
+    /*
     "sp_roleassignment10" = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Container Apps SandboxGroup Data Owner/${var.owner_entra_object_id}")
       role_definition_id_or_name       = "Container Apps SandboxGroup Data Owner"
@@ -122,6 +123,7 @@ module "environment_resource_group" {
       principal_type                   = "ServicePrincipal"
       description                      = local.iac_message
     }
+*/
 
     ## ==========================================================================================
     "up_roleassignment1" = {
@@ -135,14 +137,6 @@ module "environment_resource_group" {
     "up_roleassignment2" = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Reader and Data Access/${var.owner_entra_object_id}")
       role_definition_id_or_name       = "Reader and Data Access" ## Storage Only
-      principal_id                     = var.owner_entra_object_id
-      skip_service_principal_aad_check = false
-      principal_type                   = "User"
-      description                      = local.iac_message
-    }
-    "up_roleassignment3" = {
-      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Contributor/${var.owner_entra_object_id}")
-      role_definition_id_or_name       = "Contributor"
       principal_id                     = var.owner_entra_object_id
       skip_service_principal_aad_check = false
       principal_type                   = "User"
