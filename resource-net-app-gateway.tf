@@ -29,7 +29,7 @@ resource "azurerm_subnet" "app_gateway" {
 
   name                                          = "ApplicationGatewaySubnet"
   resource_group_name                           = module.environment_resource_group.resource.name
-  virtual_network_name                          = azurerm_virtual_network.this.name
+  virtual_network_name                          = local.vnet_resource_name
   address_prefixes                              = [format("10.%s.66.0/24", local.regions[var.location].location_number)]
   default_outbound_access_enabled               = false
   service_endpoints                             = var.deploy_private_endpoints ? null : local.service_endpoints

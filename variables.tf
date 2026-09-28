@@ -513,6 +513,34 @@ DESC
   }
 }
 
+variable "logging_enabled" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+Enable or disable logging for the environment.
+DESC
+  default     = false
+}
+
+variable "logging_basic_only" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+Use only basic tables for logging where applicable.
+DESC
+  default     = false
+}
+
+variable "logging_retention" {
+  type        = number
+  sensitive   = false
+  description = <<DESC
+The number of days to retain logging for the environment. Set to 0 to disable retention.
+DESC
+  default     = 0
+}
+
+
 variable "outbound_access" {
   type        = string
   sensitive   = false

@@ -8,7 +8,7 @@ locals {
 resource "azurerm_subnet" "containerappenv" {
   name                                          = local.aca_env_name
   resource_group_name                           = module.environment_resource_group.resource.name
-  virtual_network_name                          = azurerm_virtual_network.this.name
+  virtual_network_name                          = local.vnet_resource_name
   address_prefixes                              = [format("10.%s.12.0/23", local.regions[var.location].location_number)]
   default_outbound_access_enabled               = true
   service_endpoints                             = local.service_endpoints
@@ -29,7 +29,7 @@ resource "azurerm_subnet" "containerappenv" {
 resource "azurerm_subnet" "aca_sandbox" {
   name                                          = "aca_sandbox"
   resource_group_name                           = module.environment_resource_group.resource.name
-  virtual_network_name                          = azurerm_virtual_network.this.name
+  virtual_network_name                          = local.vnet_resource_name
   address_prefixes                              = [format("10.%s.20.0/24", local.regions[var.location].location_number)]
   default_outbound_access_enabled               = true
   service_endpoints                             = local.service_endpoints

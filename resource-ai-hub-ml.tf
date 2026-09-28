@@ -11,7 +11,7 @@ resource "azurerm_subnet" "mlhub" {
 
   name                 = "machine-learning"
   resource_group_name  = module.environment_resource_group.resource.name
-  virtual_network_name = azurerm_virtual_network.this.name
+  virtual_network_name = local.vnet_resource_name
   address_prefixes     = [format("10.%s.92.0/24", local.regions[var.location].location_number)]
   ## Note, the VMSS won't use the default Internet outbound (even if enabled - you have to use a NAT Gateway)
   default_outbound_access_enabled               = var.deploy_private_endpoints ? false : true
@@ -23,7 +23,7 @@ resource "azurerm_subnet" "mlhub" {
   #  azurerm_subnet_service_endpoint_storage_policy.storage.id
   #]
   depends_on = [
-    azurerm_virtual_network.this
+    module.virtual_network
   ]
 }
 

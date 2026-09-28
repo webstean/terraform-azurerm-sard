@@ -4,6 +4,19 @@ locals {
   vnet_name_location = lower("${local.vnet_name}-${lower(var.location)}")
   vnet_random_suffix = substr(random_string.environment.result, 0, 6)
   vnet_name_hostname = lower(substr(replace("l${local.vnet_random_suffix}${local.vnet_name_location}", "-", ""), 0, 24))
+  vnet_resource_name = module.virtual_network.name
+  vnet_resource_id   = module.virtual_network.resource_id
+  vnet_subnets = concat(
+    azurerm_subnet.outbound[*],
+    azurerm_subnet.mlhub[*],
+    azurerm_subnet.bastion[*],
+    azurerm_subnet.containerappenv[*],
+    azurerm_subnet.aca_sandbox[*],
+    azurerm_subnet.sqlserver[*],
+    azurerm_subnet.app_gateway[*],
+    azurerm_subnet.private_endpoints[*],
+    azurerm_subnet.pls_nat[*],
+  )
 }
 
 ## https://blog.cloudtrooper.net/2023/02/06/virtual-network-gateways-routing-in-azure/
@@ -15,27 +28,33 @@ Register-AzEdgeZonesExtendedZone -Name 'perth'
 Get-AzEdgeZonesExtendedZone -Name 'perth'
 */
 
-resource "azurerm_virtual_network" "this" {
-  name                = local.vnet_name_location
-  location            = module.environment_resource_group.resource.location
-  resource_group_name = module.environment_resource_group.resource.name
+module "virtual_network" {
+  source           = "Azure/avm-res-network-virtualnetwork/azurerm"
+  version          = "~> 0.22, < 1.0"
+  enable_telemetry = var.enable_telemetry
 
+  name          = local.vnet_name_location
+  location      = module.environment_resource_group.resource.location
+  parent_id     = module.environment_resource_group.resource_id
   address_space = local.regions[var.location].vnet_address_space
   bgp_community = local.regions[var.location].vnet_bgp_community
-  ## dns_servers       = local.regions[var.location].dns_servers
-
-  encryption {
+  encryption = {
+    enabled     = true
     enforcement = "AllowUnencrypted"
   }
-
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
+
+moved {
+  from = azurerm_virtual_network.this
+  to   = module.virtual_network.azapi_resource.vnet
 }
 
 # Wait 10 seconds for the network watcher to be created as a byproduct of the VNet creation
 resource "time_sleep" "wait_10_seconds_for_network_watcher_creation" {
   create_duration = "10s"
 
-  depends_on = [azurerm_virtual_network.this]
+  depends_on = [module.virtual_network]
 }
 
 # Network Watcher — one per region per subscription is the norm; Azure will reject a
@@ -43,13 +62,13 @@ resource "time_sleep" "wait_10_seconds_for_network_watcher_creation" {
 data "azurerm_network_watcher" "this" {
   name                = "NetworkWatcher_${lower(var.location)}"
   resource_group_name = "NetworkWatcherRG"
-  depends_on          = [azurerm_virtual_network.this]
+  depends_on          = [module.virtual_network]
 }
 
 resource "azurerm_subnet" "outbound" {
   name                 = "outbound"
   resource_group_name  = module.environment_resource_group.resource.name
-  virtual_network_name = azurerm_virtual_network.this.name
+  virtual_network_name = local.vnet_resource_name
   address_prefixes     = [format("10.%s.99.0/24", local.regions[var.location].location_number)]
   ## Note, the VMSS won't use the default Internet outbound (even if enabled - you have to use a NAT Gateway)
   default_outbound_access_enabled               = true
@@ -890,7 +909,7 @@ data "azurerm_virtual_network" "azure_vnet_details" {
 
 locals {
   subnet_details = tomap({
-    for snet in azurerm_virtual_network.this.subnet : snet.name => {
+    for snet in local.vnet_subnets : snet.name => {
       id                = snet.id
       address_prefixes  = snet.address_prefixes
       service_endpoints = try(snet.service_endpoints, [])

@@ -16,7 +16,7 @@ locals {
 ## Bastion costs $$$ (unless it is Developer - which is free) - around $100 per month per region! (this code will create one bastion per region!!!)
 ## Bastion is a managed service - no need to patch or update
 resource "azurerm_public_ip" "bastion" {
-  for_each = { for k, v in azurerm_virtual_network.this : k => v if var.bastion_sku != "Developer" }
+  for_each = var.bastion_sku != "Developer" ? { this = true } : {}
 
   name                = "pip-${local.bastion_name_location}"
   resource_group_name = module.environment_resource_group.resource.name
@@ -62,7 +62,7 @@ resource "azurerm_subnet" "bastion" {
 
   name                            = "AzureBastionSubnet"
   resource_group_name             = module.environment_resource_group.resource.name
-  virtual_network_name            = azurerm_virtual_network.this.name
+  virtual_network_name            = local.vnet_resource_name
   address_prefixes                = [format(local.subnet_bastion.address_format_ipv4, local.regions[var.location].location_number)]
   default_outbound_access_enabled = false
 
@@ -72,7 +72,7 @@ resource "azurerm_subnet" "bastion" {
   ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
   private_endpoint_network_policies = "Disabled"
   depends_on = [
-    azurerm_virtual_network.this
+    module.virtual_network
   ]
 }
 
@@ -87,7 +87,7 @@ resource "azurerm_bastion_host" "this" {
     content {
       name                 = lower("${local.bastion_name}-config")
       subnet_id            = azurerm_subnet.bastion.id
-      public_ip_address_id = azurerm_public_ip.bastion.id
+      public_ip_address_id = azurerm_public_ip.bastion["this"].id
     }
   }
   ## AZs are free with Bastion
@@ -110,14 +110,14 @@ resource "azurerm_bastion_host" "this" {
   ## Premium Only features
   session_recording_enabled = var.bastion_sku == "Premium" ? true : false
 
-  virtual_network_id = azurerm_virtual_network.this.id
+  virtual_network_id = local.vnet_resource_id
 
   timeouts {
     create = "90m"
   }
   depends_on = [
     module.environment_resource_group,
-    azurerm_virtual_network.this
+    module.virtual_network
   ]
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
@@ -170,7 +170,7 @@ resource "azurerm_monitor_diagnostic_setting" "bastion2" {
 */
 
 resource "azurerm_network_security_group" "bastion" {
-  for_each = { for k, v in azurerm_virtual_network.this : k => v if var.bastion_sku != "Developer" }
+  for_each = var.bastion_sku != "Developer" ? { this = true } : {}
 
   name                = "nsg-bastion-${lower(module.environment_resource_group.resource.location)}"
   resource_group_name = module.environment_resource_group.resource.name

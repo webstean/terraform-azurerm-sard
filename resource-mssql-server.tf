@@ -10,7 +10,7 @@ locals {
 resource "azurerm_subnet" "sqlserver" {
   name                            = "databases"
   resource_group_name             = module.environment_resource_group.resource.name
-  virtual_network_name            = azurerm_virtual_network.this.name
+  virtual_network_name            = local.vnet_resource_name
   address_prefixes                = [format("10.%s.101.0/24", local.regions[var.location].location_number)]
   default_outbound_access_enabled = false
 

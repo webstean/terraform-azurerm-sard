@@ -32,7 +32,7 @@ resource "azurerm_storage_account" "this" {
     default_action             = tobool(var.deploy_private_endpoints) ? "Deny" : "Allow"
     bypass                     = ["AzureServices"]
     ip_rules                   = tobool(var.deploy_private_endpoints) ? [] : ["0.0.0.0/0"]
-    virtual_network_subnet_ids = tobool(var.deploy_private_endpoints) ? null : [for subnets in azurerm_virtual_network.this.subnet : subnets.id if contains(subnets.service_endpoints, "Microsoft.Storage")]
+    virtual_network_subnet_ids = tobool(var.deploy_private_endpoints) ? null : [for subnet in local.vnet_subnets : subnet.id if try(contains(subnet.service_endpoints, "Microsoft.Storage"), false)]
   }
 
   azure_files_authentication {
@@ -192,7 +192,7 @@ resource "azurerm_storage_account" "diag" {
     default_action             = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? "Deny" : "Deny"
     bypass                     = ["AzureServices"]
     ip_rules                   = tobool(var.deploy_private_endpoints) ? [] : ["0.0.0.0/0"]
-    virtual_network_subnet_ids = tobool(var.deploy_private_endpoints) ? null : [for subnets in azurerm_virtual_network.this.subnet : subnets.id if contains(subnets.service_endpoints, "Microsoft.Storage")]
+    virtual_network_subnet_ids = tobool(var.deploy_private_endpoints) ? null : [for subnet in local.vnet_subnets : subnet.id if try(contains(subnet.service_endpoints, "Microsoft.Storage"), false)]
   }
 
   identity {

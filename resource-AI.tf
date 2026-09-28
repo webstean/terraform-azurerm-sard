@@ -26,7 +26,7 @@ module "ai_keyvault" {
   network_acls = {
     default_action             = tobool(var.deploy_private_endpoints) ? "Deny" : "Allow"
     bypass                     = "AzureServices"
-    virtual_network_subnet_ids = tobool(var.deploy_private_endpoints) ? null : [for subnets in azurerm_virtual_network.this.subnet : subnets.id if contains(subnets.service_endpoints, "Microsoft.KeyVault")]
+    virtual_network_subnet_ids = tobool(var.deploy_private_endpoints) ? null : [for subnet in local.vnet_subnets : subnet.id if try(contains(subnet.service_endpoints, "Microsoft.KeyVault"), false)]
   }
 
   /*

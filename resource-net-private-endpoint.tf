@@ -10,7 +10,7 @@ resource "azurerm_subnet" "private_endpoints" {
 
   name                            = "private-endpoints"
   resource_group_name             = module.environment_resource_group.resource.name
-  virtual_network_name            = azurerm_virtual_network.this.name
+  virtual_network_name            = local.vnet_resource_name
   address_prefixes                = [format("10.%s.200.0/24", local.regions[var.location].location_number)]
   default_outbound_access_enabled = false
 
@@ -131,10 +131,10 @@ module "private_dns_zones" {
   parent_id   = module.environment_resource_group.resource.id
 
   virtual_network_links = {
-    "${azurerm_virtual_network.this.name}" = {
-      vnetlinkname                           = "${azurerm_virtual_network.this.name}-${replace(lower(each.key), ".", "-")}"
-      name                                   = "${azurerm_virtual_network.this.name}-${replace(lower(each.key), ".", "-")}"
-      virtual_network_id                     = azurerm_virtual_network.this.id
+    "${local.vnet_resource_name}" = {
+      vnetlinkname                           = "${local.vnet_resource_name}-${replace(lower(each.key), ".", "-")}"
+      name                                   = "${local.vnet_resource_name}-${replace(lower(each.key), ".", "-")}"
+      virtual_network_id                     = local.vnet_resource_id
       autoregistration                       = true
       registration_enabled                   = true
       private_dns_zone_supports_private_link = true
@@ -160,10 +160,10 @@ module "sql_private_dns_zones" {
   parent_id   = module.environment_resource_group.resource.id
 
   virtual_network_links = {
-    "${azurerm_virtual_network.this.name}" = {
-      vnetlinkname                           = "${azurerm_virtual_network.this.name}-privatelink-database-windows-net"
-      name                                   = "${azurerm_virtual_network.this.name}-privatelink-database-windows-net"
-      virtual_network_id                     = azurerm_virtual_network.this.id
+    "${local.vnet_resource_name}" = {
+      vnetlinkname                           = "${local.vnet_resource_name}-privatelink-database-windows-net"
+      name                                   = "${local.vnet_resource_name}-privatelink-database-windows-net"
+      virtual_network_id                     = local.vnet_resource_id
       autoregistration                       = true
       registration_enabled                   = true
       private_dns_zone_supports_private_link = true
