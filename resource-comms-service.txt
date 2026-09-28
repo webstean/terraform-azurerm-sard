@@ -1,3 +1,5 @@
+## Depreciated
+
 locals {
   comms_name          = "cm-${var.prefix}"
   comms_name_location = lower("${local.comms_name}-${lower(var.location)}")
