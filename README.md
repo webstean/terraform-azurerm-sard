@@ -57,6 +57,8 @@ Next steps here
 | [azapi_resource.foundry](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource.free_sql_database](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource.helloworld_resiliency_policy](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
+| [azapi_resource.sandbox_group](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
+| [azapi_resource.sandbox_vnet_connection](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource_action.sql_server_automatic_tuning](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource_action) | resource |
 | [azapi_update_resource.aca_env_otel](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/update_resource) | resource |
 | [azapi_update_resource.configurationStore_telemetry](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/update_resource) | resource |
@@ -199,6 +201,7 @@ Next steps here
 | [azurerm_subnet.outbound](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.pls_nat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.private_endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_subnet.sandbox](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.sqlserver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet_nat_gateway_association.containerappenv](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_nat_gateway_association) | resource |
 | [azurerm_subnet_nat_gateway_association.vmss](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_nat_gateway_association) | resource |
