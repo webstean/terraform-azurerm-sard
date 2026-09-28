@@ -12,7 +12,7 @@ locals {
     azurerm_subnet.bastion[*],
     azurerm_subnet.containerappenv[*],
     azurerm_subnet.aca_sandbox[*],
-    azurerm_subnet.sandbox[*],
+    #try(azurerm_subnet.sandbox[*], []),
     azurerm_subnet.sqlserver[*],
     azurerm_subnet.app_gateway[*],
     azurerm_subnet.private_endpoints[*],
