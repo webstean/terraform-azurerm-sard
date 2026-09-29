@@ -2,13 +2,17 @@
 locals {
   sandbox_name = "${var.prefix}-sandbox"
 }
-resource "azurerm_subnet" "sandbox" {
+
+module "sandbox_subnet" {
   count = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? 0 : 1
 
-  name                                          = "sandboxcontainers-${var.prefix}"
-  resource_group_name                           = module.environment_resource_group.resource.name
-  virtual_network_name                          = local.vnet_resource_name
-  address_prefixes                              = [format("10.%s.87.0/24", local.regions[var.location].location_number)]
+  source  = "Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
+  version = "~> 0.22, < 1.0"
+
+  name             = "sandboxcontainers-${var.prefix}"
+  parent_id        = local.vnet_resource_id
+  address_prefixes = [format("10.%s.87.0/23", local.regions[var.location].location_number)]
+
   default_outbound_access_enabled               = true
   service_endpoints                             = local.service_endpoints
   private_link_service_network_policies_enabled = false
@@ -16,16 +20,17 @@ resource "azurerm_subnet" "sandbox" {
   ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
   private_endpoint_network_policies = tobool(var.deploy_private_endpoints) ? "Enabled" : "Disabled"
 
-  delegation {
+  delegations = [{
     name = "sandbox-delegation"
-    service_delegation {
-      name    = "Microsoft.App/environments"
-      actions = local.delegation-actions
+    service_delegation = {
+      name = "Microsoft.App/environments"
     }
-  }
-  lifecycle {
-    ignore_changes = [delegation]
-  }
+  }]
+}
+
+moved {
+  from = azurerm_subnet.sandbox[0]
+  to   = module.sandbox_subnet[0].azapi_resource.subnet
 }
 
 resource "azurerm_storage_container" "sandbox_container" {
@@ -72,7 +77,7 @@ module "sandbox_group" {
 
   vnet_connections = {
     default = {
-      subnet_id = azurerm_subnet.sandbox.id
+      subnet_id = module.sandbox_subnet[0].resource_id
     }
   }
 
