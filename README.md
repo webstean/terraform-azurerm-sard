@@ -384,7 +384,6 @@ Next steps here
 | <a name="output_vmss_admin_password_keyvault_id"></a> [vmss\_admin\_password\_keyvault\_id](#output\_vmss\_admin\_password\_keyvault\_id) | The Key Vault ID where the VMSS admin password is stored. |
 | <a name="output_vmss_admin_password_keyvault_secret_name"></a> [vmss\_admin\_password\_keyvault\_secret\_name](#output\_vmss\_admin\_password\_keyvault\_secret\_name) | The Key Vault secret name where the VMSS admin password is stored. |
 | <a name="output_vmss_admin_username"></a> [vmss\_admin\_username](#output\_vmss\_admin\_username) | The admin username for the VMSS. |
-| <a name="output_vnet_subnet_details"></a> [vnet\_subnet\_details](#output\_vnet\_subnet\_details) | The details of the subnets within the virtual network. |
 | <a name="output_web_pubsub_hostname"></a> [web\_pubsub\_hostname](#output\_web\_pubsub\_hostname) | The hostname of the Web Pub Sub. |
 | <a name="output_web_pubsub_id"></a> [web\_pubsub\_id](#output\_web\_pubsub\_id) | The ID of the Web Pub Sub. |
 
