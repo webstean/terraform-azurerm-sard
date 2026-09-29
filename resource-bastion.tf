@@ -56,24 +56,30 @@ resource "azurerm_monitor_diagnostic_setting" "bastion-publicip2" {
 }
 */
 
-## alway create, (its free), so we can upgrade seamlessly to different Bastion SKUs
-resource "azurerm_subnet" "bastion" {
-  ## for_each = { for k, v in azurerm_virtual_network.this : k => v if var.bastion_sku != "Developer" }
+module "bastion_subnet" {
+  source  = "Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
+  version = "~> 0.22, < 1.0"
 
-  name                            = "AzureBastionSubnet"
-  resource_group_name             = module.environment_resource_group.resource.name
-  virtual_network_name            = local.vnet_resource_name
-  address_prefixes                = [format(local.subnet_bastion.address_format_ipv4, local.regions[var.location].location_number)]
-  default_outbound_access_enabled = false
+  name             = "AzureBastionSubnet"
+  parent_id        = local.vnet_resource_id
+  address_prefixes = [format(local.subnet_bastion.address_format_ipv4, local.regions[var.location].location_number)]
 
-  service_endpoints                             = []
+  default_outbound_access_enabled               = false
+  service_endpoints                             = null
   private_link_service_network_policies_enabled = false
   ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
   ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
   private_endpoint_network_policies = "Disabled"
-  depends_on = [
-    module.virtual_network
-  ]
+
+  route_table = {
+    id = null
+  }
+  nat_gateway = {
+    id = null
+  }
+  network_security_group = {
+    id = azurerm_network_security_group.bastion.id
+  }
 }
 
 resource "azurerm_bastion_host" "this" {
@@ -86,7 +92,7 @@ resource "azurerm_bastion_host" "this" {
 
     content {
       name                 = lower("${local.bastion_name}-config")
-      subnet_id            = azurerm_subnet.bastion.id
+      subnet_id            = module.bastion_subnet.resource_id
       public_ip_address_id = azurerm_public_ip.bastion["this"].id
     }
   }
@@ -170,8 +176,6 @@ resource "azurerm_monitor_diagnostic_setting" "bastion2" {
 */
 
 resource "azurerm_network_security_group" "bastion" {
-  for_each = var.bastion_sku != "Developer" ? { this = true } : {}
-
   name                = "nsg-bastion-${lower(module.environment_resource_group.resource.location)}"
   resource_group_name = module.environment_resource_group.resource.name
   location            = module.environment_resource_group.resource.location

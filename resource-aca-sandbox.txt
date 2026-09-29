@@ -1,37 +1,9 @@
 
-locals {
-  sandbox_name = "${var.prefix}-sandbox"
-}
 
-module "sandbox_subnet" {
-  count = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? 0 : 1
+## oracle alternative
+## https://github.com/ashishsinha1602/oci-sandbox-factory
+## https://ashishsinha1602.github.io/oci-sandbox-factory/
 
-  source  = "Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
-  version = "~> 0.22, < 1.0"
-
-  name             = "sandboxcontainers-${var.prefix}"
-  parent_id        = local.vnet_resource_id
-  address_prefixes = [format("10.%s.87.0/23", local.regions[var.location].location_number)]
-
-  default_outbound_access_enabled               = true
-  service_endpoints                             = local.service_endpoints
-  private_link_service_network_policies_enabled = false
-  ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
-  ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
-  private_endpoint_network_policies = tobool(var.deploy_private_endpoints) ? "Enabled" : "Disabled"
-
-  delegations = [{
-    name = "sandbox-delegation"
-    service_delegation = {
-      name = "Microsoft.App/environments"
-    }
-  }]
-}
-
-moved {
-  from = azurerm_subnet.sandbox[0]
-  to   = module.sandbox_subnet[0].azapi_resource.subnet
-}
 
 resource "azurerm_storage_container" "sandbox_container" {
   count = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? 0 : 1
@@ -53,7 +25,7 @@ module "sandbox_group" {
 
   source = "git::https://github.com/Azure/terraform-provider-aca.git//modules/sandbox_groups?ref=debaefd1c08d8156a3291c48432dd4ca63e0fbed"
 
-  name              = "sandbox-group-${local.sandbox_name}"
+  name              = "sandbox-group-${local.aca_sandbox_name}"
   resource_group_id = module.environment_resource_group.resource_id
   location          = module.environment_resource_group.resource.location
   identity = {
@@ -95,7 +67,7 @@ data "aca_sandbox_public_disk_image" "ubuntu" {
 resource "aca_sandbox" "ubuntu" {
   sandbox_group_id = module.sandbox_group.id
   location         = module.sandbox_group.location
-  name             = "sandbox-group-${local.sandbox_name}-ubuntu"
+  name             = "sandbox-group-${local.aca_sandbox_name}-ubuntu"
 
   source = {
     public_disk_image = data.aca_sandbox_public_disk_image.ubuntu.name

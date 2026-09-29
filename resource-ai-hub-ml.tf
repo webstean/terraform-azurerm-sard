@@ -6,25 +6,29 @@ locals {
   ml_scenario      = "AI Hub and Projects"
 }
 
-resource "azurerm_subnet" "mlhub" {
-  count = var.deploy_private_endpoints ? 1 : 0
+module "subnet_mlhub" {
+  source  = "Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
+  version = "~> 0.22, < 1.0"
 
-  name                 = "machine-learning"
-  resource_group_name  = module.environment_resource_group.resource.name
-  virtual_network_name = local.vnet_resource_name
-  address_prefixes     = [format("10.%s.92.0/24", local.regions[var.location].location_number)]
-  ## Note, the VMSS won't use the default Internet outbound (even if enabled - you have to use a NAT Gateway)
-  default_outbound_access_enabled               = var.deploy_private_endpoints ? false : true
-  service_endpoints                             = var.deploy_private_endpoints ? null : local.service_endpoints
-  private_link_service_network_policies_enabled = false
-  ## Possible values are Disabled, Enabled, NetworkSecurityGroupEnabled and RouteTableEnabled.
-  private_endpoint_network_policies = "Enabled"
-  #service_endpoint_policy_ids = [
-  #  azurerm_subnet_service_endpoint_storage_policy.storage.id
-  #]
-  depends_on = [
-    module.virtual_network
-  ]
+  name             = "mlhub-${var.prefix}"
+  parent_id        = local.vnet_resource_id
+  address_prefixes = [format("10.%s.93.0/24", local.regions[var.location].location_number)]
+
+  default_outbound_access_enabled               = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+  service_endpoints                             = tobool(var.deploy_private_endpoints) ? [] : local.service_endpoints
+  private_link_service_network_policies_enabled = tobool(var.deploy_private_link_service) ? true : false
+  ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
+  ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
+  private_endpoint_network_policies = tobool(var.deploy_private_endpoints) ? "Enabled" : "Disabled"
+  route_table = {
+    id = azurerm_route_table.this.id
+  }
+  nat_gateway = {
+    id = var.deploy_nat_gateway ? module.nat_gateway.resource_id : null
+  }
+  network_security_group = {
+    id = (tobool(var.data_pii) || tobool(var.data_phi)) ? azurerm_network_security_group.secure.id : azurerm_network_security_group.any2any.id
+  }
 }
 
 module "aihub" {
@@ -88,7 +92,7 @@ module "aihub" {
     }
   }
   serverless_compute = var.deploy_private_endpoints ? {
-    subnet_id = azurerm_subnet.mlhub[0].id
+    subnet_id = module.subnet_mlhub.resource_id
   } : null
   lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
     kind = "CanNotDelete"

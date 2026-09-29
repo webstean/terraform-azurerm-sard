@@ -95,13 +95,6 @@ resource "azurerm_key_vault_certificate" "letsencrypt-aca" {
 }
 ## azurerm_key_vault_certificate.letsencrypt-aca.certificate_data_base64
 
-
-
-resource "azurerm_subnet_network_security_group_association" "containerappenv" {
-  subnet_id                 = azurerm_subnet.containerappenv.id
-  network_security_group_id = (tobool(var.data_pii) || tobool(var.data_phi)) ? azurerm_network_security_group.secure.id : azurerm_network_security_group.any2any.id
-}
-
 resource "azurerm_storage_share" "containerappenv_logs" {
   name               = "logs-${local.aca_env_name}"
   storage_account_id = azurerm_storage_account.this.id
@@ -129,7 +122,7 @@ resource "azurerm_container_app_environment" "this" {
   internal_load_balancer_enabled = tobool(var.deploy_private_endpoints) ? true : false
 
   ## Provided subnet must have a size of at least /23
-  infrastructure_subnet_id = azurerm_subnet.containerappenv.id
+  infrastructure_subnet_id = module.containerappenv_subnet.resource_id
   zone_redundancy_enabled  = (tobool(var.data_pii) || tobool(var.data_phi)) ? true : false
   ##multual_tls_enabled = false
 

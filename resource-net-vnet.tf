@@ -8,8 +8,7 @@ locals {
   vnet_resource_id   = module.virtual_network.resource_id
   vnet_subnets = concat(
     azurerm_subnet.outbound[*],
-    azurerm_subnet.mlhub[*],
-    azurerm_subnet.bastion[*],
+    module.subnet_mlhub.name,
     #azurerm_subnet.containerappenv[*],
     #azurerm_subnet.aca_sandbox[*],
     #try(azurerm_subnet.sandbox[*], []),
@@ -46,10 +45,12 @@ module "virtual_network" {
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
+/*
 moved {
   from = azurerm_virtual_network.this
   to   = module.virtual_network.azapi_resource.vnet
 }
+*/
 
 # Wait 10 seconds for the network watcher to be created as a byproduct of the VNet creation
 resource "time_sleep" "wait_10_seconds_for_network_watcher_creation" {
