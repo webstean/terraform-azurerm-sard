@@ -147,6 +147,7 @@ resource "azurerm_storage_container" "rag_documents" {
   storage_account_id    = azurerm_storage_account.this.id
   container_access_type = "private"
 }
+/*
 resource "azurerm_role_assignment" "search_blob_reader" {
   count = var.ai_free_search_principal_id != "" ? 1 : 0
 
@@ -154,7 +155,7 @@ resource "azurerm_role_assignment" "search_blob_reader" {
   role_definition_name = "Storage Blob Data Reader"
   principal_id         = var.ai_free_search_principal_id
 }
-
+*/
 
 /*
 resource "azurerm_monitor_diagnostic_setting" "storage_metrics" {
