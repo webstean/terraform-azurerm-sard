@@ -51,23 +51,25 @@ A short name (typically 3-8 characters, lowercase) for the customer, used as a p
 DESC
 }
 
-variable "sql_administrator_group_display_name" {
+variable "administrator_group_display_name" {
   type        = string
   sensitive   = false
   description = <<DESC
-Entra ID display name for the user or group that will have SQL Server administrator permissions.
+Entra ID display name for the user or group that will have administrator permissions.
+Note, can be a Entra ID user or a group.
 DESC
 }
 
-variable "sql_administrator_group_object_id" {
+variable "administrator_group_object_id" {
   type        = string
   sensitive   = false
   description = <<DESC
-The Entra ID object ID for the SQL administrator group (can be a user or a group)
+The Entra ID object ID for the administrator group
+Note, can be a Entra ID user or a group.
 DESC
   validation {
-    condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.sql_administrator_group_object_id)))
-    error_message = "The variable 'sql_administrator_group_object_id' must be a valid GUID."
+    condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.administrator_group_object_id)))
+    error_message = "The variable 'administrator_group_object_id' must be a valid GUID."
   }
 }
 

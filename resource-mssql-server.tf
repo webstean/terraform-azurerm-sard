@@ -271,8 +271,8 @@ resource "azurerm_mssql_server" "this" {
   public_network_access_enabled        = tobool(var.deploy_private_endpoints) ? false : false
   outbound_network_restriction_enabled = false
   azuread_administrator {
-    login_username              = var.sql_administrator_group_display_name
-    object_id                   = var.sql_administrator_group_object_id
+    login_username              = var.administrator_group_display_name
+    object_id                   = var.administrator_group_object_id
     azuread_authentication_only = true
   }
   identity {
@@ -334,8 +334,8 @@ resource "azurerm_mssql_server" "this-failover" {
   public_network_access_enabled        = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
   outbound_network_restriction_enabled = false
   azuread_administrator {
-    login_username              = var.sql_administrator_group_display_name
-    object_id                   = var.sql_administrator_group_object_id
+    login_username              = var.administrator_group_display_name
+    object_id                   = var.administrator_group_object_id
     azuread_authentication_only = true
   }
   identity {

@@ -9,6 +9,35 @@ locals {
     service_endpoints   = null
     delegation          = null
   }
+  bastion_access_principal_ids = [
+    var.owner_entra_object_id
+  ]
+}
+
+resource "azurerm_role_definition" "bastion_connect" {
+  name        = "Bastion VM Connect for the ${title(var.customer)} ${upper(var.prefix)} environment"
+  scope       = module.environment_resource_group.resource.resource_id
+  description = "Minimum permissions to connect to VMs via Azure Bastion: read VM, NIC, and Bastion host."
+
+  permissions {
+    actions = [
+      "Microsoft.Compute/virtualMachines/read",
+      "Microsoft.Network/networkInterfaces/read",
+      "Microsoft.Network/bastionHosts/read",
+      "Microsoft.Network/bastionHosts/action", # required to initiate connection sessions
+    ]
+    not_actions = []
+  }
+  assignable_scopes = [
+    module.environment_resource_group.resource.resource_id
+  ]
+}
+
+resource "azurerm_role_assignment" "bastion_connect" {
+  for_each           = toset(local.bastion_access_principal_ids)
+  scope              = module.environment_resource_group.resource.resource_id
+  role_definition_id = azurerm_role_definition.bastion_connect.role_definition_resource_id
+  principal_id       = each.value
 }
 
 resource "azurerm_network_security_group" "bastion" {
