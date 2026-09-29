@@ -136,6 +136,7 @@ Next steps here
 | [azurerm_public_ip.app_gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_public_ip.relay](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_public_ip.vmss_external](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
+| [azurerm_role_assignment.bastion_connect](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.compute_recommendations](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.diag_storage_blob_full_access](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.diag_storage_queue_full_access](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
@@ -164,6 +165,7 @@ Next steps here
 | [azurerm_role_assignment.umi_storage_diag_table_data_reader_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.umi_storage_table_data_reader_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.web_pubsub_owner1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_definition.bastion_connect](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
 | [azurerm_route_table.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/route_table) | resource |
 | [azurerm_static_web_app.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/static_web_app) | resource |
 | [azurerm_static_web_app_custom_domain.apex](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/static_web_app_custom_domain) | resource |
@@ -222,13 +224,13 @@ Next steps here
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_administrator_group_display_name"></a> [administrator\_group\_display\_name](#input\_administrator\_group\_display\_name) | Entra ID display name for the user or group that will have administrator permissions.<br/>Note, can be a Entra ID user or a group. | `string` | n/a | yes |
+| <a name="input_administrator_group_object_id"></a> [administrator\_group\_object\_id](#input\_administrator\_group\_object\_id) | The Entra ID object ID for the administrator group<br/>Note, can be a Entra ID user or a group. | `string` | n/a | yes |
 | <a name="input_customer"></a> [customer](#input\_customer) | The name of the customer (free-text) | `string` | n/a | yes |
 | <a name="input_owner_email"></a> [owner\_email](#input\_owner\_email) | Email address of the resource owner, used for contact and billing notifications | `string` | n/a | yes |
 | <a name="input_owner_entra_display_name"></a> [owner\_entra\_display\_name](#input\_owner\_entra\_display\_name) | Display name of the owner in Entra ID for RBAC role assignment and resource access control. | `string` | n/a | yes |
 | <a name="input_owner_entra_object_id"></a> [owner\_entra\_object\_id](#input\_owner\_entra\_object\_id) | The Entra ID object ID for the owner of this environment | `string` | n/a | yes |
 | <a name="input_prefix"></a> [prefix](#input\_prefix) | A short name (typically 3-8 characters, lowercase) for the customer, used as a prefix for all Azure resource names to ensure global uniqueness. | `string` | n/a | yes |
-| <a name="input_sql_administrator_group_display_name"></a> [sql\_administrator\_group\_display\_name](#input\_sql\_administrator\_group\_display\_name) | Entra ID display name for the user or group that will have SQL Server administrator permissions. | `string` | n/a | yes |
-| <a name="input_sql_administrator_group_object_id"></a> [sql\_administrator\_group\_object\_id](#input\_sql\_administrator\_group\_object\_id) | The Entra ID object ID for the SQL administrator group (can be a user or a group) | `string` | n/a | yes |
 | <a name="input_subscription_id"></a> [subscription\_id](#input\_subscription\_id) | The single Azure subscription ID in which the resources will be deployed. | `string` | n/a | yes |
 | <a name="input_aca_consumption_gpu_enabled"></a> [aca\_consumption\_gpu\_enabled](#input\_aca\_consumption\_gpu\_enabled) | If true, adds a Consumption GPU workload profile to the Azure Container Apps environment. | `bool` | `false` | no |
 | <a name="input_aca_consumption_gpu_max_count"></a> [aca\_consumption\_gpu\_max\_count](#input\_aca\_consumption\_gpu\_max\_count) | Maximum replica count for the ACA Consumption GPU workload profile. | `number` | `1` | no |
