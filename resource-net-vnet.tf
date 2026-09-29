@@ -10,8 +10,8 @@ locals {
     azurerm_subnet.outbound[*],
     azurerm_subnet.mlhub[*],
     azurerm_subnet.bastion[*],
-    azurerm_subnet.containerappenv[*],
-    azurerm_subnet.aca_sandbox[*],
+    #azurerm_subnet.containerappenv[*],
+    #azurerm_subnet.aca_sandbox[*],
     #try(azurerm_subnet.sandbox[*], []),
     azurerm_subnet.sqlserver[*],
     azurerm_subnet.app_gateway[*],
@@ -166,10 +166,6 @@ resource "azurerm_route_table" "this" {
 ## Attach the route table to the subnet hosting the VMs
 resource "azurerm_subnet_route_table_association" "subnet01_kms_route" {
   subnet_id      = azurerm_subnet.outbound.id
-  route_table_id = azurerm_route_table.this.id
-}
-resource "azurerm_subnet_route_table_association" "subnet02_kms_route" {
-  subnet_id      = azurerm_subnet.containerappenv.id
   route_table_id = azurerm_route_table.this.id
 }
 

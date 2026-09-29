@@ -1,51 +1,100 @@
-locals {
-  aca_env_name          = "aca-env-${var.prefix}"
-  aca_env_name_location = lower("${local.aca_env_name}-${lower(var.location)}")
-  aca_env_random_suffix = substr(random_string.environment.result, 0, 6)
-  aca_env_name_hostname = lower(substr(replace("a${local.aca_env_random_suffix}${var.prefix}${local.aca_env_name_location}", "-", ""), 0, 24))
+
+resource "azurerm_dns_a_record" "aca" { ## establish domain ownership
+  name                = "*"             ## ".${azurerm_dns_zone.aca.name}"
+  resource_group_name = module.environment_resource_group.resource.name
+  zone_name           = azurerm_dns_zone.aca.name
+  records = [
+    azurerm_container_app_environment.this.static_ip_address,
+  ]
+  ttl  = 300
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
+resource "azurerm_dns_txt_record" "aca" { ## establish domain ownership
 
-resource "azurerm_subnet" "containerappenv" {
-  name                                          = local.aca_env_name
-  resource_group_name                           = module.environment_resource_group.resource.name
-  virtual_network_name                          = local.vnet_resource_name
-  address_prefixes                              = [format("10.%s.12.0/23", local.regions[var.location].location_number)]
-  default_outbound_access_enabled               = true
-  service_endpoints                             = local.service_endpoints
-  private_link_service_network_policies_enabled = false
-  ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
-  ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
-  private_endpoint_network_policies = tobool(var.deploy_private_endpoints) ? "Enabled" : "Disabled"
+  name                = "asuid"
+  zone_name           = azurerm_dns_zone.aca.name
+  resource_group_name = module.environment_resource_group.resource.name
+  record {
+    value = azurerm_container_app_environment.this.custom_domain_verification_id
+  }
+  ttl  = 300
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  depends_on = [
+    azurerm_dns_a_record.aca,
+    azurerm_dns_zone.aca,
+    azurerm_container_app_environment.this,
+    azurerm_dns_caa_record.aca_allowed_certs,
+  ]
+}
+resource "azurerm_container_app_environment_certificate" "this" {
+  name                         = "${lower(local.ingress_custom_aca)}-certificate"
+  container_app_environment_id = azurerm_container_app_environment.this.id
 
-  delegation {
-    name = "azure-container-apps-delegation"
-    service_delegation {
-      name    = "Microsoft.App/environments"
-      actions = local.delegation-actions
-    }
+  certificate_key_vault { ## letsencrypt wildcard certificate for aca
+    identity            = azurerm_user_assigned_identity.environment.id
+    key_vault_secret_id = azurerm_key_vault_certificate.letsencrypt-aca.versionless_secret_id
+  }
+  depends_on = [
+    azurerm_key_vault_certificate.letsencrypt-aca,
+    azurerm_dns_caa_record.aca_allowed_certs,
+    azurerm_dns_a_record.aca,
+    azurerm_dns_txt_record.aca,
+    azurerm_dns_ns_record.aca,
+    azurerm_container_app_environment.this
+  ]
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
-resource "azurerm_subnet" "aca_sandbox" {
-  name                                          = "aca_sandbox"
-  resource_group_name                           = module.environment_resource_group.resource.name
-  virtual_network_name                          = local.vnet_resource_name
-  address_prefixes                              = [format("10.%s.20.0/24", local.regions[var.location].location_number)]
-  default_outbound_access_enabled               = true
-  service_endpoints                             = local.service_endpoints
-  private_link_service_network_policies_enabled = false
-  ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
-  ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
-  private_endpoint_network_policies = tobool(var.deploy_private_endpoints) ? "Enabled" : "Disabled"
+output "aca_certificate_subject_name" {
+  description = "The subject name of the Container App Environment."
+  sensitive   = false
+  value       = azurerm_container_app_environment_certificate.this.subject_name
+}
 
-  delegation {
-    name = "azure-container-apps-delegation"
-    service_delegation {
-      name    = "Microsoft.App/environments"
-      actions = local.delegation-actions
+## create wildcard certificate for aca
+resource "acme_certificate" "aca_wildcard" {
+  account_key_pem = acme_registration.this.account_key_pem
+  profile         = "tlsserver" ## classic, tlsserver, shortlived
+  common_name     = azurerm_dns_zone.aca.name
+  subject_alternative_names = [
+    "*.${azurerm_dns_zone.aca.name}" ## wildcard SAN - DNS-01 challenge is mandatory for wildcards
+  ]
+  min_days_remaining            = local.min_days_remaining
+  revoke_certificate_on_destroy = true
+  dns_challenge {
+    provider = "azuredns"
+    config = {
+      AZURE_AUTH_METHOD     = var.letsencrypt_dns_auth_method ## oidc or env
+      AZURE_TENANT_ID       = data.azurerm_client_config.current.tenant_id
+      AZURE_CLIENT_ID       = data.azurerm_client_config.current.client_id
+      AZURE_SUBSCRIPTION_ID = data.azurerm_client_config.current.subscription_id
+      AZURE_RESOURCE_GROUP  = module.environment_resource_group.resource.name
+      AZURE_ZONE_NAME       = azurerm_dns_zone.aca.name
+      AZURE_CLIENT_SECRET   = var.letsencrypt_dns_auth_method == "env" ? var.custom_dns_azure_client_secret : ""
+      AZURE_TTL             = 300
     }
   }
+  depends_on = [
+    azurerm_dns_a_record.aca,
+    azurerm_dns_txt_record.aca,
+    azurerm_dns_zone.aca,
+    azurerm_dns_ns_record.aca
+  ]
 }
+
+## write/update certificate in KeyVault so you can use it in other services
+resource "azurerm_key_vault_certificate" "letsencrypt-aca" {
+  name         = "cert-wildcard-${lower(replace(acme_certificate.aca_wildcard.certificate_domain, ".", "-"))}"
+  key_vault_id = module.cert_keyvault.resource_id
+
+  certificate {
+    contents = acme_certificate.aca_wildcard.certificate_p12
+  }
+}
+## azurerm_key_vault_certificate.letsencrypt-aca.certificate_data_base64
+
 
 
 resource "azurerm_subnet_network_security_group_association" "containerappenv" {

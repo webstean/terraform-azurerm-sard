@@ -195,13 +195,6 @@ resource "azurerm_subnet_nat_gateway_association" "vmss" {
   nat_gateway_id = module.nat_gateway[0].resource_id
 }
 
-resource "azurerm_subnet_nat_gateway_association" "containerappenv" {
-  count = var.deploy_nat_gateway ? 1 : 0
-
-  subnet_id      = azurerm_subnet.containerappenv.id
-  nat_gateway_id = module.nat_gateway[0].resource_id
-}
-
 /*
 resource "azurerm_monitor_diagnostic_setting" "nat_gateway_metrics" {
   count = var.vmss_number_of_instances == 0 || var.vmss_autoscale_enabled == false ? 0 : 1

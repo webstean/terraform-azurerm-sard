@@ -291,61 +291,6 @@ resource "azurerm_dns_a_record" "acatest" {
   ttl                 = 300
   tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
-resource "azurerm_dns_a_record" "aca" { ## establish domain ownership
-  name                = "*"             ## ".${azurerm_dns_zone.aca.name}"
-  resource_group_name = module.environment_resource_group.resource.name
-  zone_name           = azurerm_dns_zone.aca.name
-  records = [
-    azurerm_container_app_environment.this.static_ip_address,
-  ]
-  ttl  = 300
-  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-}
-resource "azurerm_dns_txt_record" "aca" { ## establish domain ownership
-
-  name                = "asuid"
-  zone_name           = azurerm_dns_zone.aca.name
-  resource_group_name = module.environment_resource_group.resource.name
-  record {
-    value = azurerm_container_app_environment.this.custom_domain_verification_id
-  }
-  ttl  = 300
-  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-  depends_on = [
-    azurerm_dns_a_record.aca,
-    azurerm_dns_zone.aca,
-    azurerm_container_app_environment.this,
-    azurerm_dns_caa_record.aca_allowed_certs,
-  ]
-}
-
-resource "azurerm_container_app_environment_certificate" "this" {
-  name                         = "${lower(local.ingress_custom_aca)}-certificate"
-  container_app_environment_id = azurerm_container_app_environment.this.id
-
-  certificate_key_vault { ## letsencrypt wildcard certificate for aca
-    identity            = azurerm_user_assigned_identity.environment.id
-    key_vault_secret_id = azurerm_key_vault_certificate.letsencrypt-aca.versionless_secret_id
-  }
-  depends_on = [
-    azurerm_key_vault_certificate.letsencrypt-aca,
-    azurerm_dns_caa_record.aca_allowed_certs,
-    azurerm_dns_a_record.aca,
-    azurerm_dns_txt_record.aca,
-    azurerm_dns_ns_record.aca,
-    azurerm_container_app_environment.this
-  ]
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-output "aca_certificate_subject_name" {
-  description = "The subject name of the Container App Environment."
-  sensitive   = false
-  value       = azurerm_container_app_environment_certificate.this.subject_name
-}
-
 
 resource "azurerm_dns_cname_record" "pubsub" { ## custom domain, needs premium SKU
   for_each = local.appconfiguration_sku == "premium" ? local.ingress_aliases_pubsub : toset([])
