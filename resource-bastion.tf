@@ -172,23 +172,6 @@ resource "azurerm_network_security_group" "bastion" {
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
-## The subnet must be in the same VNet and resource group as the bastion host.
-
-## Bastion costs $$$ (unless it is Developer - which is free) - around $100 per month per region! (this code will create one bastion per region!!!)
-## Bastion is a managed service - no need to patch or update
-resource "azurerm_public_ip" "bastion" {
-  for_each = var.bastion_sku != "Developer" ? { this = true } : {}
-
-  name                = "pip-${local.bastion_name_location}"
-  resource_group_name = module.environment_resource_group.resource.name
-  location            = module.environment_resource_group.resource.location
-  allocation_method   = "Static"
-  sku                 = "Standard" ## Basic, Standard, and StandardV2 (currently, only support NAT Gateways)
-  sku_tier            = var.bastion_sku == "Premium" ? "Global" : "Regional"
-  domain_name_label   = local.bastion_name_hostname
-  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-}
-
 /*
 resource "azurerm_monitor_diagnostic_setting" "bastion-publicip1" {
   for_each = { for k, v in azurerm_public_ip.bastion : k => v if var.bastion_sku != "Developer" }
