@@ -10,5 +10,6 @@
     },
     "[terraform]": {
         "editor.defaultFormatter": "hashicorp.terraform"
-    }
+    },
+    "chat.sessionSync.enabled": true
 }

@@ -83,16 +83,17 @@ output "environment_storage_account_name" {
 }
 
 output "environment_storage_file_connection_script_ps1" {
-  description = "A PowerShell script to connect dirve Z: to the azure files created as part of this environment."
+  description = "A PowerShell script to connect drive letter Z: to the azure files created as part of this environment."
   sensitive   = false
   value = replace(<<-PS1
+$driveLetter = 'Z'
 $connectTestResult = Test-NetConnection -ComputerName ${azurerm_storage_account.this.name}.file.core.windows.net -Port 445
 if ($connectTestResult.TcpTestSucceeded) {
     Write-Output "Successfully connected to ${azurerm_storage_account.this.name}.file.core.windows.net on port 445."
     ## Remove any previously saved password
     cmd.exe /C "cmdkey /delete:`"${azurerm_storage_account.this.name}.file.core.windows.net`"" | Out-Null
     ## Mount the drive
-    New-PSDrive -Name Z -PSProvider FileSystem -Root "\\${azurerm_storage_account.this.name}.file.core.windows.net\${azurerm_storage_share.global.name}" -Persist
+    New-PSDrive -Name $driveLetter -PSProvider FileSystem -Root "\\${azurerm_storage_account.this.name}.file.core.windows.net\${azurerm_storage_share.global.name}" -Persist
 } else {
     Write-Error -Message "Unable to reach the Azure storage account ${azurerm_storage_account.this.name}.file.core.windows.net via port 445. Check to ensure a proxy, firewall, or ISP is not blocking port 445, or use Azure P2S VPN, Azure S2S VPN, or Express Route to tunnel SMB traffic over a different port."
 }

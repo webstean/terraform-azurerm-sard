@@ -166,9 +166,17 @@ module "environment_resource_group" {
       principal_type                   = "User"
       description                      = local.iac_message
     }
-    
-/*
+    ## Provide access to access Azure Files via Rest APIs: https://learn.microsoft.com/en-us/azure/storage/files/authorize-oauth-rest
     "up_roleassignment7" = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Storage File Data Privileged Contributor/${var.owner_entra_object_id}")
+      role_definition_id_or_name       = "Storage File Data Privileged Contributor"
+      principal_id                     = var.owner_entra_object_id
+      skip_service_principal_aad_check = false
+      principal_type                   = "User"
+      description                      = local.iac_message
+    }
+    /*
+    "up_roleassignment8" = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Container Apps SandboxGroup Data Owner/${var.owner_entra_object_id}")
       role_definition_id_or_name       = "Container Apps SandboxGroup Data Owner"
       principal_id                     = var.owner_entra_object_id
@@ -178,7 +186,7 @@ module "environment_resource_group" {
     }
 */
     /*
-    "up_roleassignment8" = {
+    "up_roleassignment9" = {
       role_definition_id_or_name       = "Storage Blob Data Reader"
       principal_id                     = var.owner_entra_object_id
       skip_service_principal_aad_check = false
