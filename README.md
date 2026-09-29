@@ -47,7 +47,6 @@ Next steps here
 
 | Name | Type |
 |------|------|
-| [acme_certificate.aca_wildcard](https://registry.terraform.io/providers/vancluever/acme/latest/docs/resources/certificate) | resource |
 | [acme_certificate.pubsub](https://registry.terraform.io/providers/vancluever/acme/latest/docs/resources/certificate) | resource |
 | [acme_registration.this](https://registry.terraform.io/providers/vancluever/acme/latest/docs/resources/registration) | resource |
 | [azapi_resource.aiservices_connection](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
@@ -56,9 +55,7 @@ Next steps here
 | [azapi_resource.embedding_small](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource.foundry](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource.free_sql_database](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
-| [azapi_resource.helloworld_resiliency_policy](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource_action.sql_server_automatic_tuning](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource_action) | resource |
-| [azapi_update_resource.aca_env_otel](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/update_resource) | resource |
 | [azapi_update_resource.configurationStore_telemetry](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/update_resource) | resource |
 | [azapi_update_resource.vmss_external_reverse_fqdn](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/update_resource) | resource |
 | [azurerm_app_configuration_feature.test_feature](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/app_configuration_feature) | resource |
@@ -74,15 +71,9 @@ Next steps here
 | [azurerm_cdn_frontdoor_origin_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_origin_group) | resource |
 | [azurerm_cdn_frontdoor_profile.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_profile) | resource |
 | [azurerm_cdn_frontdoor_route.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_route) | resource |
-| [azurerm_container_app_environment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment) | resource |
-| [azurerm_container_app_environment_certificate.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_certificate) | resource |
-| [azurerm_container_app_environment_storage.logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_storage) | resource |
-| [azurerm_container_app_environment_storage.shared](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_storage) | resource |
-| [azurerm_container_app_job.github_runner](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_job) | resource |
 | [azurerm_container_registry_task.dab_build](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry_task) | resource |
 | [azurerm_container_registry_task_schedule_run_now.dab_build_now](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry_task_schedule_run_now) | resource |
 | [azurerm_databox_edge_device.gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/databox_edge_device) | resource |
-| [azurerm_dns_a_record.aca](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
 | [azurerm_dns_a_record.acatest](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
 | [azurerm_dns_a_record.apex_alias](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
 | [azurerm_dns_a_record.external-nlb](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
@@ -112,7 +103,6 @@ Next steps here
 | [azurerm_dns_ns_record.delegation](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_ns_record) | resource |
 | [azurerm_dns_srv_record.m365_sip_tls](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_srv_record) | resource |
 | [azurerm_dns_srv_record.m365_sipfederationtls_tcp](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_srv_record) | resource |
-| [azurerm_dns_txt_record.aca](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_txt_record) | resource |
 | [azurerm_dns_txt_record.dmarc](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_txt_record) | resource |
 | [azurerm_dns_txt_record.frontdoor_swa_verify](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_txt_record) | resource |
 | [azurerm_dns_txt_record.frontdoor_validation](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_txt_record) | resource |
@@ -120,7 +110,6 @@ Next steps here
 | [azurerm_dns_zone.aca](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_zone) | resource |
 | [azurerm_dns_zone.environment](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_zone) | resource |
 | [azurerm_key_vault.sql_kv](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault) | resource |
-| [azurerm_key_vault_certificate.letsencrypt-aca](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_certificate) | resource |
 | [azurerm_key_vault_certificate.letsencrypt-pubsub](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_certificate) | resource |
 | [azurerm_key_vault_key.tde](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_key) | resource |
 | [azurerm_key_vault_secret.sql_database_connection_free_encrypted](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
@@ -149,7 +138,6 @@ Next steps here
 | [azurerm_public_ip.bastion](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_public_ip.relay](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_public_ip.vmss_external](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
-| [azurerm_role_assignment.aspire_dotnet_dashboard_access](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.compute_recommendations](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.diag_storage_blob_full_access](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.diag_storage_queue_full_access](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
@@ -188,8 +176,6 @@ Next steps here
 | [azurerm_storage_container.rag_documents](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_container.sku_finder_cache](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_container.sqldiag](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
-| [azurerm_storage_share.containerappenv_logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) | resource |
-| [azurerm_storage_share.containerappenv_shared](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) | resource |
 | [azurerm_storage_share.global](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) | resource |
 | [azurerm_subnet.aca_sandbox](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.app_gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
@@ -202,10 +188,10 @@ Next steps here
 | [azurerm_subnet.sqlserver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet_nat_gateway_association.containerappenv](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_nat_gateway_association) | resource |
 | [azurerm_subnet_nat_gateway_association.vmss](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_nat_gateway_association) | resource |
-| [azurerm_subnet_network_security_group_association.containerappenv](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_network_security_group_association) | resource |
 | [azurerm_subnet_network_security_group_association.outbound](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_network_security_group_association) | resource |
 | [azurerm_subnet_route_table_association.subnet01_kms_route](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
-| [azurerm_subnet_route_table_association.subnet02_kms_route](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
+| [azurerm_subnet_route_table_association.subnet_aca_containerapp_route](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
+| [azurerm_subnet_route_table_association.subnet_aca_sandbox_route](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
 | [azurerm_user_assigned_identity.environment](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_user_assigned_identity.free_sql_database](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_user_assigned_identity.sqlserver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
@@ -338,12 +324,6 @@ Next steps here
 
 | Name | Description |
 |------|-------------|
-| <a name="output_aca_certificate_subject_name"></a> [aca\_certificate\_subject\_name](#output\_aca\_certificate\_subject\_name) | The subject name of the Container App Environment. |
-| <a name="output_aca_env_custom_domain_verification_id"></a> [aca\_env\_custom\_domain\_verification\_id](#output\_aca\_env\_custom\_domain\_verification\_id) | The custom domain verification ID of the Container App Environment. |
-| <a name="output_aca_env_default_domain"></a> [aca\_env\_default\_domain](#output\_aca\_env\_default\_domain) | The default domain of the Container App Environment. |
-| <a name="output_aca_env_id"></a> [aca\_env\_id](#output\_aca\_env\_id) | The ID of the Container App Environment. |
-| <a name="output_aca_env_static_ip_address"></a> [aca\_env\_static\_ip\_address](#output\_aca\_env\_static\_ip\_address) | The static IP address of the Container App Environment. |
-| <a name="output_aca_portal_url"></a> [aca\_portal\_url](#output\_aca\_portal\_url) | The portal URL of the Container App Environment. |
 | <a name="output_ai_hub_id"></a> [ai\_hub\_id](#output\_ai\_hub\_id) | The resource ID of the AI Hub. |
 | <a name="output_appconfiguration_endpoint"></a> [appconfiguration\_endpoint](#output\_appconfiguration\_endpoint) | The endpoint of the environment's Azure App Configuration store. |
 | <a name="output_appconfiguration_id"></a> [appconfiguration\_id](#output\_appconfiguration\_id) | The resource ID of the environment's Azure App Configuration store. |
@@ -427,7 +407,6 @@ Next steps here
 | <a name="module_cert_keyvault"></a> [cert\_keyvault](#module\_cert\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
 | <a name="module_environment_resource_group"></a> [environment\_resource\_group](#module\_environment\_resource\_group) | Azure/avm-res-resources-resourcegroup/azurerm | ~>0.0, < 1.0 |
 | <a name="module_foundry_keyvault"></a> [foundry\_keyvault](#module\_foundry\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
-| <a name="module_helloworld_container_app"></a> [helloworld\_container\_app](#module\_helloworld\_container\_app) | Azure/avm-res-app-containerapp/azurerm | ~> 0.9, < 1.0 |
 | <a name="module_log_analytics_workspace"></a> [log\_analytics\_workspace](#module\_log\_analytics\_workspace) | Azure/avm-res-operationalinsights-workspace/azurerm | ~>0.0, < 1.0 |
 | <a name="module_nat_gateway"></a> [nat\_gateway](#module\_nat\_gateway) | Azure/avm-res-network-natgateway/azurerm | ~>0.0, < 1.0 |
 | <a name="module_pls_internal_load_balancer"></a> [pls\_internal\_load\_balancer](#module\_pls\_internal\_load\_balancer) | Azure/avm-res-network-loadbalancer/azurerm | ~>0.5, < 1.0 |
