@@ -315,7 +315,7 @@ locals {
       classic                    = false
       kind                       = "SpeechServices"
       storage                    = true
-      sku_name                   = "F0" ## only one allowed per subscription
+      sku_name                   = "F0"  ## only one allowed per subscription
       dynamic_throttling_enabled = false ## This feature is currently not supported for the resource kind SpeechServices and sku S0."
       rai_policy                 = false
     }
