@@ -11,170 +11,6 @@ locals {
   }
 }
 
-## The subnet must be in the same VNet and resource group as the bastion host.
-
-## Bastion costs $$$ (unless it is Developer - which is free) - around $100 per month per region! (this code will create one bastion per region!!!)
-## Bastion is a managed service - no need to patch or update
-resource "azurerm_public_ip" "bastion" {
-  for_each = var.bastion_sku != "Developer" ? { this = true } : {}
-
-  name                = "pip-${local.bastion_name_location}"
-  resource_group_name = module.environment_resource_group.resource.name
-  location            = module.environment_resource_group.resource.location
-  allocation_method   = "Static"
-  sku                 = "Standard"
-  sku_tier            = "Regional"
-  domain_name_label   = local.bastion_name_hostname
-  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-}
-
-/*
-resource "azurerm_monitor_diagnostic_setting" "bastion-publicip1" {
-  for_each = { for k, v in azurerm_public_ip.bastion : k => v if var.bastion_sku != "Developer" }
-
-  name                       = "Audit-${each.value.name}-to-Azure-Monitor"
-  target_resource_id         = each.value.id
-  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
-
-  enabled_log {
-    category_group = "audit"
-  }
-}
-*/
-
-/*
-resource "azurerm_monitor_diagnostic_setting" "bastion-publicip2" {
-  for_each = { for k, v in azurerm_public_ip.bastion : k => v if var.bastion_sku != "Developer" }
-
-  name                       = "Logs-${each.value.name}-to-Azure-Monitor"
-  target_resource_id         = each.value.id
-  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
-
-  enabled_log {
-    category_group = "allLogs"
-  }
-}
-*/
-
-module "bastion_subnet" {
-  source  = "Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
-  version = "~> 0.22, < 1.0"
-
-  name             = "AzureBastionSubnet"
-  parent_id        = local.vnet_resource_id
-  address_prefixes = [format(local.subnet_bastion.address_format_ipv4, local.regions[var.location].location_number)]
-
-  default_outbound_access_enabled               = false
-  service_endpoints                             = null
-  private_link_service_network_policies_enabled = false
-  ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
-  ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
-  private_endpoint_network_policies = "Disabled"
-
-  route_table = {
-    id = null
-  }
-  nat_gateway = {
-    id = null
-  }
-  network_security_group = {
-    id = azurerm_network_security_group.bastion.id
-  }
-}
-
-resource "azurerm_bastion_host" "this" {
-  name                = local.bastion_name_location
-  resource_group_name = module.environment_resource_group.resource.name
-  location            = module.environment_resource_group.resource.location
-
-  dynamic "ip_configuration" {
-    for_each = var.bastion_sku != "Developer" ? [1] : []
-
-    content {
-      name                 = lower("${local.bastion_name}-config")
-      subnet_id            = module.bastion_subnet.resource_id
-      public_ip_address_id = azurerm_public_ip.bastion["this"].id
-    }
-  }
-  ## AZs are free with Bastion
-  zones = var.bastion_sku != "Developer" ? local.regions[var.location].zones : []
-
-  ## Basic is the other option
-  sku                = var.bastion_sku
-  copy_paste_enabled = true
-
-  ## Standard SKU features
-  file_copy_enabled = var.bastion_sku == "Standard" || var.bastion_sku == "Premium" ? true : false
-  tunneling_enabled = var.bastion_sku == "Standard" || var.bastion_sku == "Premium" ? true : false
-  ## Tunnel can be used to access a Windows VM - Windows Admin Center (WAC)
-
-  scale_units            = 2
-  ip_connect_enabled     = var.bastion_sku == "Standard" || var.bastion_sku == "Premium" ? true : false
-  kerberos_enabled       = var.bastion_sku == "Standard" || var.bastion_sku == "Premium" ? true : false
-  shareable_link_enabled = var.bastion_sku == "Standard" || var.bastion_sku == "Premium" ? true : false
-
-  ## Premium Only features
-  session_recording_enabled = var.bastion_sku == "Premium" ? true : false
-
-  virtual_network_id = local.vnet_resource_id
-
-  timeouts {
-    create = "90m"
-  }
-  depends_on = [
-    module.environment_resource_group,
-    module.virtual_network
-  ]
-  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-}
-
-output "bastion_id" {
-  description = "Bastion Host ID"
-  value       = azurerm_bastion_host.this.id
-  sensitive   = false
-}
-
-output "bastion_command_wac_tunnel_pwsh" {
-  description = "Bastion Tunnel command to access Windows Admin Center - only works with Standard or Premium Bastion SKUs"
-  sensitive   = false
-  value       = "Start-BastionTunnel -VmName 'vm-name' -BastionName '${azurerm_bastion_host.this.name}' -BastionResourceGroup '${azurerm_bastion_host.this.resource_group_name}' -ResourcePort 6516 -LocalPort 8443"
-  ## Then browse to https://localhost:8443 and log in with your Azure credentials. This will open a secure tunnel to the target VM over HTTPS. You can also use this command to connect to a Windows VM using Windows Admin Center (WAC) if the WAC extension is installed on the target VM.
-}
-
-output "bastion_command_native_rdp" {
-  description = "Bastion RDP command to access a Windows VM (via native client) - only works with Standard or Premium Bastion SKUs"
-  sensitive   = false
-  ## Remote RDP connections to VMs that are joined to Microsoft Entra ID is allowed only from Windows 10 or later PCs that are either Microsoft Entra registered, Microsoft Entra joined, or Microsoft Entra hybrid joined to the same directory as the VM.
-  value = "az network bastion rdp --name ${azurerm_bastion_host.this.name} --resource-group ${azurerm_bastion_host.this.resource_group_name} --target-resource-id vm-name"
-}
-
-output "bastion_command_native_ssh" {
-  description = "Bastion SSH command to access a Linux VM (via native client) - only works with Standard or Premium Bastion SKUs"
-  sensitive   = false
-  value       = "az network bastion ssh --name ${azurerm_bastion_host.this.name} --resource-group ${azurerm_bastion_host.this.resource_group_name} --target-resource-id vm-name"
-}
-
-/*
-resource "azurerm_monitor_diagnostic_setting" "bastion1" {
-  name                       = "Audit-${azurerm_bastion_host.this.name}-to-Azure-Monitor"
-  target_resource_id         = azurerm_bastion_host.this.id
-  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
-
-  enabled_log {
-    category_group = "audit"
-  }
-}
-resource "azurerm_monitor_diagnostic_setting" "bastion2" {
-  name                       = "Logs-${azurerm_bastion_host.this.name}-to-Azure-Monitor"
-  target_resource_id         = azurerm_bastion_host.this.id
-  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
-
-  enabled_log {
-    category_group = "allLogs"
-  }
-}
-*/
-
 resource "azurerm_network_security_group" "bastion" {
   name                = "nsg-bastion-${lower(module.environment_resource_group.resource.location)}"
   resource_group_name = module.environment_resource_group.resource.name
@@ -335,4 +171,161 @@ resource "azurerm_network_security_group" "bastion" {
   }
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
+
+## The subnet must be in the same VNet and resource group as the bastion host.
+
+## Bastion costs $$$ (unless it is Developer - which is free) - around $100 per month per region! (this code will create one bastion per region!!!)
+## Bastion is a managed service - no need to patch or update
+resource "azurerm_public_ip" "bastion" {
+  for_each = var.bastion_sku != "Developer" ? { this = true } : {}
+
+  name                = "pip-${local.bastion_name_location}"
+  resource_group_name = module.environment_resource_group.resource.name
+  location            = module.environment_resource_group.resource.location
+  allocation_method   = "Static"
+  sku                 = "Standard" ## Basic, Standard, and StandardV2 (currently, only support NAT Gateways)
+  sku_tier            = var.bastion_sku == "Premium" ? "Global" : "Regional"
+  domain_name_label   = local.bastion_name_hostname
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
+
+/*
+resource "azurerm_monitor_diagnostic_setting" "bastion-publicip1" {
+  for_each = { for k, v in azurerm_public_ip.bastion : k => v if var.bastion_sku != "Developer" }
+
+  name                       = "Audit-${each.value.name}-to-Azure-Monitor"
+  target_resource_id         = each.value.id
+  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
+
+  enabled_log {
+    category_group = "audit"
+  }
+}
+*/
+
+/*
+resource "azurerm_monitor_diagnostic_setting" "bastion-publicip2" {
+  for_each = { for k, v in azurerm_public_ip.bastion : k => v if var.bastion_sku != "Developer" }
+
+  name                       = "Logs-${each.value.name}-to-Azure-Monitor"
+  target_resource_id         = each.value.id
+  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
+
+  enabled_log {
+    category_group = "allLogs"
+  }
+}
+*/
+
+module "bastion_subnet" {
+  source  = "Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
+  version = "~> 0.22, < 1.0"
+
+  name             = "AzureBastionSubnet"
+  parent_id        = local.vnet_resource_id
+  address_prefixes = [format(local.subnet_bastion.address_format_ipv4, local.regions[var.location].location_number)]
+
+  default_outbound_access_enabled               = false
+  service_endpoints                             = null
+  private_link_service_network_policies_enabled = false
+  ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
+  ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
+  private_endpoint_network_policies = "Disabled"
+
+  route_table = {
+    id = null
+  }
+  nat_gateway = {
+    id = null
+  }
+  network_security_group = {
+    id = azurerm_network_security_group.bastion.id
+  }
+}
+
+module "avm-res-network-bastionhost" {
+  source           = "Azure/avm-res-network-bastionhost/azurerm"
+  version          = "0.9.0"
+  enable_telemetry = var.enable_telemetry
+
+  name               = local.bastion_name
+  location           = module.environment_resource_group.resource.location
+  parent_id          = module.environment_resource_group.resource_id
+  sku                = var.bastion_sku
+  copy_paste_enabled = true
+
+  ip_configuration = {
+    name             = lower("${local.bastion_name}-config")
+    create_public_ip = true
+    subnet_id        = module.bastion_subnet.resource_id
+  }
+
+  ## Standard SKU features
+  file_copy_enabled = var.bastion_sku == "Standard" || var.bastion_sku == "Premium" ? true : false
+  tunneling_enabled = var.bastion_sku == "Standard" || var.bastion_sku == "Premium" ? true : false
+  ## Tunnel can be used to access a Windows VM - Windows Admin Center (WAC)
+
+  scale_units            = 2
+  ip_connect_enabled     = var.bastion_sku == "Standard" || var.bastion_sku == "Premium" ? true : false
+  kerberos_enabled       = var.bastion_sku == "Standard" || var.bastion_sku == "Premium" ? true : false
+  shareable_link_enabled = var.bastion_sku == "Standard" || var.bastion_sku == "Premium" ? true : false
+
+  ## Premium Only features
+  session_recording_enabled = var.bastion_sku == "Premium" ? true : false
+
+  virtual_network_id = local.vnet_resource_id
+
+  depends_on = [
+    module.environment_resource_group,
+    module.virtual_network
+  ]
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
+
+output "bastion_id" {
+  description = "Bastion Host ID"
+  value       = module.avm-res-network-bastionhost.resource_id
+  sensitive   = false
+}
+
+output "bastion_command_wac_tunnel_pwsh" {
+  description = "Bastion Tunnel command to access Windows Admin Center - only works with Standard or Premium Bastion SKUs"
+  sensitive   = false
+  value       = "Start-BastionTunnel -VmName 'vm-name' -BastionName '${module.avm-res-network-bastionhost.name}' -BastionResourceGroup '${module.environment_resource_group.resource.name}' -ResourcePort 6516 -LocalPort 8443"
+  ## Then browse to https://localhost:8443 and log in with your Azure credentials. This will open a secure tunnel to the target VM over HTTPS. You can also use this command to connect to a Windows VM using Windows Admin Center (WAC) if the WAC extension is installed on the target VM.
+}
+
+output "bastion_command_native_rdp" {
+  description = "Bastion RDP command to access a Windows VM (via native client) - only works with Standard or Premium Bastion SKUs"
+  sensitive   = false
+  ## Remote RDP connections to VMs that are joined to Microsoft Entra ID is allowed only from Windows 10 or later PCs that are either Microsoft Entra registered, Microsoft Entra joined, or Microsoft Entra hybrid joined to the same directory as the VM.
+  value = "az network bastion rdp --name ${module.avm-res-network-bastionhost.name} --resource-group ${module.environment_resource_group.resource.name} --target-resource-id vm-name"
+}
+
+output "bastion_command_native_ssh" {
+  description = "Bastion SSH command to access a Linux VM (via native client) - only works with Standard or Premium Bastion SKUs"
+  sensitive   = false
+  value       = "az network bastion ssh --name ${module.avm-res-network-bastionhost.name} --resource-group ${module.environment_resource_group.resource.name} --target-resource-id vm-name"
+}
+
+/*
+resource "azurerm_monitor_diagnostic_setting" "bastion1" {
+  name                       = "Audit-${azurerm_bastion_host.this.name}-to-Azure-Monitor"
+  target_resource_id         = azurerm_bastion_host.this.id
+  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
+
+  enabled_log {
+    category_group = "audit"
+  }
+}
+resource "azurerm_monitor_diagnostic_setting" "bastion2" {
+  name                       = "Logs-${azurerm_bastion_host.this.name}-to-Azure-Monitor"
+  target_resource_id         = azurerm_bastion_host.this.id
+  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
+
+  enabled_log {
+    category_group = "allLogs"
+  }
+}
+*/
 
