@@ -127,7 +127,7 @@ locals {
       classic                    = false
       kind                       = "ComputerVision"
       storage                    = false
-      sku_name                   = "F0"
+      sku_name                   = "F0" ## only one allowed per subscription
       dynamic_throttling_enabled = false
       rai_policy                 = false
     }
@@ -194,11 +194,11 @@ locals {
       rai_policy                 = false
     }
     FormRecognizer = { ## otherwise known as Document Intelligence
-      enable                     = true
+      enable                     = false
       classic                    = false
       kind                       = "FormRecognizer" ## Document Intelligence
       storage                    = true
-      sku_name                   = "F0"
+      sku_name                   = "F0" ## only one allowed per subscription
       dynamic_throttling_enabled = false
       rai_policy                 = false
     }
@@ -311,11 +311,11 @@ locals {
       rai_policy                 = false
     }
     SpeechServices = {
-      enable                     = true
+      enable                     = false
       classic                    = false
       kind                       = "SpeechServices"
       storage                    = true
-      sku_name                   = "F0"
+      sku_name                   = "F0" ## only one allowed per subscription
       dynamic_throttling_enabled = false ## This feature is currently not supported for the resource kind SpeechServices and sku S0."
       rai_policy                 = false
     }

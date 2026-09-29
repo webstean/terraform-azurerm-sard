@@ -48,8 +48,7 @@ module "aihub" {
   key_vault = {
     resource_id = module.ai_keyvault.resource_id
   }
-  kind = "Hub" ## offering additional AI capabilities while still leveraging the underlying
-  ## Azure Machine Learning infrastructure.
+  kind                          = "Hub" ## offering additional AI capabilities while still leveraging the underlying Azure Machine Learning infrastructure.
   provision_network_now_enabled = false
   public_network_access_enabled = true
   application_insights = {
