@@ -6,6 +6,7 @@ locals {
   vnet_name_hostname = lower(substr(replace("l${local.vnet_random_suffix}${local.vnet_name_location}", "-", ""), 0, 24))
   vnet_resource_name = module.virtual_network.name
   vnet_resource_id   = module.virtual_network.resource_id
+  /*
   vnet_subnets = concat(
     azurerm_subnet.outbound[*],
     module.subnet_mlhub.name,
@@ -17,6 +18,7 @@ locals {
     azurerm_subnet.private_endpoints[*],
     azurerm_subnet.pls_nat[*],
   )
+*/
 }
 
 ## https://blog.cloudtrooper.net/2023/02/06/virtual-network-gateways-routing-in-azure/
@@ -905,6 +907,7 @@ data "azurerm_virtual_network" "azure_vnet_details" {
 }
 */
 
+/*
 locals {
   subnet_details = tomap({
     for snet in local.vnet_subnets : snet.name => {
@@ -920,6 +923,7 @@ output "vnet_subnet_details" {
   sensitive   = false
   value       = local.subnet_details
 }
+*/
 
 /*
 locals {

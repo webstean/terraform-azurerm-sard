@@ -238,10 +238,10 @@ module "vmss_keyvault" {
   enabled_for_disk_encryption     = true ## Whether Azure Disk Encryption is permitted to retrieve secrets from the vault
   enabled_for_template_deployment = true ## Whether Azure Resource Manager is permitted to retrieve secrets from the vault
   network_acls = {
-    default_action             = tobool(var.deploy_private_endpoints) ? "Deny" : "Allow"
-    bypass                     = "AzureServices"
-    ip_rules                   = tobool(var.deploy_private_endpoints) ? [] : ["0.0.0.0/0"]
-    virtual_network_subnet_ids = tobool(var.deploy_private_endpoints) ? null : [for subnet in local.vnet_subnets : subnet.id if try(contains(subnet.service_endpoints, "Microsoft.KeyVault"), false)]
+    default_action = tobool(var.deploy_private_endpoints) ? "Deny" : "Allow"
+    bypass         = "AzureServices"
+    ip_rules       = tobool(var.deploy_private_endpoints) ? [] : ["0.0.0.0/0"]
+    #virtual_network_subnet_ids = tobool(var.deploy_private_endpoints) ? null : [for subnet in local.vnet_subnets : subnet.id if try(contains(subnet.service_endpoints, "Microsoft.KeyVault"), false)]
   }
 
   /*

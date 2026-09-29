@@ -16,7 +16,7 @@ locals {
 
 resource "azurerm_role_definition" "bastion_connect" {
   name        = "Bastion VM Connect for the ${title(var.customer)} ${upper(var.prefix)} environment"
-  scope       = module.environment_resource_group.resource.resource_id
+  scope       = module.environment_resource_group.resource.id
   description = "Minimum permissions to connect to VMs via Azure Bastion: read VM, NIC, and Bastion host."
 
   permissions {
@@ -29,13 +29,13 @@ resource "azurerm_role_definition" "bastion_connect" {
     not_actions = []
   }
   assignable_scopes = [
-    module.environment_resource_group.resource.resource_id
+    module.environment_resource_group.resource.id
   ]
 }
 
 resource "azurerm_role_assignment" "bastion_connect" {
   for_each           = toset(local.bastion_access_principal_ids)
-  scope              = module.environment_resource_group.resource.resource_id
+  scope              = module.environment_resource_group.resource.id
   role_definition_id = azurerm_role_definition.bastion_connect.role_definition_resource_id
   principal_id       = each.value
 }
@@ -262,11 +262,11 @@ module "avm-res-network-bastionhost" {
 
   name               = local.bastion_name
   location           = module.environment_resource_group.resource.location
-  parent_id          = module.environment_resource_group.resource_id
+  parent_id          = module.environment_resource_group.resource.id
   sku                = var.bastion_sku
   copy_paste_enabled = true
 
-  ip_configuration = {
+  ip_configuration = var.bastion_sku == "Developer" ? null : {
     name             = lower("${local.bastion_name}-config")
     create_public_ip = true
     subnet_id        = module.bastion_subnet.resource_id
@@ -296,8 +296,8 @@ module "avm-res-network-bastionhost" {
 
 output "bastion_id" {
   description = "Bastion Host ID"
-  value       = module.avm-res-network-bastionhost.resource_id
   sensitive   = false
+  value       = module.environment_resource_group.resource.id
 }
 
 output "bastion_command_wac_tunnel_pwsh" {
