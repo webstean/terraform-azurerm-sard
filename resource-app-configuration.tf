@@ -100,9 +100,9 @@ module "appconfiguration" {
       principal_type                   = "ServicePrincipal"
       description                      = local.iac_message
     }
-    sp_role_assignment_3 = {
-      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Owner/${data.azurerm_client_config.current.object_id}")
-      role_definition_id_or_name       = "Owner"
+    sp_role_assignment_3a = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/App Configuration Contributor/${data.azurerm_client_config.current.object_id}")
+      role_definition_id_or_name       = "App Configuration Contributor"
       principal_id                     = data.azurerm_client_config.current.object_id
       skip_service_principal_aad_check = true
       principal_type                   = "ServicePrincipal"
