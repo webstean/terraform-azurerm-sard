@@ -20,14 +20,14 @@ module "redis" {
   version          = "~>0.0, < 1.0"
   enable_telemetry = var.enable_telemetry
 
-  name              = local.redis_name_location
-  parent_id         = module.environment_resource_group.resource_id
-  location          = module.environment_resource_group.resource.location
-  sku_name          = local.redis_sku_name
-  clustering_policy = local.redis_clustering_policy
-  eviction_policy   = "AllKeysLRU"
-  zones             = (tobool(var.data_pii) || tobool(var.data_phi)) ? local.regions[module.environment_resource_group.resource.location].zones : null
-  high_availability = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? "Enabled" : "Disabled"
+  name                  = local.redis_name_location
+  parent_id             = module.environment_resource_group.resource_id
+  location              = module.environment_resource_group.resource.location
+  sku_name              = local.redis_sku_name
+  clustering_policy     = local.redis_clustering_policy
+  eviction_policy       = "AllKeysLRU"
+  zones                 = (tobool(var.data_pii) || tobool(var.data_phi)) ? local.regions[module.environment_resource_group.resource.location].zones : null
+  high_availability     = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? "Enabled" : "Disabled"
   public_network_access = (tobool(var.deploy_private_endpoints)) ? "Disabled" : "Enabled"
 
   managed_identities = {
@@ -43,17 +43,6 @@ module "redis" {
       access_policy_name = "default"
     }
   }
-
-  #  diagnostic_settings = {
-  #    diag_setting_1 = {
-  #      name       = "Terraform Diagnostic Setting 1"
-  #      log_groups = ["allLogs"]
-  #      metric     = ["AllMetrics"]
-  #      #metric_categories              = ["SLI", "Requests"]
-  #      log_analytics_destination_type = null
-  #      workspace_resource_id          = module.log_analytics_workspace.resource.resource_id
-  #    }
-  #  }
 
   lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
     kind = "CanNotDelete"

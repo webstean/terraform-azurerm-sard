@@ -12,7 +12,6 @@ locals {
   vmss_hibernate_enabled              = var.vmss_hibernation_enabled
   vmss_enable_standby_pool            = false    ## To be true, this needs special permissions setup: https://learn.microsoft.com/en-us/azure/virtual-machine-scale-sets/standby-pools-configure-permissions
   vmss_patching_mode                  = "Manual" ## "Rolling", "Automatic", "Manual"
-  #vmss_subnet_id                      = module.outbound_subnet.resource_id
 }
 
 locals {
@@ -51,10 +50,19 @@ module "nat_gateway" {
       zones                   = local.regions[var.location].zones
     }
   }
+  diagnostic_settings = var.logging_enabled == false ? null : {
+    diag_setting_1 = {
+      name       = "Optional Logging 1"
+      log_groups = ["allLogs"]
+      metric     = ["AllMetrics"]
+      #metric_categories              = ["SLI", "Requests"]
+      log_analytics_destination_type = null
+      workspace_resource_id          = module.log_analytics_workspace.resource.resource_id
+    }
+  }
   lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
     kind = "CanNotDelete"
   } : null
-
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
@@ -119,6 +127,17 @@ module "vmss_external_load_balancer" {
     }
   }
 
+  diagnostic_settings = var.logging_enabled == false ? null : {
+    diag_setting_1 = {
+      name       = "Optional Logging 1"
+      log_groups = ["allLogs"]
+      metric     = ["AllMetrics"]
+      #metric_categories              = ["SLI", "Requests"]
+      log_analytics_destination_type = null
+      workspace_resource_id          = module.log_analytics_workspace.resource.resource_id
+    }
+  }
+
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 
   depends_on = [azapi_update_resource.vmss_external_reverse_fqdn]
@@ -142,7 +161,20 @@ resource "azurerm_public_ip" "vmss_external" {
   sku                     = "Standard"
   sku_tier                = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
   zones                   = local.regions[var.location].zones
-  tags                    = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+
+  /*
+  diagnostic_settings = var.logging_enabled == false ? null : {
+    diag_setting_1 = {
+      name       = "Optional Logging 1"
+      log_groups = ["allLogs"]
+      metric     = ["AllMetrics"]
+      #metric_categories              = ["SLI", "Requests"]
+      log_analytics_destination_type = null
+      workspace_resource_id          = module.log_analytics_workspace.resource.resource_id
+    }
+  }
+  */
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 
   lifecycle {
     ignore_changes = [reverse_fqdn]
@@ -236,18 +268,16 @@ module "vmss_keyvault" {
     ip_rules       = tobool(var.deploy_private_endpoints) ? [] : ["0.0.0.0/0"]
     #virtual_network_subnet_ids = tobool(var.deploy_private_endpoints) ? null : [for subnet in local.vnet_subnets : subnet.id if try(contains(subnet.service_endpoints, "Microsoft.KeyVault"), false)]
   }
-
-  /*
-  diagnostic_settings = {
+  diagnostic_settings = var.logging_enabled == false ? null : {
     diag_setting_1 = {
-      name                           = "Logs-Metrics-And-Audit to Azure Monitor ${module.log_analytics_workspace.resource.name}"
-      log_groups                     = ["allLogs", "audit"]
-      metric_categories              = ["AllMetrics"]
+      name       = "Optional Logging 1"
+      log_groups = ["allLogs"]
+      metric     = ["AllMetrics"]
+      #metric_categories              = ["SLI", "Requests"]
       log_analytics_destination_type = null
-      workspace_resource_id          = module.log_analytics_workspace.resource_id
+      workspace_resource_id          = module.log_analytics_workspace.resource.resource_id
     }
   }
-*/
   role_assignments = {
     role_assignment_1 = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Key Vault Secrets User/${azurerm_user_assigned_identity.environment.principal_id}")

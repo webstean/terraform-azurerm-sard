@@ -7,18 +7,30 @@ locals {
   sql_port                 = "1433"
 }
 
-resource "azurerm_subnet" "sqlserver" {
-  name                            = "databases"
-  resource_group_name             = module.environment_resource_group.resource.name
-  virtual_network_name            = local.vnet_resource_name
-  address_prefixes                = [format("10.%s.101.0/24", local.regions[var.location].location_number)]
-  default_outbound_access_enabled = false
+module "sqlserver_subnet" {
+  source  = "Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
+  version = "~> 0.22, < 1.0"
 
-  service_endpoints                             = local.service_endpoints
-  private_link_service_network_policies_enabled = false
+  name             = "sqlserver"
+  parent_id        = module.virtual_network.resource_id
+  address_prefixes = [format("10.%s.55.0/24", local.regions[var.location].location_number)]
+
+  default_outbound_access_enabled               = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+  service_endpoints                             = tobool(var.deploy_private_endpoints) ? [] : local.service_endpoints
+  private_link_service_network_policies_enabled = tobool(var.deploy_private_link_service) ? true : false
   ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
   ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
-  private_endpoint_network_policies = "Enabled"
+  private_endpoint_network_policies = "Disabled"
+
+  route_table = {
+    id = azurerm_route_table.this.id
+  }
+  nat_gateway = var.deploy_nat_gateway == true ? {
+    id = try(module.nat_gateway.resource_id, null)
+  } : null
+  network_security_group = {
+    id = (tobool(var.data_pii) || tobool(var.data_phi)) ? azurerm_network_security_group.secure.id : azurerm_network_security_group.any2any.id
+  }
 }
 
 resource "azurerm_user_assigned_identity" "sqlserver" {

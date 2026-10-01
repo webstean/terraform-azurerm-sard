@@ -1,5 +1,5 @@
 locals {
-  nginx_friendly_name = 'NGINX Proxy, Cache, API Manager"
+  nginx_friendly_name = "NGINX Proxy, Cache, API Manager"
   nginx_name          = "nginx-${var.prefix}"
   nginx_name_location = lower("${local.nginx_name}-${lower(var.location)}")
   nginx_random_suffix = substr(md5(local.nginx_name_location), 0, 6)
@@ -44,125 +44,6 @@ resource "azurerm_public_ip" "nginx" {
 
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
-
-resource "azurerm_subnet" "nginx" {
-  name                                          = local.nginx_name
-  resource_group_name                           = module.environment_resource_group.resource.name
-  virtual_network_name                          = azurerm_virtual_network.this.name
-  address_prefixes                              = [format("10.%s.55.0/24", local.regions[var.location].location_number)]
-  default_outbound_access_enabled               = false
-  service_endpoints                             = var.deploy_private_endpoints ? null : local.service_endpoints
-  private_link_service_network_policies_enabled = false
-  ## Possible values are Disabled, Enabled, NetworkSecurityGroupEnabled and RouteTableEnabled.
-  private_endpoint_network_policies = "Enabled"
-
-  delegation {
-    name = "delegation"
-    service_delegation {
-      name = "NGINX.NGINXPLUS/nginxDeployments"
-      actions = [
-        "Microsoft.Network/virtualNetworks/subnets/join/action",
-      ]
-    }
-  }
-}
-resource "azurerm_nginx_deployment" "this" {
-  name                = local.nginx_name_hostname
-  sku                 = "standardv3_Monthly"
-  resource_group_name = module.environment_resource_group.resource.name
-  location            = module.environment_resource_group.resource.location
-
-  automatic_upgrade_channel = "stable"
-  auto_scale_profile {
-    name         = "${local.nginx_name_hostname}-auto-scale"
-    min_capacity = 10
-    max_capacity = 20
-  }
-
-  //  frontend_private { ## Internal
-  //    allocation_method = "Static"
-  //    subnet_id         = azurerm_subnet.nginx.id
-  //    ip_address = 
-  //  }
-  frontend_public {
-    ip_address = [azurerm_public_ip.nginx.id]
-  }
-  network_interface {
-    subnet_id = azurerm_subnet.nginx.id
-  }
-
-
-  identity {
-    type         = "SystemAssigned, UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.environment.id]
-  }
-  ##email = azuread_group.cloud_support.mail
-
-  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-  #  depends_on = [
-  #    azurerm_subnet_network_security_group_association.nginx
-  #  ]
-}
-
-resource "azurerm_nginx_configuration" "nginx" {
-  nginx_deployment_id = azurerm_nginx_deployment.this.id
-  root_file           = "/etc/nginx/nginx.conf"
-
-  config_file {
-    content = base64encode(<<-EOT
-http {
-    server {
-        listen 80;
-        location / {
-            default_type text/html;
-            return 200 '<!doctype html><html lang="en"><head></head><body>
-                <div>this one will be updated</div>
-                <div>at 10:38 am</div>
-            </body></html>';
-        }
-        include site/*.conf;
-    }
-}
-EOT
-    )
-    virtual_path = "/etc/nginx/nginx.conf"
-  }
-
-  config_file {
-    content = base64encode(<<-EOT
-location /bbb {
- default_type text/html;
- return 200 '<!doctype html><html lang="en"><head></head><body>
-  <div>this one will be updated</div>
-  <div>at 10:38 am</div>
- </body></html>';
-}
-EOT
-    )
-    virtual_path = "/etc/nginx/site/b.conf"
-  }
-}
-
-/*
-resource "azurerm_monitor_diagnostic_setting" "nginx_metrics" {
-  name                       = "Metrics-${azurerm_nginx_deployment.this.name}-to-Azure-Monitor"
-  target_resource_id         = azurerm_nginx_deployment.this.id
-  log_analytics_workspace_id =   workspace_id = module.log_analytics_workspace.resource.resource_id
-
-  enabled_metric {
-    category = "AllMetrics"
-  }
-}
-resource "azurerm_monitor_diagnostic_setting" "nginx_logs" {
-  name                       = "Logs-${azurerm_nginx_deployment.this.name}-to-Azure-Monitor"
-  target_resource_id         = azurerm_nginx_deployment.this.id
-  log_analytics_workspace_id =   workspace_id = module.log_analytics_workspace.resource.resource_id
-
-  enabled_log {
-    category_group = "allLogs"
-  }
-}
-*/
 
 resource "azurerm_network_security_group" "nginx" {
   name                = "nsg-nginx-${lower(module.environment_resource_group.resource.location)}"
@@ -294,8 +175,136 @@ resource "azurerm_network_security_group" "nginx" {
   }
 }
 
-resource "azurerm_subnet_network_security_group_association" "nginx" {
-  subnet_id                 = azurerm_subnet.nginx.id
-  network_security_group_id = azurerm_network_security_group.nginx.id
+module "nginx_subnet" {
+  source  = "Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
+  version = "~> 0.22, < 1.0"
+
+  name             = "nginx"
+  parent_id        = module.virtual_network.resource_id
+  address_prefixes = [format("10.%s.55.0/24", local.regions[var.location].location_number)]
+
+  default_outbound_access_enabled               = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+  service_endpoints                             = null
+  private_link_service_network_policies_enabled = tobool(var.deploy_private_link_service) ? true : false
+  ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
+  ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
+  private_endpoint_network_policies = "Disabled"
+
+  route_table = {
+    id = azurerm_route_table.this.id
+  }
+  nat_gateway = var.deploy_nat_gateway == true ? {
+    id = try(module.nat_gateway.resource_id, null)
+  } : null
+  network_security_group = {
+    id = azurerm_network_security_group.nginx.id
+  }
+  delegations = [{
+    name = "delegation"
+    service_delegation = {
+      name = "NGINX.NGINXPLUS/nginxDeployments"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+      ]
+    }
+  }]
 }
+
+resource "azurerm_nginx_deployment" "this" {
+  name                = local.nginx_name_hostname
+  sku                 = "standardv3_Monthly"
+  resource_group_name = module.environment_resource_group.resource.name
+  location            = module.environment_resource_group.resource.location
+
+  automatic_upgrade_channel = "stable"
+  auto_scale_profile {
+    name         = "${local.nginx_name_hostname}-auto-scale"
+    min_capacity = 10
+    max_capacity = 20
+  }
+
+  //  frontend_private { ## Internal
+  //    allocation_method = "Static"
+  //    subnet_id         = azurerm_subnet.nginx.id
+  //    ip_address =
+  //  }
+  frontend_public {
+    ip_address = [azurerm_public_ip.nginx.id]
+  }
+  network_interface {
+    subnet_id = module.nginx_subnet.resource_id
+  }
+
+
+  identity {
+    type         = "SystemAssigned, UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.environment.id]
+  }
+  ##email = azuread_group.cloud_support.mail
+
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  #  depends_on = [
+  #    azurerm_subnet_network_security_group_association.nginx
+  #  ]
+}
+
+resource "azurerm_nginx_configuration" "nginx" {
+  nginx_deployment_id = azurerm_nginx_deployment.this.id
+  root_file           = "/etc/nginx/nginx.conf"
+
+  config_file {
+    content = base64encode(<<-EOT
+http {
+    server {
+        listen 80;
+        location / {
+            default_type text/html;
+            return 200 '<!doctype html><html lang="en"><head></head><body>
+                <div>this one will be updated</div>
+                <div>at 10:38 am</div>
+            </body></html>';
+        }
+        include site/*.conf;
+    }
+}
+EOT
+    )
+    virtual_path = "/etc/nginx/nginx.conf"
+  }
+
+  config_file {
+    content = base64encode(<<-EOT
+location /bbb {
+ default_type text/html;
+ return 200 '<!doctype html><html lang="en"><head></head><body>
+  <div>this one will be updated</div>
+  <div>at 10:38 am</div>
+ </body></html>';
+}
+EOT
+    )
+    virtual_path = "/etc/nginx/site/b.conf"
+  }
+}
+
+/*
+resource "azurerm_monitor_diagnostic_setting" "nginx_metrics" {
+  name                       = "Metrics-${azurerm_nginx_deployment.this.name}-to-Azure-Monitor"
+  target_resource_id         = azurerm_nginx_deployment.this.id
+  log_analytics_workspace_id =   workspace_id = module.log_analytics_workspace.resource.resource_id
+
+  enabled_metric {
+    category = "AllMetrics"
+  }
+}
+resource "azurerm_monitor_diagnostic_setting" "nginx_logs" {
+  name                       = "Logs-${azurerm_nginx_deployment.this.name}-to-Azure-Monitor"
+  target_resource_id         = azurerm_nginx_deployment.this.id
+  log_analytics_workspace_id =   workspace_id = module.log_analytics_workspace.resource.resource_id
+
+  enabled_log {
+    category_group = "allLogs"
+  }
+}
+*/
 

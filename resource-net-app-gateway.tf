@@ -24,19 +24,31 @@ locals {
   app_gateway_redirect_configuration_name    = "rdrcfg-${local.gateway_name_location}"
 }
 
-resource "azurerm_subnet" "app_gateway" {
-  count = var.inbound_access == "App-Gateway" ? 1 : 0
+module "appgateway_subnet" {
+  source  = "Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
+  version = "~> 0.22, < 1.0"
 
-  name                                          = "ApplicationGatewaySubnet"
-  resource_group_name                           = module.environment_resource_group.resource.name
-  virtual_network_name                          = local.vnet_resource_name
-  address_prefixes                              = [format("10.%s.66.0/24", local.regions[var.location].location_number)]
-  default_outbound_access_enabled               = false
-  service_endpoints                             = var.deploy_private_endpoints ? null : local.service_endpoints
-  private_link_service_network_policies_enabled = true
+  name             = "ApplicationGatewaySubnet"
+  parent_id        = module.virtual_network.resource_id
+  address_prefixes = [format("10.%s.66.0/24", local.regions[var.location].location_number)]
+
+  default_outbound_access_enabled               = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+  service_endpoints                             = null
+  private_link_service_network_policies_enabled = tobool(var.deploy_private_link_service) ? true : false
   ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
   ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
-  private_endpoint_network_policies = "Enabled"
+  private_endpoint_network_policies = "Disabled"
+
+  route_table = {
+    id = azurerm_route_table.this.id
+  }
+  nat_gateway = var.deploy_nat_gateway == true ? {
+    id = try(module.nat_gateway.resource_id, null)
+  } : null
+  network_security_group = {
+    id = (tobool(var.data_pii) || tobool(var.data_phi)) ? azurerm_network_security_group.secure.id : azurerm_network_security_group.any2any.id
+  }
+  ## no delegations for this subnet, for the Application Gateway we are using the dedicated subnet only
 }
 
 resource "azurerm_public_ip" "app_gateway" {
@@ -132,7 +144,7 @@ resource "azurerm_application_gateway" "this" {
 
   gateway_ip_configuration {
     name      = local.app_gateway_frontend_port_name
-    subnet_id = azurerm_subnet.app_gateway[0].id
+    subnet_id = module.appgateway_subnet.resource_id
   }
 
   frontend_port {

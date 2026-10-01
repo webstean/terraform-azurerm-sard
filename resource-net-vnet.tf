@@ -577,9 +577,9 @@ module "outbound_subnet" {
   parent_id        = module.virtual_network.resource_id
   address_prefixes = [format(local.subnet_bastion.address_format_ipv4, local.regions[var.location].location_number)]
 
-  default_outbound_access_enabled               = false
-  service_endpoints                             = null
-  private_link_service_network_policies_enabled = false
+  default_outbound_access_enabled               = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+  service_endpoints                             = tobool(var.deploy_private_endpoints) ? [] : local.service_endpoints
+  private_link_service_network_policies_enabled = tobool(var.deploy_private_link_service) ? true : false
   ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
   ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
   private_endpoint_network_policies = "Disabled"
