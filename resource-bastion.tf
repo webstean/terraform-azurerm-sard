@@ -247,9 +247,9 @@ module "bastion_subnet" {
   #route_table = {
   #  id = null
   #}
-  #nat_gateway = {
-  #  id = null
-  #}
+  nat_gateway = var.deploy_nat_gateway == true ? {
+    id = try(module.nat_gateway.resource_id, null)
+  } : null
   network_security_group = {
     id = azurerm_network_security_group.bastion.id
   }

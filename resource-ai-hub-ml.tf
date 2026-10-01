@@ -23,9 +23,9 @@ module "subnet_mlhub" {
   route_table = {
     id = azurerm_route_table.this.id
   }
-  nat_gateway = {
-    id = var.deploy_nat_gateway ? module.nat_gateway.resource_id : null
-  }
+  nat_gateway = var.deploy_nat_gateway == true ? {
+    id = try(module.nat_gateway.resource_id, null)
+  } : null
   network_security_group = {
     id = (tobool(var.data_pii) || tobool(var.data_phi)) ? azurerm_network_security_group.secure.id : azurerm_network_security_group.any2any.id
   }
