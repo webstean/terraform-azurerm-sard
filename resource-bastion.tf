@@ -244,12 +244,12 @@ module "bastion_subnet" {
   ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
   private_endpoint_network_policies = "Disabled"
 
-  route_table = {
-    id = null
-  }
-  nat_gateway = {
-    id = null
-  }
+  #route_table = {
+  #  id = null
+  #}
+  #nat_gateway = {
+  #  id = null
+  #}
   network_security_group = {
     id = azurerm_network_security_group.bastion.id
   }
