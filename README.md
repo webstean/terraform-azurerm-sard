@@ -177,10 +177,8 @@ Next steps here
 | [azurerm_storage_container.sku_finder_cache](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_container.sqldiag](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_share.global](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) | resource |
-| [azurerm_subnet.app_gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.pls_nat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.private_endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
-| [azurerm_subnet.sqlserver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_user_assigned_identity.environment](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_user_assigned_identity.free_sql_database](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_user_assigned_identity.sqlserver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
@@ -391,6 +389,7 @@ Next steps here
 | <a name="module_ai_keyvault"></a> [ai\_keyvault](#module\_ai\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
 | <a name="module_aihub"></a> [aihub](#module\_aihub) | Azure/avm-res-machinelearningservices-workspace/azurerm | ~>0.0, < 1.0 |
 | <a name="module_appconfiguration"></a> [appconfiguration](#module\_appconfiguration) | Azure/avm-res-appconfiguration-configurationstore/azure | ~>0.0, < 1.0 |
+| <a name="module_appgateway_subnet"></a> [appgateway\_subnet](#module\_appgateway\_subnet) | Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet | ~> 0.22, < 1.0 |
 | <a name="module_application_insights"></a> [application\_insights](#module\_application\_insights) | Azure/avm-res-insights-component/azurerm | ~>0.0, < 1.0 |
 | <a name="module_avm-res-network-bastionhost"></a> [avm-res-network-bastionhost](#module\_avm-res-network-bastionhost) | Azure/avm-res-network-bastionhost/azurerm | ~> 0.3, < 1.0 |
 | <a name="module_bastion_subnet"></a> [bastion\_subnet](#module\_bastion\_subnet) | Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet | ~> 0.22, < 1.0 |
@@ -406,6 +405,7 @@ Next steps here
 | <a name="module_private_endpoint_sqlserver"></a> [private\_endpoint\_sqlserver](#module\_private\_endpoint\_sqlserver) | Azure/avm-res-network-privateendpoint/azurerm | ~>0.0, < 1.0 |
 | <a name="module_sandbox_subnet"></a> [sandbox\_subnet](#module\_sandbox\_subnet) | Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet | ~> 0.22, < 1.0 |
 | <a name="module_sql_private_dns_zones"></a> [sql\_private\_dns\_zones](#module\_sql\_private\_dns\_zones) | Azure/avm-res-network-privatednszone/azurerm | ~>0.0, < 1.0 |
+| <a name="module_sqlserver_subnet"></a> [sqlserver\_subnet](#module\_sqlserver\_subnet) | Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet | ~> 0.22, < 1.0 |
 | <a name="module_subnet_mlhub"></a> [subnet\_mlhub](#module\_subnet\_mlhub) | Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet | ~> 0.22, < 1.0 |
 | <a name="module_virtual_network"></a> [virtual\_network](#module\_virtual\_network) | Azure/avm-res-network-virtualnetwork/azurerm | ~> 0.22, < 1.0 |
 | <a name="module_virtualmachinescaleset"></a> [virtualmachinescaleset](#module\_virtualmachinescaleset) | Azure/avm-res-compute-virtualmachinescaleset/azurerm | ~>0.0, < 1.0 |
