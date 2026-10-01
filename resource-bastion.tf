@@ -271,6 +271,7 @@ module "avm-res-network-bastionhost" {
     create_public_ip = true
     subnet_id        = module.bastion_subnet.resource_id
   }
+  ## zones are free, but only on anything not 'Developer'
   zones = var.bastion_sku == "Developer" ? [] : local.regions[var.location].zones
 
   ## Standard SKU features
