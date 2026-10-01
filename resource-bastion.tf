@@ -309,47 +309,33 @@ module "avm-res-network-bastionhost" {
 output "bastion_id" {
   description = "Bastion Host ID"
   sensitive   = false
-  value       = module.environment_resource_group.resource.id
+  value       = module.avm-res-network-bastionhost.resource_id
 }
 
 output "bastion_command_wac_tunnel_pwsh" {
   description = "Bastion Tunnel command to access Windows Admin Center - only works with Standard or Premium Bastion SKUs"
   sensitive   = false
-  value       = "Start-BastionTunnel -VmName 'vm-name' -BastionName '${module.avm-res-network-bastionhost.name}' -BastionResourceGroup '${module.environment_resource_group.resource.name}' -ResourcePort 6516 -LocalPort 8443"
-  ## Then browse to https://localhost:8443 and log in with your Azure credentials. This will open a secure tunnel to the target VM over HTTPS. You can also use this command to connect to a Windows VM using Windows Admin Center (WAC) if the WAC extension is installed on the target VM.
+  value       = <<VEOF
+## Bastion Tunnel command to access Windows Admin Center (WAC) - only works with Standard or Premium Bastion SKUs
+Start-BastionTunnel -VmName 'vm-name' -BastionName '${module.avm-res-network-bastionhost.name}' -BastionResourceGroup '${module.environment_resource_group.resource.name}' -ResourcePort 6516 -LocalPort 8443
+## Then browse to https://localhost:8443 and log in with your Azure credentials. This will open a secure tunnel to the target VM over HTTPS. You can also use this command to connect to a Windows VM using Windows Admin Center (WAC) if the WAC extension is installed on the target VM.
+VEOF
 }
 
 output "bastion_command_native_rdp" {
   description = "Bastion RDP command to access a Windows VM (via native client) - only works with Standard or Premium Bastion SKUs"
   sensitive   = false
-  ## Remote RDP connections to VMs that are joined to Microsoft Entra ID is allowed only from Windows 10 or later PCs that are either Microsoft Entra registered, Microsoft Entra joined, or Microsoft Entra hybrid joined to the same directory as the VM.
-  value = "az network bastion rdp --name ${module.avm-res-network-bastionhost.name} --resource-group ${module.environment_resource_group.resource.name} --target-resource-id vm-name"
+  value       = <<VEOF
+## Remote RDP connections to VMs that are joined to Microsoft Entra ID is allowed only from Windows 10 or later PCs that are either Microsoft Entra registered, Microsoft Entra joined, or Microsoft Entra hybrid joined to the same directory as the VM.
+az network bastion rdp --name ${module.avm-res-network-bastionhost.name} --resource-group ${module.environment_resource_group.resource.name} --target-resource-id vm-name
+VEOF
 }
 
 output "bastion_command_native_ssh" {
   description = "Bastion SSH command to access a Linux VM (via native client) - only works with Standard or Premium Bastion SKUs"
   sensitive   = false
-  value       = "az network bastion ssh --name ${module.avm-res-network-bastionhost.name} --resource-group ${module.environment_resource_group.resource.name} --target-resource-id vm-name"
+  value       = <<VEOF
+## Bastion SSH command to access a Linux VM (via native client) - only works with Standard or Premium Bastion SKUs
+az network bastion ssh --name ${module.avm-res-network-bastionhost.name} --resource-group ${module.environment_resource_group.resource.name} --target-resource-id vm-name
+VEOF
 }
-
-/*
-resource "azurerm_monitor_diagnostic_setting" "bastion1" {
-  name                       = "Audit-${azurerm_bastion_host.this.name}-to-Azure-Monitor"
-  target_resource_id         = azurerm_bastion_host.this.id
-  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
-
-  enabled_log {
-    category_group = "audit"
-  }
-}
-resource "azurerm_monitor_diagnostic_setting" "bastion2" {
-  name                       = "Logs-${azurerm_bastion_host.this.name}-to-Azure-Monitor"
-  target_resource_id         = azurerm_bastion_host.this.id
-  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
-
-  enabled_log {
-    category_group = "allLogs"
-  }
-}
-*/
-
