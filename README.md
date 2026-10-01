@@ -396,7 +396,7 @@ Next steps here
 | <a name="module_aihub"></a> [aihub](#module\_aihub) | Azure/avm-res-machinelearningservices-workspace/azurerm | ~>0.0, < 1.0 |
 | <a name="module_appconfiguration"></a> [appconfiguration](#module\_appconfiguration) | Azure/avm-res-appconfiguration-configurationstore/azure | ~>0.0, < 1.0 |
 | <a name="module_application_insights"></a> [application\_insights](#module\_application\_insights) | Azure/avm-res-insights-component/azurerm | ~>0.0, < 1.0 |
-| <a name="module_avm-res-network-bastionhost"></a> [avm-res-network-bastionhost](#module\_avm-res-network-bastionhost) | Azure/avm-res-network-bastionhost/azurerm | 0.9.0 |
+| <a name="module_avm-res-network-bastionhost"></a> [avm-res-network-bastionhost](#module\_avm-res-network-bastionhost) | Azure/avm-res-network-bastionhost/azurerm | ~> 0.3, < 1.0 |
 | <a name="module_bastion_subnet"></a> [bastion\_subnet](#module\_bastion\_subnet) | Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet | ~> 0.22, < 1.0 |
 | <a name="module_cert_keyvault"></a> [cert\_keyvault](#module\_cert\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
 | <a name="module_containerappenv_subnet"></a> [containerappenv\_subnet](#module\_containerappenv\_subnet) | Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet | ~> 0.22, < 1.0 |
