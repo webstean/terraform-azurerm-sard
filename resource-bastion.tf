@@ -234,7 +234,7 @@ module "bastion_subnet" {
   version = "~> 0.22, < 1.0"
 
   name             = "AzureBastionSubnet"
-  parent_id        = local.vnet_resource_id
+  parent_id        = module.virtual_network.resource_id
   address_prefixes = [format(local.subnet_bastion.address_format_ipv4, local.regions[var.location].location_number)]
 
   default_outbound_access_enabled               = false
@@ -277,7 +277,7 @@ module "avm-res-network-bastionhost" {
   ## Standard SKU features
   file_copy_enabled = var.bastion_sku == "Standard" || var.bastion_sku == "Premium" ? true : false
   tunneling_enabled = var.bastion_sku == "Standard" || var.bastion_sku == "Premium" ? true : false
-  ## Tunnel can be used to access a Windows VM - Windows Admin Center (WAC)
+  ## Tunnel can be used to access a Windows Admin Center (WAC) on Azure VMs
 
   scale_units            = var.bastion_sku == "Developer" ? null : 2
   ip_connect_enabled     = var.bastion_sku == "Standard" || var.bastion_sku == "Premium" ? true : false
@@ -287,8 +287,7 @@ module "avm-res-network-bastionhost" {
   ## Premium Only features
   session_recording_enabled = var.bastion_sku == "Premium" ? true : false
 
-  virtual_network_id = local.vnet_resource_id
-
+  virtual_network_id = module.virtual_network.resource_id
   diagnostic_settings = var.logging_enabled == false ? null : {
     diag_setting_1 = {
       name       = "Optional Logging 1"

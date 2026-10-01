@@ -134,7 +134,7 @@ module "private_dns_zones" {
     "${local.vnet_resource_name}" = {
       vnetlinkname                           = "${local.vnet_resource_name}-${replace(lower(each.key), ".", "-")}"
       name                                   = "${local.vnet_resource_name}-${replace(lower(each.key), ".", "-")}"
-      virtual_network_id                     = local.vnet_resource_id
+      virtual_network_id                     = module.virtual_network.resource_id
       autoregistration                       = true
       registration_enabled                   = true
       private_dns_zone_supports_private_link = true
@@ -163,7 +163,7 @@ module "sql_private_dns_zones" {
     "${local.vnet_resource_name}" = {
       vnetlinkname                           = "${local.vnet_resource_name}-privatelink-database-windows-net"
       name                                   = "${local.vnet_resource_name}-privatelink-database-windows-net"
-      virtual_network_id                     = local.vnet_resource_id
+      virtual_network_id                     = module.virtual_network.resource_id
       autoregistration                       = true
       registration_enabled                   = true
       private_dns_zone_supports_private_link = true

@@ -46,7 +46,7 @@ resource "azurerm_lb_backend_address_pool_address" "target" {
 
   name                    = "target-ip"
   backend_address_pool_id = azurerm_lb_backend_address_pool.relay[0].id
-  virtual_network_id      = local.vnet_resource_id
+  virtual_network_id      = module.virtual_network.resource_id
 
   # the private IP you're relaying to
   ip_address = module.private_endpoint_sqlserver[0].resource.private_service_connection[0].private_ip_address
