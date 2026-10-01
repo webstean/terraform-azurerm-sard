@@ -271,14 +271,14 @@ module "avm-res-network-bastionhost" {
     create_public_ip = true
     subnet_id        = module.bastion_subnet.resource_id
   }
-  zones = var.bastion_sku == "Developer" ? nulll : local.regions[var.location].zones
+  zones = var.bastion_sku == "Developer" ? null : local.regions[var.location].zones
 
   ## Standard SKU features
   file_copy_enabled = var.bastion_sku == "Standard" || var.bastion_sku == "Premium" ? true : false
   tunneling_enabled = var.bastion_sku == "Standard" || var.bastion_sku == "Premium" ? true : false
   ## Tunnel can be used to access a Windows VM - Windows Admin Center (WAC)
 
-  scale_units            = 2
+  scale_units            = var.bastion_sku == "Developer" ? null : 2
   ip_connect_enabled     = var.bastion_sku == "Standard" || var.bastion_sku == "Premium" ? true : false
   kerberos_enabled       = var.bastion_sku == "Standard" || var.bastion_sku == "Premium" ? true : false
   shareable_link_enabled = var.bastion_sku == "Standard" || var.bastion_sku == "Premium" ? true : false
