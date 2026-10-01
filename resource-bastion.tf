@@ -20,11 +20,13 @@ resource "azurerm_role_definition" "bastion_connect" {
   description = "Minimum permissions to connect to VMs via Azure Bastion: read VM, NIC, and Bastion host."
 
   permissions {
+    # Azure Bastion exposes no '/action' operation - connection sessions only require read access
     actions = [
       "Microsoft.Compute/virtualMachines/read",
       "Microsoft.Network/networkInterfaces/read",
+      "Microsoft.Network/networkInterfaces/ipConfigurations/read",
+      "Microsoft.Network/virtualNetworks/read",
       "Microsoft.Network/bastionHosts/read",
-      "Microsoft.Network/bastionHosts/action", # required to initiate connection sessions
     ]
     not_actions = []
   }
