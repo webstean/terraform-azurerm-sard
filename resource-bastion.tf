@@ -129,10 +129,10 @@ resource "azurerm_network_security_group" "bastion" {
     access                     = "Allow"
     protocol                   = "*"
     source_port_range          = "*"
-    destination_port_ranges    = ["80", "443"]
-    source_address_prefix      = "VirtualNetwork"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
     destination_address_prefix = "Internet"
-    description                = "Allow Https outbound to Internet"
+    description                = "Allow HTTP outbound to Internet for Bastion session and certificate validation"
   }
   ## Ingress Traffic from Azure Bastion:
   ## Azure Bastion will reach to the target VM over private IP.
@@ -160,10 +160,10 @@ resource "azurerm_network_security_group" "bastion" {
     priority                   = 606
     direction                  = "Outbound"
     access                     = "Allow"
-    protocol                   = "*"
+    protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "443"
-    source_address_prefix      = "VirtualNetwork"
+    source_address_prefix      = "*"
     destination_address_prefix = "AzureCloud"
     description                = "Allow Azure Cloud"
   }
