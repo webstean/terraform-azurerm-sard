@@ -288,6 +288,17 @@ module "avm-res-network-bastionhost" {
 
   virtual_network_id = local.vnet_resource_id
 
+  diagnostic_settings = var.logging_enabled == false ? null : {
+    diag_setting_1 = {
+      name       = "Optional Logging 1"
+      log_groups = ["allLogs"]
+      metric     = ["AllMetrics"]
+      #metric_categories              = ["SLI", "Requests"]
+      log_analytics_destination_type = null
+      workspace_resource_id          = module.log_analytics_workspace.resource.resource_id
+    }
+  }
+
   depends_on = [
     module.environment_resource_group,
     module.virtual_network
