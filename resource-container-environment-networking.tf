@@ -11,7 +11,7 @@ module "containerappenv_subnet" {
   version = "~> 0.22, < 1.0"
 
   name             = "containerappenv-${var.prefix}"
-  parent_id        = local.vnet_resource_id
+  parent_id        = module.virtual_network.resource_id
   address_prefixes = [format("10.%s.12.0/23", local.regions[var.location].location_number)]
 
   default_outbound_access_enabled               = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
@@ -45,8 +45,8 @@ module "sandbox_subnet" {
   version = "~> 0.22, < 1.0"
 
   name             = "sandboxcontainers-${var.prefix}"
-  parent_id        = local.vnet_resource_id
-  address_prefixes = [format("10.%s.87.0/23", local.regions[var.location].location_number)]
+  parent_id        = module.virtual_network.resource_id
+  address_prefixes = [format("10.%s.86.0/23", local.regions[var.location].location_number)]
 
   default_outbound_access_enabled               = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
   service_endpoints                             = tobool(var.deploy_private_endpoints) ? [] : local.service_endpoints
