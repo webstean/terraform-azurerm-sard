@@ -12,7 +12,7 @@ locals {
   vmss_hibernate_enabled              = var.vmss_hibernation_enabled
   vmss_enable_standby_pool            = false    ## To be true, this needs special permissions setup: https://learn.microsoft.com/en-us/azure/virtual-machine-scale-sets/standby-pools-configure-permissions
   vmss_patching_mode                  = "Manual" ## "Rolling", "Automatic", "Manual"
-  vmss_subnet_id                      = module.outbound_subnet.resource_id
+  #vmss_subnet_id                      = module.outbound_subnet.resource_id
 }
 
 locals {
@@ -187,13 +187,6 @@ resource "azurerm_monitor_diagnostic_setting" "pip_logs" {
   }
 }
 */
-
-resource "azurerm_subnet_nat_gateway_association" "vmss" {
-  count = var.deploy_nat_gateway ? 1 : 0
-
-  subnet_id      = local.vmss_subnet_id
-  nat_gateway_id = module.nat_gateway[0].resource_id
-}
 
 /*
 resource "azurerm_monitor_diagnostic_setting" "nat_gateway_metrics" {
@@ -530,7 +523,7 @@ module "virtualmachinescaleset" {
     network_security_group_id = (tobool(var.data_pii) || tobool(var.data_phi)) ? azurerm_network_security_group.secure.id : azurerm_network_security_group.any2any.id
     ip_configuration = [{
       name      = "VMSS-IPConfig"
-      subnet_id = local.vmss_subnet_id
+      subnet_id = module.outbound_subnet.resource_id
       #public_ip_address = [{
       #  name     = "VMSS-PIP"
       #  sku_name = "StandardV2"
