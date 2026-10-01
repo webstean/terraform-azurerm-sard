@@ -47,131 +47,6 @@ module "virtual_network" {
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
-/*
-moved {
-  from = azurerm_virtual_network.this
-  to   = module.virtual_network.azapi_resource.vnet
-}
-*/
-
-# Wait 10 seconds for the network watcher to be created as a byproduct of the VNet creation
-resource "time_sleep" "wait_10_seconds_for_network_watcher_creation" {
-  create_duration = "10s"
-
-  depends_on = [module.virtual_network]
-}
-
-# Network Watcher — one per region per subscription is the norm; Azure will reject a
-# duplicate if one already exists in this region, so remove/import this resource if so.
-data "azurerm_network_watcher" "this" {
-  name                = "NetworkWatcher_${lower(var.location)}"
-  resource_group_name = "NetworkWatcherRG"
-  depends_on          = [module.virtual_network]
-}
-
-resource "azurerm_subnet" "outbound" {
-  name                 = "outbound"
-  resource_group_name  = module.environment_resource_group.resource.name
-  virtual_network_name = local.vnet_resource_name
-  address_prefixes     = [format("10.%s.99.0/24", local.regions[var.location].location_number)]
-  ## Note, the VMSS won't use the default Internet outbound (even if enabled - you have to use a NAT Gateway)
-  default_outbound_access_enabled               = true
-  service_endpoints                             = var.deploy_private_endpoints ? null : local.service_endpoints
-  private_link_service_network_policies_enabled = false
-  ## Possible values are Disabled, Enabled, NetworkSecurityGroupEnabled and RouteTableEnabled.
-  private_endpoint_network_policies = tobool(var.deploy_private_endpoints) ? "Enabled" : "Disabled"
-  #service_endpoint_policy_ids = [
-  #  azurerm_subnet_service_endpoint_storage_policy.storage.id
-  #]
-}
-
-/*
-resource "azurerm_monitor_diagnostic_setting" "vnet-metrics" {
-  name                       = "Metrics-${azurerm_virtual_network.this.name}-to-Azure-Monitor"
-  target_resource_id         = azurerm_virtual_network.this.id
-  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
-
-  enabled_metric {
-    category = "AllMetrics"
-  }
-}
-resource "azurerm_monitor_diagnostic_setting" "vnet_logs" {
-  name                       = "Logs-${azurerm_virtual_network.this.name}-to-Azure-Monitor"
-  target_resource_id         = azurerm_virtual_network.this.id
-  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
-
-  enabled_log {
-    category_group = "allLogs"
-  }
-}
-*/
-
-# Route table with direct-to-internet routes for Windows KMS activation endpoints
-# Activation needs to come from a Azure IP Address, not from a private IP address, so we need to route traffic to the Internet for the KMS endpoints
-resource "azurerm_route_table" "this" {
-  name                          = "Direct-Internet-Routes"
-  resource_group_name           = module.environment_resource_group.resource.name
-  location                      = module.environment_resource_group.resource.location
-  bgp_route_propagation_enabled = false ## keep them, as simple static routes
-
-  route {
-    name           = "DirectRouteToKMS" ## Windows Activation
-    address_prefix = "23.102.135.246/32"
-    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway (On-Premise), VnetLocal, Internet, VirtualAppliance and None.
-  }
-
-  route {
-    name           = "DirectRouteToAZKMS01" ## Windows Activation
-    address_prefix = "20.118.99.224/32"
-    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
-  }
-
-  route {
-    name           = "DirectRouteToAZKMS02" ## Windows Activation
-    address_prefix = "40.83.235.53/32"
-    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
-  }
-
-  route {
-    name           = "DirectRouteToTeamsTURN" ## voice, video for MS Teams
-    address_prefix = "20.202.0.0/16"
-    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
-  }
-
-  route {
-    name           = "DirectRouteToGoogleDNS1" ## Google DNS
-    address_prefix = "8.8.8.8/32"
-    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
-  }
-
-  route {
-    name           = "DirectRouteToGoogleDNS2" ## Google DNS
-    address_prefix = "8.8.4.4/32"
-    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
-  }
-
-  route {
-    name           = "DirectRouteToCloudflareDNS1" ## Cloudflare DNS
-    address_prefix = "1.1.1.1/32"
-    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
-  }
-
-  route {
-    name           = "DirectRouteToCloudflareDNS2" ## Cloudflare DNS
-    address_prefix = "1.0.0.1/32"
-    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
-  }
-
-  ## to route traffic to a Secure vWAN (see routing intent) - do not use a route table, like this one.
-  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-}
-
-## Attach the route table to the subnet hosting the VMs
-resource "azurerm_subnet_route_table_association" "subnet01_kms_route" {
-  subnet_id      = azurerm_subnet.outbound.id
-  route_table_id = azurerm_route_table.this.id
-}
-
 resource "azurerm_network_security_group" "secure" { ## designed to be associated to NIC or subnets or both!
   name                = "nsg-general-access-${lower(module.environment_resource_group.resource.location)}"
   resource_group_name = module.environment_resource_group.resource.name
@@ -679,9 +554,126 @@ resource "azurerm_network_security_group" "any2any" {
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
-resource "azurerm_subnet_network_security_group_association" "outbound" {
-  subnet_id                 = azurerm_subnet.outbound.id
-  network_security_group_id = (tobool(var.data_pii) || tobool(var.data_phi)) ? azurerm_network_security_group.secure.id : azurerm_network_security_group.any2any.id
+# Wait 10 seconds for the network watcher to be created as a byproduct of the VNet creation
+resource "time_sleep" "wait_10_seconds_for_network_watcher_creation" {
+  create_duration = "10s"
+
+  depends_on = [module.virtual_network]
+}
+
+# Network Watcher — one per region per subscription is the norm; Azure will reject a
+# duplicate if one already exists in this region, so remove/import this resource if so.
+data "azurerm_network_watcher" "this" {
+  name                = "NetworkWatcher_${lower(var.location)}"
+  resource_group_name = "NetworkWatcherRG"
+  depends_on          = [module.virtual_network]
+}
+
+module "outbound_subnet" {
+  source  = "Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
+  version = "~> 0.22, < 1.0"
+
+  name             = "outbound"
+  parent_id        = module.virtual_network.resource_id
+  address_prefixes = [format(local.subnet_bastion.address_format_ipv4, local.regions[var.location].location_number)]
+
+  default_outbound_access_enabled               = false
+  service_endpoints                             = null
+  private_link_service_network_policies_enabled = false
+  ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
+  ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
+  private_endpoint_network_policies = "Disabled"
+
+  route_table = {
+    id = azurerm_route_table.this.id
+  }
+  nat_gateway = var.deploy_nat_gateway == true ? {
+    id = try(module.nat_gateway.resource_id, null)
+  } : null
+  network_security_group = {
+    id = (tobool(var.data_pii) || tobool(var.data_phi)) ? azurerm_network_security_group.secure.id : azurerm_network_security_group.any2any.id
+  }
+}
+
+/*
+resource "azurerm_monitor_diagnostic_setting" "vnet-metrics" {
+  name                       = "Metrics-${azurerm_virtual_network.this.name}-to-Azure-Monitor"
+  target_resource_id         = azurerm_virtual_network.this.id
+  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
+
+  enabled_metric {
+    category = "AllMetrics"
+  }
+}
+resource "azurerm_monitor_diagnostic_setting" "vnet_logs" {
+  name                       = "Logs-${azurerm_virtual_network.this.name}-to-Azure-Monitor"
+  target_resource_id         = azurerm_virtual_network.this.id
+  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
+
+  enabled_log {
+    category_group = "allLogs"
+  }
+}
+*/
+
+# Route table with direct-to-internet routes for Windows KMS activation endpoints
+# Activation needs to come from a Azure IP Address, not from a private IP address, so we need to route traffic to the Internet for the KMS endpoints
+resource "azurerm_route_table" "this" {
+  name                          = "Direct-Internet-Routes"
+  resource_group_name           = module.environment_resource_group.resource.name
+  location                      = module.environment_resource_group.resource.location
+  bgp_route_propagation_enabled = false ## keep them, as simple static routes
+
+  route {
+    name           = "DirectRouteToKMS" ## Windows Activation
+    address_prefix = "23.102.135.246/32"
+    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway (On-Premise), VnetLocal, Internet, VirtualAppliance and None.
+  }
+
+  route {
+    name           = "DirectRouteToAZKMS01" ## Windows Activation
+    address_prefix = "20.118.99.224/32"
+    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
+  }
+
+  route {
+    name           = "DirectRouteToAZKMS02" ## Windows Activation
+    address_prefix = "40.83.235.53/32"
+    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
+  }
+
+  route {
+    name           = "DirectRouteToTeamsTURN" ## voice, video for MS Teams
+    address_prefix = "20.202.0.0/16"
+    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
+  }
+
+  route {
+    name           = "DirectRouteToGoogleDNS1" ## Google DNS
+    address_prefix = "8.8.8.8/32"
+    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
+  }
+
+  route {
+    name           = "DirectRouteToGoogleDNS2" ## Google DNS
+    address_prefix = "8.8.4.4/32"
+    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
+  }
+
+  route {
+    name           = "DirectRouteToCloudflareDNS1" ## Cloudflare DNS
+    address_prefix = "1.1.1.1/32"
+    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
+  }
+
+  route {
+    name           = "DirectRouteToCloudflareDNS2" ## Cloudflare DNS
+    address_prefix = "1.0.0.1/32"
+    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
+  }
+
+  ## to route traffic to a Secure vWAN (see routing intent) - do not use a route table, like this one.
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 /*
