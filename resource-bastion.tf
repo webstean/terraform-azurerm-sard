@@ -257,7 +257,7 @@ module "bastion_subnet" {
 
 module "avm-res-network-bastionhost" {
   source           = "Azure/avm-res-network-bastionhost/azurerm"
-  version          = "0.9.0"
+  version = "~> 0.3, < 1.0"
   enable_telemetry = var.enable_telemetry
 
   name               = local.bastion_name
