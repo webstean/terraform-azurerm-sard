@@ -47,7 +47,7 @@ resource "azurerm_container_app_environment_certificate" "this" {
   }
 }
 
-resource "azapi_update_resource" "custom_domain" {
+resource "azapi_update_resource" "aca_custom_domain_binding" {
   type        = "Microsoft.App/containerApps@2024-03-01"
   resource_id = azurerm_container_app_environment.this.id
 
@@ -66,7 +66,14 @@ resource "azapi_update_resource" "custom_domain" {
       }
     }
   }
-
+  depends_on = [
+    azurerm_key_vault_certificate.letsencrypt-aca,
+    azurerm_dns_caa_record.aca_allowed_certs,
+    azurerm_dns_a_record.aca,
+    azurerm_dns_txt_record.aca,
+    azurerm_dns_ns_record.aca,
+    azurerm_container_app_environment.this
+  ]
 }
 
 output "aca_certificate_subject_name" {
