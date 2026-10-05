@@ -47,6 +47,28 @@ resource "azurerm_container_app_environment_certificate" "this" {
   }
 }
 
+resource "azapi_update_resource" "custom_domain" {
+  type        = "Microsoft.App/containerApps@2024-03-01"
+  resource_id = azurerm_container_app_environment.this.id
+
+  body = {
+    properties = {
+      configuration = {
+        ingress = {
+          customDomains = [
+            {
+              name          = {}
+              certificateId = azurerm_container_app_environment_certificate.this.id
+              bindingType   = "SniEnabled"
+            }
+          ]
+        }
+      }
+    }
+  }
+
+}
+
 output "aca_certificate_subject_name" {
   description = "The subject name of the Container App Environment."
   sensitive   = false

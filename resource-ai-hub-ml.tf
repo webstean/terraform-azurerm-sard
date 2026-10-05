@@ -12,7 +12,7 @@ module "subnet_mlhub" {
 
   name             = "mlhub-${var.prefix}"
   parent_id        = module.virtual_network.resource_id
-  address_prefixes = [format("10.%s.93.0/24", local.regions[var.location].location_number)]
+  address_prefixes = [format("10.%s.104.0/24", local.regions[var.location].location_number)]
 
   default_outbound_access_enabled               = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
   service_endpoints                             = tobool(var.deploy_private_endpoints) ? [] : local.service_endpoints
