@@ -308,7 +308,7 @@ output "bastion_command_wac_tunnel_pwsh" {
   sensitive   = false
   value       = <<VEOF
 ## Bastion Tunnel command to access Windows Admin Center (WAC) - only works with Standard or Premium Bastion SKUs
-Start-BastionTunnel -VmName 'vm-name' -BastionName '${module.avm-res-network-bastionhost.name}' -BastionResourceGroup '${module.environment_resource_group.resource.name}' -ResourcePort 6516 -LocalPort 8443
+Start-BastionTunnel -VmName 'vm-name' -BastionName '${module.avm-res-network-bastionhost.name}' -VMResourceGroup '${module.environment_resource_group.resource.name}' -BastionResourceGroup '${module.environment_resource_group.resource.name}' -ResourcePort 6516 -LocalPort 8443
 ## Then browse to https://localhost:8443 and log in with your Azure credentials. This will open a secure tunnel to the target VM over HTTPS. You can also use this command to connect to a Windows VM using Windows Admin Center (WAC) if the WAC extension is installed on the target VM.
 VEOF
 }
@@ -318,10 +318,10 @@ output "bastion_command_native_rdp" {
   sensitive   = false
   value       = <<VEOF
 ## Remote RDP connections to VMs that are joined to Microsoft Entra ID is allowed only from Windows 10 or later PCs that are either Microsoft Entra registered, Microsoft Entra joined, or Microsoft Entra hybrid joined to the same directory as the VM.
-az network bastion rdp --name ${module.avm-res-network-bastionhost.name} --resource-group ${module.environment_resource_group.resource.name} --target-resource-id vm-name
+az network bastion rdp --name ${module.avm-res-network-bastionhost.name} --resource-group ${module.environment_resource_group.resource.name} --target-ip-address X.Y.Z.A
 VEOF
 }
-
+## az network bastion rdp --name ba-ev27 --resource-group RG-ENV-EV27-AUSTRALIAEAST --target-ip-address 10.2.25.5
 output "bastion_command_native_ssh" {
   description = "Bastion SSH command to access a Linux VM (via native client) - only works with Standard or Premium Bastion SKUs"
   sensitive   = false
