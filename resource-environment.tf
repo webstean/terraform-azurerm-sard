@@ -176,7 +176,7 @@ module "environment_resource_group" {
       description                      = local.iac_message
     }
     "up_roleassignment8" = {
-      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Storage File Data Privileged Contributor/${var.owner_entra_object_id}")
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Key Vault Secrets User/${var.owner_entra_object_id}")
       role_definition_id_or_name       = "Key Vault Secrets User"
       principal_id                     = var.owner_entra_object_id
       skip_service_principal_aad_check = false
