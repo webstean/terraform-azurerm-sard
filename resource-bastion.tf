@@ -308,6 +308,7 @@ output "bastion_command_wac_tunnel_pwsh" {
   sensitive   = false
   value       = <<VEOF
 ## Bastion Tunnel command to access Windows Admin Center (WAC) - only works with Standard or Premium Bastion SKUs
+## PS Function
 Start-BastionTunnel -VmName 'vm-name' -BastionName '${module.avm-res-network-bastionhost.name}' -VMResourceGroup '${module.environment_resource_group.resource.name}' -BastionResourceGroup '${module.environment_resource_group.resource.name}' -ResourcePort 6516 -LocalPort 8443
 ## Then browse to https://localhost:8443 and log in with your Azure credentials. This will open a secure tunnel to the target VM over HTTPS. You can also use this command to connect to a Windows VM using Windows Admin Center (WAC) if the WAC extension is installed on the target VM.
 VEOF
