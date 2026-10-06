@@ -208,6 +208,13 @@ module "nginx_subnet" {
       ]
     }
   }]
+  depends_on = [
+    azurerm_route_table.this,
+    module.virtual_network,
+    azurerm_network_security_group.secure,
+    azurerm_network_security_group.any2any,
+    module.nat_gateway
+  ]
 }
 
 resource "azurerm_nginx_deployment" "this" {

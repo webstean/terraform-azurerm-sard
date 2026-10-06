@@ -49,6 +49,13 @@ module "appgateway_subnet" {
     id = (tobool(var.data_pii) || tobool(var.data_phi)) ? azurerm_network_security_group.secure.id : azurerm_network_security_group.any2any.id
   }
   ## no delegations for this subnet, for the Application Gateway we are using the dedicated subnet only
+  depends_on = [
+    azurerm_route_table.this,
+    module.virtual_network,
+    azurerm_network_security_group.secure,
+    azurerm_network_security_group.any2any,
+    module.nat_gateway
+  ]
 }
 
 resource "azurerm_public_ip" "app_gateway" {

@@ -36,6 +36,14 @@ module "containerappenv_subnet" {
   network_security_group = {
     id = (tobool(var.data_pii) || tobool(var.data_phi)) ? azurerm_network_security_group.secure.id : azurerm_network_security_group.any2any.id
   }
+  depends_on = [
+    azurerm_route_table.this,
+    module.virtual_network,
+    azurerm_network_security_group.secure,
+    azurerm_network_security_group.any2any,
+    module.nat_gateway
+  ]
+
 }
 
 module "sandbox_subnet" {
