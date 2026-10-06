@@ -6,6 +6,10 @@ This repository is a Terraform module for deploying and experimenting with Azure
 
 Create dedicated files for any new resource, as this repositoroy serves as the basis for specialist terraform modules, where the resource-*.tf file can simply be deleted, so resources specifc outputs should appear in the resource-tf file not in `outputs.tf` file.
 
+Leverage AVM (Azure Verified Modules), where possible with azurerm as a fallback and azapi as a last resorce.
+
+Where possible, leverage the msgraph provider in prefernce to the azuread provider.
+
 ## Editing
 
 - Keep changes focused on the owning resource file and follow nearby naming, formatting, and module patterns. Reuse existing shared variables and locals where appropriate.
