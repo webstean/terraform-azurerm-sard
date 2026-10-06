@@ -244,7 +244,7 @@ module "bastion_subnet" {
   private_link_service_network_policies_enabled = false
   ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
   ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
-  private_endpoint_network_policies = "Disabled"
+  private_endpoint_network_policies = tobool(var.deploy_private_endpoints) ? "Enabled" : "Disabled"
 
   #route_table = {
   #  id = null
@@ -326,7 +326,7 @@ output "bastion_command_native_rdp" {
   sensitive   = false
   value       = <<VEOF
 ## Remote RDP connections to VMs that are joined to Microsoft Entra ID is allowed only from Windows 10 or later PCs that are either Microsoft Entra registered, Microsoft Entra joined, or Microsoft Entra hybrid joined to the same directory as the VM.
-az network bastion rdp --name ${module.avm-res-network-bastionhost.name} --resource-group ${module.environment_resource_group.resource.name} --target-ip-address X.Y.Z.A
+az network bastion rdp --name ${module.avm-res-network-bastionhost.name} --resource-group ${module.environment_resource_group.resource.name} --target-resource-id vmResourceId id
 VEOF
 }
 ## az network bastion rdp --name ba-ev27 --resource-group RG-ENV-EV27-AUSTRALIAEAST --target-ip-address 10.2.25.5

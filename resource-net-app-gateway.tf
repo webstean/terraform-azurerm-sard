@@ -37,7 +37,7 @@ module "appgateway_subnet" {
   private_link_service_network_policies_enabled = tobool(var.deploy_private_link_service) ? true : false
   ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
   ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
-  private_endpoint_network_policies = "Disabled"
+  private_endpoint_network_policies = tobool(var.deploy_private_endpoints) ? "Enabled" : "Disabled"
 
   route_table = {
     id = azurerm_route_table.this.id
