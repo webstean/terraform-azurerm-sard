@@ -2,7 +2,9 @@
 
 ## Project
 
-This repository is a Terraform module for deploying and experimenting with Azure resources. The root module is organized primarily as one `resource-*.tf` file per resource area; shared inputs, locals, data sources, outputs, and tags live in `variables.tf`, `locals.tf`, `data.tf`, `outputs.tf`, and `tags.tf` respectively. Examples are under `examples/`.
+This repository is a Terraform module for deploying and experimenting with Azure resources. The root module is organized primarily as one `resource-*.tf` file per resource area; shared inputs, locals, data sources, generic outputs, and tags live in `variables.tf`, `locals.tf`, `data.tf`, `outputs.tf`, and `tags.tf` respectively. Examples are under `examples/`.
+
+Create dedicated files for any new resource, as this repositoroy serves as the basis for specialist terraform modules, where the resource-*.tf file can simply be deleted, so resources specifc outputs should appear in the resource-tf file not in `outputs.tf` file.
 
 ## Editing
 
@@ -23,3 +25,7 @@ terraform validate
 ```
 
 The documentation workflow also runs `terraform-docs` and updates the generated README section. There is no configured Go test module or active Go test suite evident in the repository; `tests/main_test.go` currently contains only a commented command.
+
+## Relase
+
+As this is experimental, commit changes directly to the main branch and publish changes as per the process outlined in .github\workflows\module-release.yml
