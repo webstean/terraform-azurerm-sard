@@ -10,7 +10,6 @@ resource "azurerm_dns_a_record" "aca" { ## establish domain ownership
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 resource "azurerm_dns_txt_record" "aca" { ## establish domain ownership
-
   name                = "asuid"
   zone_name           = azurerm_dns_zone.aca.name
   resource_group_name = module.environment_resource_group.resource.name
