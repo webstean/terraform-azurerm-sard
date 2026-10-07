@@ -143,6 +143,7 @@ module "vmss_external_load_balancer" {
   depends_on = [azapi_update_resource.vmss_external_reverse_fqdn]
 }
 
+/*
 moved {
   from = module.vmss_external_load_balancer[0].azurerm_public_ip.this["vmss_frontend"]
   to   = azurerm_public_ip.vmss_external[0]
@@ -180,7 +181,9 @@ resource "azurerm_public_ip" "vmss_external" {
     ignore_changes = [reverse_fqdn]
   }
 }
+*/
 
+/*
 resource "azapi_update_resource" "vmss_external_reverse_fqdn" {
   count = var.deploy_vmss_external_load_balancer ? 1 : 0
 
@@ -194,6 +197,7 @@ resource "azapi_update_resource" "vmss_external_reverse_fqdn" {
 
   depends_on = [azurerm_dns_a_record.vmss_external_reverse_fqdn]
 }
+*/
 
 /*
 resource "azurerm_monitor_diagnostic_setting" "pip-metrics" {
@@ -344,12 +348,6 @@ module "avm_ptn_ephemeral_credential" {
 }
 
 */
-
-#module "get_valid_sku_for_deployment_region" {
-#  source = "../modules/sku_selector"
-#
-#  deployment_region = module.environment_resource_group.resource.location
-#}
 
 output "vmss_admin_username" {
   description = "The admin username for the VMSS."
