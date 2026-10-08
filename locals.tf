@@ -112,7 +112,7 @@ locals {
       location_shortname                 = "ae"
       zone_redundancy_available          = true
       zones                              = ["1", "2", "3"]
-      zones_one                          = [tostring(random_integer.random_region_zone.result)]
+      zones_one                          = ["${tostring(random_integer.random_region_zone.result)}"]
       zones_full                         = ["1", "2", "3"]
       default_rep_location               = "australiasoutheast"
       sql_maintenance_configuration_name = "SQL_AustraliaEast_DB_1"
@@ -293,7 +293,7 @@ locals {
       location_shortname                 = "ind"
       zone_redundancy_available          = true
       zones                              = ["1", "2", "3"]
-      zones_one                          = [tostring(random_integer.random_region_zone.result)]
+      zones_one                          = ["${tostring(random_integer.random_region_zone.result)}"]
       zones_full                         = ["1", "2", "3"]
       default_rep_location               = "southindia"
       sql_maintenance_configuration_name = "SQL_CentralIndia_DB_1"
@@ -338,7 +338,7 @@ locals {
       location_shortname                 = "wus3"
       zone_redundancy_available          = false
       zones                              = ["1", "2", "3"]
-      zones_one                          = [tostring(random_integer.random_region_zone.result)]
+      zones_one                          = ["${tostring(random_integer.random_region_zone.result)}"]
       zones_full                         = ["1", "2", "3"]
       default_rep_location               = null
       sql_maintenance_configuration_name = "SQL_WestUS3_DB_1"
@@ -360,7 +360,6 @@ locals {
       vnet_bgp_community = null ## The BGP community attribute in format <as-number>:<community-value>.
 
       dns_servers = null ## Azure Internal DNS - https://learn.microsoft.com/en-us/azure/virtual-network/what-is-ip-address-168-63-129-16
-
     }
   }
 }
