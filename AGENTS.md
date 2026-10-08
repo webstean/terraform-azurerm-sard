@@ -36,5 +36,4 @@ As this is experimental, commit changes directly to the main branch and publish 
 
 ## Every 
 
-End every reply with 'Checked against AGENTS.md'
-
+End every reply with '✅ Checked against AGENTS.md'
