@@ -88,7 +88,6 @@ resource "azurerm_public_ip" "vmss_external" {
   domain_name_label       = local.vmss_external_load_balancer_pip_count == 1 ? "${local.vmss_name}${random_string.environment.result}" : "${local.vmss_name}${random_string.environment.result}-${format("%02d", each.value)}"
   idle_timeout_in_minutes = 30
   ip_version              = "IPv4"
-  reverse_fqdn            = local.external-nlb_name
   sku                     = "Standard"
   sku_tier                = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
   zones                   = tobool(var.deploy_private_endpoints) ? local.regions[var.location].regions : null
