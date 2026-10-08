@@ -193,9 +193,7 @@ module "nginx_subnet" {
   route_table = {
     id = azurerm_route_table.this.id
   }
-  nat_gateway = var.deploy_nat_gateway == true ? {
-    id = try(module.nat_gateway.resource_id, null)
-  } : null
+  nat_gateway = var.deploy_nat_gateway ? { id = module.nat_gateway.resource_id } : null
   network_security_group = {
     id = azurerm_network_security_group.nginx.id
   }
