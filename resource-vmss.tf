@@ -110,7 +110,7 @@ module "vmss_external_load_balancer" {
   frontend_ip_configurations = {
     for index in range(local.vmss_external_load_balancer_pip_count) :
     format("vmss_frontend_%02d", index + 1) => {
-      name                          = index == 0 ? "vmss-external-frontend" : format("vmss-external-frontend-%02d", index + 1)
+      name                          = format("vmss-external-frontend-%02d", index + 1)
       public_ip_address_resource_id = azurerm_public_ip.vmss_external[format("pip%02d", index + 1)].id
       ## Azure rejects zones on a frontend config that references a public IP; zones come from the public IP itself.
       zones = ["None"]
@@ -135,8 +135,8 @@ module "vmss_external_load_balancer" {
   lb_rules = {
     for index in range(local.vmss_external_load_balancer_pip_count) :
     format("vmss_rule_%02d", index + 1) => {
-      name                              = index == 0 ? "vmss-rule" : format("vmss-rule-%02d", index + 1)
-      frontend_ip_configuration_name    = index == 0 ? "vmss-external-frontend" : format("vmss-external-frontend-%02d", index + 1)
+      name                              = format("vmss-rule-%02d", index + 1)
+      frontend_ip_configuration_name    = format("vmss-external-frontend-%02d", index + 1)
       protocol                          = "Tcp"
       frontend_port                     = var.vmss_port_tcp_external
       backend_port                      = var.vmss_port_tcp_internal
