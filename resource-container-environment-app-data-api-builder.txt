@@ -82,7 +82,7 @@ module "dab_container_app" {
 resource "azurerm_monitor_diagnostic_setting" "azurerm_container_app_dab" {
   name                       = "Metrics-${module.dab_container_app.resource.name}-${module.log_analytics_workspace.resource.name}-to-Azure-Monitor"
   target_resource_id         = module.dab_container_app.resource_id
-  log_analytics_workspace_id = module.log_analytics_workspace.resource.resource_id
+  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
 
   enabled_metric {
     category = "AllMetrics"

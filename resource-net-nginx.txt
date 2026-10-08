@@ -296,7 +296,7 @@ EOT
 resource "azurerm_monitor_diagnostic_setting" "nginx_metrics" {
   name                       = "Metrics-${azurerm_nginx_deployment.this.name}-to-Azure-Monitor"
   target_resource_id         = azurerm_nginx_deployment.this.id
-  log_analytics_workspace_id =   workspace_id = module.log_analytics_workspace.resource.resource_id
+  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
 
   enabled_metric {
     category = "AllMetrics"
@@ -305,7 +305,7 @@ resource "azurerm_monitor_diagnostic_setting" "nginx_metrics" {
 resource "azurerm_monitor_diagnostic_setting" "nginx_logs" {
   name                       = "Logs-${azurerm_nginx_deployment.this.name}-to-Azure-Monitor"
   target_resource_id         = azurerm_nginx_deployment.this.id
-  log_analytics_workspace_id =   workspace_id = module.log_analytics_workspace.resource.resource_id
+  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
 
   enabled_log {
     category_group = "allLogs"

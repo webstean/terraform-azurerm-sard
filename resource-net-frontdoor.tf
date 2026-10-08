@@ -100,7 +100,7 @@ module "frontdoor" {
       metric     = ["AllMetrics"]
       #metric_categories              = ["SLI", "Requests"]
       log_analytics_destination_type = null
-      workspace_resource_id          = module.log_analytics_workspace.resource.resource_id
+      workspace_resource_id          = module.log_analytics_workspace.resource_id
     }
   }
   depends_on = [azurerm_dns_txt_record.frontdoor_swa_verify]

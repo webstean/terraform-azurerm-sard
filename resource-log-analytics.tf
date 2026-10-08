@@ -215,7 +215,7 @@ resource "azurerm_log_analytics_datasource_windows_performance_counter" "example
 }
 resource "azurerm_log_analytics_datasource_windows_event" "example" {
   name                = "example-lad-wpc"
-  workspace_id = module.log_analytics_workspace.resource.resource_id
+  workspace_id = module.log_analytics_workspace.resource_id
   workspace_name      = module.log_analytics_workspace.name
   event_log_name      = "Application"
   event_types         = ["Error"]
@@ -225,7 +225,7 @@ resource "azurerm_log_analytics_datasource_windows_event" "example" {
 /*
 resource "azurerm_log_analytics_workspace_table_custom_log" "this1" {
   name         = "example_CL"
-  workspace_id = module.log_analytics_workspace.resource.resource_id
+  workspace_id = module.log_analytics_workspace.resource_id
   display_name = "Example_Custom_Log"
   description  = "This is an example custom log"
   plan         = "Basic"

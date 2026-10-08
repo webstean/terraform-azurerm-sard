@@ -221,7 +221,7 @@ module "vmss_keyvault" {
       metric     = ["AllMetrics"]
       #metric_categories              = ["SLI", "Requests"]
       log_analytics_destination_type = null
-      workspace_resource_id          = module.log_analytics_workspace.resource.resource_id
+      workspace_resource_id          = module.log_analytics_workspace.resource_id
     }
   }
   lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
@@ -547,7 +547,7 @@ module "virtualmachinescaleset" {
       metric     = ["AllMetrics"]
       #metric_categories              = ["SLI", "Requests"]
       log_analytics_destination_type = null
-      workspace_resource_id          = module.log_analytics_workspace.resource.resource_id
+      workspace_resource_id          = module.log_analytics_workspace.resource_id
     }
   }
 */
@@ -659,7 +659,7 @@ module "vmss_autoscale_setting" {
       metric     = ["AllMetrics"]
       #metric_categories              = ["SLI", "Requests"]
       log_analytics_destination_type = null
-      workspace_resource_id          = module.log_analytics_workspace.resource.resource_id
+      workspace_resource_id          = module.log_analytics_workspace.resource_id
     }
   }
 */

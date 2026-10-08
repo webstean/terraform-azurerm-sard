@@ -55,7 +55,7 @@ module "appgateway_subnet" {
       metric     = ["AllMetrics"]
       #metric_categories              = ["SLI", "Requests"]
       log_analytics_destination_type = null
-      workspace_resource_id          = module.log_analytics_workspace.resource.resource_id
+      workspace_resource_id          = module.log_analytics_workspace.resource_id
     }
   }
 */

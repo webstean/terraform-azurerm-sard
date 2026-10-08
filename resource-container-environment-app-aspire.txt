@@ -139,7 +139,7 @@ resource "azapi_resource" "aspire_auth" {
 resource "azurerm_monitor_diagnostic_setting" "azurerm_container_app_aspire" {
   name                       = "Metrics-${module.aspire_container_app.resource.name}-${azurerm_container_app_environment.this.name}-to-Azure-Monitor"
   target_resource_id         = module.aspire_container_app.resource_id
-  log_analytics_workspace_id = module.log_analytics_workspace.resource.resource_id
+  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
 
   enabled_metric {
     category = "AllMetrics"
