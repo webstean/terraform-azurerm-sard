@@ -106,34 +106,6 @@ module "frontdoor" {
   depends_on = [azurerm_dns_txt_record.frontdoor_swa_verify]
 }
 
-/*
-resource "azurerm_monitor_diagnostic_setting" "frontdoor_logs" {
-  count = local.frontdoor_enabled ? 1 : 0
-
-  name                       = "Audit-and-Logs-${module.frontdoor[0].resource_name}-to-Azure-Monitor"
-  target_resource_id         = module.frontdoor[0].resource_id
-  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
-
-  enabled_log {
-    category_group = "audit"
-  }
-  enabled_log {
-    category_group = "allLogs"
-  }
-}
-resource "azurerm_monitor_diagnostic_setting" "frontdoor_metrics" {
-  count = local.frontdoor_enabled ? 1 : 0
-
-  name                       = "Metrics-${module.frontdoor[0].resource_name}-to-Azure-Monitor"
-  target_resource_id         = module.frontdoor[0].resource_id
-  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
-
-  enabled_metric {
-    category = "AllMetrics"
-  }
-}
-*/
-/*
 output "frontdoor_fqdn" {
   description = "The Front Door endpoint FQDN."
   sensitive   = false
@@ -144,5 +116,4 @@ output "frontdoor_txt_validation_token" {
   sensitive   = false
   value       = try(module.frontdoor[0].frontdoor_custom_domains["fd"].validation_token, null)
 }
-*/
 
