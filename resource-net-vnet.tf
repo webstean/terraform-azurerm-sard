@@ -621,6 +621,10 @@ resource "azurerm_monitor_diagnostic_setting" "vnet_logs" {
 }
 */
 
+locals {
+  next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
+}
+
 # Route table with direct-to-internet routes for Windows KMS activation endpoints
 # Activation needs to come from a Azure IP Address, not from a private IP address, so we need to route traffic to the Internet for the KMS endpoints
 resource "azurerm_route_table" "this" {
@@ -630,51 +634,51 @@ resource "azurerm_route_table" "this" {
   bgp_route_propagation_enabled = false ## keep them, as simple static routes
 
   route {
-    name           = "DirectRouteToKMS" ## Windows Activation
+    name           = "DirectRouteForAzKMS" ## Windows Activation
     address_prefix = "23.102.135.246/32"
-    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway (On-Premise), VnetLocal, Internet, VirtualAppliance and None.
+    next_hop_type  = local.next_hop_type
   }
 
   route {
-    name           = "DirectRouteToAZKMS01" ## Windows Activation
+    name           = "DirectRouteForAzKMS01" ## Windows Activation
     address_prefix = "20.118.99.224/32"
-    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
+    next_hop_type  = local.next_hop_type
   }
 
   route {
-    name           = "DirectRouteToAZKMS02" ## Windows Activation
+    name           = "DirectRouteForAzKMS02" ## Windows Activation
     address_prefix = "40.83.235.53/32"
-    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
+    next_hop_type  = local.next_hop_type
   }
 
   route {
-    name           = "DirectRouteToTeamsTURN" ## voice, video for MS Teams
+    name           = "DirectRouteForTeamsTURN" ## voice, video for MS Teams
     address_prefix = "20.202.0.0/16"
-    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
+    next_hop_type  = local.next_hop_type
   }
 
   route {
-    name           = "DirectRouteToGoogleDNS1" ## Google DNS
+    name           = "DirectRouteForGoogleDNS1" ## Google DNS
     address_prefix = "8.8.8.8/32"
-    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
+    next_hop_type  = local.next_hop_type
   }
 
   route {
-    name           = "DirectRouteToGoogleDNS2" ## Google DNS
+    name           = "DirectRouteForGoogleDNS2" ## Google DNS
     address_prefix = "8.8.4.4/32"
-    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
+    next_hop_type  = local.next_hop_type
   }
 
   route {
-    name           = "DirectRouteToCloudflareDNS1" ## Cloudflare DNS
+    name           = "DirectRouteForCloudflareDNS1" ## Cloudflare DNS
     address_prefix = "1.1.1.1/32"
-    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
+    next_hop_type  = local.next_hop_type
   }
 
   route {
-    name           = "DirectRouteToCloudflareDNS2" ## Cloudflare DNS
+    name           = "DirectRouteForCloudflareDNS2" ## Cloudflare DNS
     address_prefix = "1.0.0.1/32"
-    next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
+    next_hop_type  = local.next_hop_type
   }
 
   ## to route traffic to a Secure vWAN (see routing intent) - do not use a route table, like this one.
