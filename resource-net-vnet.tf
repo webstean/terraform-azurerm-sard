@@ -622,7 +622,7 @@ resource "azurerm_monitor_diagnostic_setting" "vnet_logs" {
 */
 
 locals {
-  next_hop_type  = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
+  next_hop_type = "Internet" ## Possible values are VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance and None.
 }
 
 # Route table with direct-to-internet routes for Windows KMS activation endpoints
