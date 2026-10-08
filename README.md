@@ -65,12 +65,6 @@ Next steps here
 | [azurerm_application_insights_workbook.workbook1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_workbook) | resource |
 | [azurerm_automation_runbook.demo_powershell_script1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_runbook) | resource |
 | [azurerm_automation_variable_string.user_assigned_identity_client_id](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_string) | resource |
-| [azurerm_cdn_frontdoor_custom_domain.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_custom_domain) | resource |
-| [azurerm_cdn_frontdoor_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_endpoint) | resource |
-| [azurerm_cdn_frontdoor_origin.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_origin) | resource |
-| [azurerm_cdn_frontdoor_origin_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_origin_group) | resource |
-| [azurerm_cdn_frontdoor_profile.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_profile) | resource |
-| [azurerm_cdn_frontdoor_route.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_route) | resource |
 | [azurerm_container_app_environment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment) | resource |
 | [azurerm_container_app_environment_certificate.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_certificate) | resource |
 | [azurerm_container_app_environment_storage.logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_storage) | resource |
@@ -141,7 +135,6 @@ Next steps here
 | [azurerm_network_security_group.inbound_sqlserver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
 | [azurerm_network_security_group.secure](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
 | [azurerm_private_link_service.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_link_service) | resource |
-| [azurerm_public_ip.app_gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_public_ip.relay](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_role_assignment.aspire_dotnet_dashboard_access](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.bastion_connect](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
@@ -405,6 +398,7 @@ Next steps here
 | <a name="module_ai_keyvault"></a> [ai\_keyvault](#module\_ai\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
 | <a name="module_aihub"></a> [aihub](#module\_aihub) | Azure/avm-res-machinelearningservices-workspace/azurerm | ~>0.0, < 1.0 |
 | <a name="module_appconfiguration"></a> [appconfiguration](#module\_appconfiguration) | Azure/avm-res-appconfiguration-configurationstore/azure | ~>0.0, < 1.0 |
+| <a name="module_appgateway_public_ip"></a> [appgateway\_public\_ip](#module\_appgateway\_public\_ip) | Azure/avm-res-network-publicipaddress/azurerm | ~> 0.0, < 1.0 |
 | <a name="module_appgateway_subnet"></a> [appgateway\_subnet](#module\_appgateway\_subnet) | Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet | ~> 0.22, < 1.0 |
 | <a name="module_application_insights"></a> [application\_insights](#module\_application\_insights) | Azure/avm-res-insights-component/azurerm | ~>0.0, < 1.0 |
 | <a name="module_avm-res-network-bastionhost"></a> [avm-res-network-bastionhost](#module\_avm-res-network-bastionhost) | Azure/avm-res-network-bastionhost/azurerm | ~> 0.3, < 1.0 |
@@ -413,6 +407,7 @@ Next steps here
 | <a name="module_containerappenv_subnet"></a> [containerappenv\_subnet](#module\_containerappenv\_subnet) | Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet | ~> 0.22, < 1.0 |
 | <a name="module_environment_resource_group"></a> [environment\_resource\_group](#module\_environment\_resource\_group) | Azure/avm-res-resources-resourcegroup/azurerm | ~>0.0, < 1.0 |
 | <a name="module_foundry_keyvault"></a> [foundry\_keyvault](#module\_foundry\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
+| <a name="module_frontdoor"></a> [frontdoor](#module\_frontdoor) | Azure/avm-res-cdn-profile/azurerm | 0.1.9 |
 | <a name="module_log_analytics_workspace"></a> [log\_analytics\_workspace](#module\_log\_analytics\_workspace) | Azure/avm-res-operationalinsights-workspace/azurerm | ~>0.0, < 1.0 |
 | <a name="module_nat_gateway"></a> [nat\_gateway](#module\_nat\_gateway) | Azure/avm-res-network-natgateway/azurerm | ~>0.0, < 1.0 |
 | <a name="module_outbound_subnet"></a> [outbound\_subnet](#module\_outbound\_subnet) | Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet | ~> 0.22, < 1.0 |
