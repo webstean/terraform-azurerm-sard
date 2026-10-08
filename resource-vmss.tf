@@ -95,6 +95,7 @@ resource "azurerm_public_ip" "vmss_external" {
   tags                    = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
+/*
 moved {
   from = module.vmss_external_load_balancer[0].azurerm_public_ip.this["vmss_frontend"]
   to   = azurerm_public_ip.vmss_external["pip01"]
@@ -109,6 +110,7 @@ moved {
   from = module.vmss_external_load_balancer[0].azurerm_public_ip.this["vmss_frontend_02"]
   to   = azurerm_public_ip.vmss_external["pip02"]
 }
+*/
 
 module "vmss_external_load_balancer" {
   count = var.deploy_vmss_external_load_balancer ? 1 : 0
