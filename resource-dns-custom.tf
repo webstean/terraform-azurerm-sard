@@ -12,6 +12,7 @@ locals {
   ingress_aliases_pubsub = toset(["pubsub"])
   ## FrontDoor
   ingress_aliases_frontdoor = toset(["fd"])
+  external-nlb_name         = "external-nlb.${var.custom_dns_zone_name}"
 }
 
 data "azurerm_dns_zone" "specified" {
@@ -87,7 +88,7 @@ resource "azurerm_dns_caa_record" "aca_allowed_certs" {
 }
 
 resource "azurerm_dns_a_record" "external-nlb" {
-  name                = "external-nlb"
+  name                = local.external-nlb_name
   resource_group_name = module.environment_resource_group.resource.name
   zone_name           = azurerm_dns_zone.environment.name
   records = coalescelist(flatten([

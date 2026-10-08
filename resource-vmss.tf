@@ -95,7 +95,7 @@ module "vmss_external_load_balancer" {
     sku                     = "Standard"                                                   ## "StandardV2" is NOT supported
     sku_tier                = tobool(var.deploy_private_endpoints) ? "Global" : "Regional" ## Regional is cheaper
     domain_name_label       = "${local.vmss_name}${random_string.environment.result}"
-    #reverse_fqdn            = azurerm_dns_a_record.external-nlb.name != "" ? azurerm_dns_a_record.external-nlb.name : null
+    reverse_fqdn            = local.external-nlb_name ##azurerm_dns_a_record.external-nlb.name != "" ? azurerm_dns_a_record.external-nlb.name : null
   }
 
   backend_address_pools = {
