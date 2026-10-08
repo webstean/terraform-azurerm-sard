@@ -91,13 +91,9 @@ resource "azurerm_dns_a_record" "external-nlb" {
   name                = local.external-nlb_name
   resource_group_name = module.environment_resource_group.resource.name
   zone_name           = azurerm_dns_zone.environment.name
-  records = coalescelist(flatten([
-    for load_balancer in module.vmss_external_load_balancer : [
-      for public_ip in load_balancer.azurerm_public_ip : public_ip.ip_address
-    ]
-  ]), ["0.0.0.0"])
-  ttl  = 300
-  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  records             = coalescelist([for public_ip in azurerm_public_ip.vmss_external : public_ip.ip_address], ["0.0.0.0"])
+  ttl                 = 300
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_dns_cname_record" "vmss" {
@@ -123,13 +119,9 @@ resource "azurerm_dns_a_record" "vmss_external_reverse_fqdn" {
   name                = "${local.vmss_name}${random_string.environment.result}"
   resource_group_name = module.environment_resource_group.resource.name
   zone_name           = azurerm_dns_zone.environment.name
-  records = coalescelist(flatten([
-    for load_balancer in module.vmss_external_load_balancer : [
-      for public_ip in load_balancer.azurerm_public_ip : public_ip.ip_address
-    ]
-  ]), ["0.0.0.0"])
-  ttl  = 300
-  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  records             = coalescelist([for public_ip in azurerm_public_ip.vmss_external : public_ip.ip_address], ["0.0.0.0"])
+  ttl                 = 300
+  tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 resource "azurerm_dns_a_record" "testv4" {

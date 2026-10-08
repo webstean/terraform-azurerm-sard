@@ -542,15 +542,6 @@ DESC
   default     = 0
 }
 
-variable "nat_gateway_pip_count" {
-  type    = number
-  default = 1
-  validation {
-    condition     = var.nat_gateway_pip_count >= 1 && var.nat_gateway_pip_count <= 16
-    error_message = "NAT Gateway sWupports 1–16 public IP addresses."
-  }
-}
-
 variable "outbound_access" {
   type        = string
   sensitive   = false

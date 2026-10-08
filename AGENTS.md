@@ -34,6 +34,6 @@ The documentation workflow also runs `terraform-docs` and updates the generated 
 
 As this is experimental, commit changes directly to the main branch and publish changes as per the process outlined in .github\workflows\module-release.yml
 
-## Every 
+## Every
 
 End every reply with '✅ Checked against AGENTS.md'

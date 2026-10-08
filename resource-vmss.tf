@@ -20,7 +20,7 @@ locals {
   nat_name_location     = lower("${local.nat_name}-${lower(var.location)}")
   nat_random_suffix     = substr(random_string.environment.result, 0, 6)
   nat_name_hostname     = lower(substr(replace("l${local.nat_random_suffix}${local.nat_name_location}", "-", ""), 0, 24))
-  nat_gateway_pip_count = var.nat_gateway_pip_count
+  nat_gateway_pip_count = 2 ## (tobool(var.data_pii) || tobool(var.data_phi)) ? 3 : 1
   nat_gateway_pip_keys = toset([
     for i in range(local.nat_gateway_pip_count) : format("pip%02d", i + 1)
   ])
@@ -72,6 +72,44 @@ module "nat_gateway" {
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
+locals {
+  vmss_external_load_balancer_pip_count = 2 ## (tobool(var.data_pii) || tobool(var.data_phi)) ? 3 : 1
+}
+
+resource "azurerm_public_ip" "vmss_external" {
+  for_each = var.deploy_vmss_external_load_balancer ? {
+    for index in range(local.vmss_external_load_balancer_pip_count) : format("pip%02d", index + 1) => index + 1
+  } : {}
+
+  name                    = "pip-vmss-external-${format("%02d", each.value)}"
+  resource_group_name     = module.environment_resource_group.resource.name
+  location                = module.environment_resource_group.resource.location
+  allocation_method       = "Static"
+  domain_name_label       = local.vmss_external_load_balancer_pip_count == 1 ? "${local.vmss_name}${random_string.environment.result}" : null
+  idle_timeout_in_minutes = 30
+  ip_version              = "IPv4"
+  reverse_fqdn            = local.external-nlb_name
+  sku                     = "Standard"
+  sku_tier                = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
+  zones                   = null
+  tags                    = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
+
+moved {
+  from = module.vmss_external_load_balancer[0].azurerm_public_ip.this["vmss_frontend"]
+  to   = azurerm_public_ip.vmss_external["pip01"]
+}
+
+moved {
+  from = module.vmss_external_load_balancer[0].azurerm_public_ip.this["vmss_frontend_01"]
+  to   = azurerm_public_ip.vmss_external["pip01"]
+}
+
+moved {
+  from = module.vmss_external_load_balancer[0].azurerm_public_ip.this["vmss_frontend_02"]
+  to   = azurerm_public_ip.vmss_external["pip02"]
+}
+
 module "vmss_external_load_balancer" {
   count = var.deploy_vmss_external_load_balancer ? 1 : 0
 
@@ -86,22 +124,13 @@ module "vmss_external_load_balancer" {
   sku_tier            = tobool(var.deploy_private_endpoints) ? "Global" : "Regional" ## Regional is cheaper
 
   frontend_ip_configurations = {
-    vmss_frontend = {
-      name = "vmss-external-frontend"
-      #public_ip_address_resource_id = azurerm_public_ip.vmss_external[0].id
+    for index in range(local.vmss_external_load_balancer_pip_count) :
+    format("vmss_frontend_%02d", index + 1) => {
+      name                          = index == 0 ? "vmss-external-frontend" : format("vmss-external-frontend-%02d", index + 1)
+      public_ip_address_resource_id = azurerm_public_ip.vmss_external[format("pip%02d", index + 1)].id
       ## Azure rejects zones on a frontend config that references a public IP; zones come from the public IP itself.
       zones = ["None"]
     }
-  }
-
-  public_ip_address_configuration = {
-    allocation_method       = "Static"
-    idle_timeout_in_minutes = 30
-    ip_version              = "IPv4"
-    sku                     = "Standard"                                                   ## "StandardV2" is NOT supported
-    sku_tier                = tobool(var.deploy_private_endpoints) ? "Global" : "Regional" ## Regional is cheaper
-    domain_name_label       = "${local.vmss_name}${random_string.environment.result}"
-    reverse_fqdn            = local.external-nlb_name ##azurerm_dns_a_record.external-nlb.name != "" ? azurerm_dns_a_record.external-nlb.name : null
   }
 
   backend_address_pools = {
@@ -120,9 +149,10 @@ module "vmss_external_load_balancer" {
   }
 
   lb_rules = {
-    vmss = {
-      name                              = "vmss-rule"
-      frontend_ip_configuration_name    = "vmss-external-frontend"
+    for index in range(local.vmss_external_load_balancer_pip_count) :
+    format("vmss_rule_%02d", index + 1) => {
+      name                              = index == 0 ? "vmss-rule" : format("vmss-rule-%02d", index + 1)
+      frontend_ip_configuration_name    = index == 0 ? "vmss-external-frontend" : format("vmss-external-frontend-%02d", index + 1)
       protocol                          = "Tcp"
       frontend_port                     = var.vmss_port_tcp_external
       backend_port                      = var.vmss_port_tcp_internal
