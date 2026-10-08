@@ -348,6 +348,8 @@ Next steps here
 | <a name="output_foundry_endpoint"></a> [foundry\_endpoint](#output\_foundry\_endpoint) | The endpoint of the Foundry resource. |
 | <a name="output_foundry_name"></a> [foundry\_name](#output\_foundry\_name) | The name of the Foundry resource. |
 | <a name="output_foundry_principal_id"></a> [foundry\_principal\_id](#output\_foundry\_principal\_id) | The principal ID of the Foundry resource, used for role assignments. |
+| <a name="output_frontdoor_fqdn"></a> [frontdoor\_fqdn](#output\_frontdoor\_fqdn) | The Front Door endpoint FQDN. |
+| <a name="output_frontdoor_txt_validation_token"></a> [frontdoor\_txt\_validation\_token](#output\_frontdoor\_txt\_validation\_token) | The Front Door custom domain TXT validation token. |
 | <a name="output_logs_otel_configuration_access_endpoint"></a> [logs\_otel\_configuration\_access\_endpoint](#output\_logs\_otel\_configuration\_access\_endpoint) | The configuration access endpoint of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_dce_id"></a> [logs\_otel\_dce\_id](#output\_logs\_otel\_dce\_id) | The ID of the Azure Monitor Data Collection Endpoint. |
 | <a name="output_logs_otel_logs_ingestion_endpoint"></a> [logs\_otel\_logs\_ingestion\_endpoint](#output\_logs\_otel\_logs\_ingestion\_endpoint) | The OTEL logs ingestion endpoint of the Azure Monitor Data Collection Endpoint. |
