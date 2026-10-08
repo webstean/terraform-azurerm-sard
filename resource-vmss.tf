@@ -93,7 +93,7 @@ module "vmss_external_load_balancer" {
     idle_timeout_in_minutes = 30
     ip_version              = "IPv4"
     sku                     = "Standard" ## "StandardV2" is NOT supported
-    sku_tier                = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
+    sku_tier                = tobool(var.deploy_private_endpoints) ? "Global" : "Regional" ## Regional is cheaper
     domain_name_label       = "${local.vmss_name}${random_string.environment.result}"
   }
 
