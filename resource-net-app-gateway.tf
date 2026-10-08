@@ -79,35 +79,20 @@ module "appgateway_public_ip" {
   allocation_method   = "Static"
   sku                 = "Standard"
 
+  diagnostic_settings = var.logging_enabled == false ? null : {
+    diag_setting_1 = {
+      name       = "Optional Logging 1"
+      log_groups = ["allLogs"]
+      metric     = ["AllMetrics"]
+      #metric_categories              = ["SLI", "Requests"]
+      log_analytics_destination_type = null
+      workspace_resource_id          = module.log_analytics_workspace.resource_id
+    }
+  }
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 
   depends_on = [azurerm_role_assignment.sql_kv_admin]
 }
-
-/*
-resource "azurerm_monitor_diagnostic_setting" "gateway_pip_metrics" {
-  count = var.inbound_access == "App-Gateway" ? 1 : 0
-
-  name                       = "Metrics-${module.appgateway_public_ip[0].name}-to-Azure-Monitor"
-  target_resource_id         = module.appgateway_public_ip[0].resource_id
-  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
-
-  enabled_metric {
-    category = "AllMetrics"
-  }
-}
-resource "azurerm_monitor_diagnostic_setting" "gateway_pip_logs" {
-  count = var.inbound_access == "App-Gateway" ? 1 : 0
-
-  name                       = "Logs-${module.appgateway_public_ip[0].name}-to-Azure-Monitor"
-  target_resource_id         = module.appgateway_public_ip[0].resource_id
-  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
-
-  enabled_log {
-    category_group = "allLogs"
-  }
-}
-*/
 
 resource "azurerm_web_application_firewall_policy" "gateway" {
   count = var.inbound_access == "App-Gateway" ? 1 : 0

@@ -46,13 +46,11 @@ module "pls_internal_load_balancer" {
       frontend_private_ip_address_allocation = "Dynamic"
     }
   }
-
   backend_address_pools = {
     pls = {
       name = "pls-backend-pool"
     }
   }
-
   lb_probes = {
     pls = {
       name     = "pls-probe"
@@ -60,7 +58,6 @@ module "pls_internal_load_balancer" {
       port     = var.private_link_service_port
     }
   }
-
   lb_rules = {
     pls = {
       name                              = "pls-rule"
@@ -72,7 +69,16 @@ module "pls_internal_load_balancer" {
       probe_object_name                 = "pls"
     }
   }
-
+  diagnostic_settings = var.logging_enabled == false ? null : {
+    diag_setting_1 = {
+      name       = "Optional Logging 1"
+      log_groups = ["allLogs"]
+      metric     = ["AllMetrics"]
+      #metric_categories              = ["SLI", "Requests"]
+      log_analytics_destination_type = null
+      workspace_resource_id          = module.log_analytics_workspace.resource_id
+    }
+  }
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 

@@ -122,8 +122,9 @@ resource "azapi_resource" "foundry" {
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
-/*
 resource "azurerm_monitor_diagnostic_setting" "foundry_logging" {
+  count = var.logging_enabled ? 1 : 0
+
   name                       = "Audit-Metrics-and-Logs-${azapi_resource.foundry.name}-to-Azure-Monitor"
   target_resource_id         = azapi_resource.foundry.id
   log_analytics_workspace_id = module.log_analytics_workspace.resource_id
@@ -138,7 +139,6 @@ resource "azurerm_monitor_diagnostic_setting" "foundry_logging" {
     category = "AllMetrics"
   }
 }
-*/
 
 resource "azapi_resource" "default_project" {
   type      = "Microsoft.CognitiveServices/accounts/projects@2025-06-01"
@@ -168,8 +168,9 @@ resource "azapi_resource" "default_project" {
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
-/*
 resource "azurerm_monitor_diagnostic_setting" "foundry_project_audit" {
+  count = var.logging_enabled ? 1 : 0
+
   name                       = "Audit-and-Logs-${azapi_resource.default_project.name}-to-Azure-Monitor"
   target_resource_id         = azapi_resource.default_project.id
   log_analytics_workspace_id = module.log_analytics_workspace.resource_id
@@ -181,10 +182,9 @@ resource "azurerm_monitor_diagnostic_setting" "foundry_project_audit" {
     category_group = "allLogs"
   }
 }
-*/
-
-/*
 resource "azurerm_monitor_diagnostic_setting" "foundry_project_metrics" {
+  count = var.logging_enabled ? 1 : 0
+
   name                       = "Metrics-${azapi_resource.default_project.name}-to-Azure-Monitor"
   target_resource_id         = azapi_resource.default_project.id
   log_analytics_workspace_id = module.log_analytics_workspace.resource_id
@@ -193,7 +193,6 @@ resource "azurerm_monitor_diagnostic_setting" "foundry_project_metrics" {
     category = "AllMetrics"
   }
 }
-*/
 
 locals {
   foundry_principal_id = azurerm_user_assigned_identity.environment.principal_id

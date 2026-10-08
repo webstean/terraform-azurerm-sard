@@ -124,7 +124,16 @@ module "appconfiguration" {
       location = local.regions[module.environment_resource_group.resource.location].default_rep_location
     }
   } : null
-
+  diagnostic_settings = var.logging_enabled == false ? null : {
+    diag_setting_1 = {
+      name       = "Optional Logging 1"
+      log_groups = ["allLogs"]
+      metric     = ["AllMetrics"]
+      #metric_categories              = ["SLI", "Requests"]
+      log_analytics_destination_type = null
+      workspace_resource_id          = module.log_analytics_workspace.resource_id
+    }
+  }
   lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
     kind = "CanNotDelete"
   } : null

@@ -114,7 +114,7 @@ output "sql_database_connection_free_unencrypted" {
 
 /*
 resource "azurerm_key_vault_secret" "sql_database_connection_alias" {
-  key_vault_id = azurerm_key_vault.sql_kv.id
+  key_vault_id = module.sql_keyvault.resource_id
   name         = "SQL-FREE-REGISTRY-ODBC-ALIAS"
   value        = local.sql_database_connection_free_odbc_alias
   depends_on = [
@@ -124,7 +124,7 @@ resource "azurerm_key_vault_secret" "sql_database_connection_alias" {
 */
 
 resource "azurerm_key_vault_secret" "sql_database_connection_free_encrypted" {
-  key_vault_id = azurerm_key_vault.sql_kv.id
+  key_vault_id = module.sql_keyvault.resource_id
   name         = "SQL-FREE-PRIMARY-CONNECTION-STRING-ENCRYPTED"
   value        = local.sql_database_connection_free_encrypted
   depends_on = [
@@ -133,7 +133,7 @@ resource "azurerm_key_vault_secret" "sql_database_connection_free_encrypted" {
 }
 
 resource "azurerm_key_vault_secret" "sql_database_connection_free_unencrypted" {
-  key_vault_id = azurerm_key_vault.sql_kv.id
+  key_vault_id = module.sql_keyvault.resource_id
   name         = "SQL-FREE-PRIMARY-CONNECTION-STRING-UNENCRYPTED"
   value        = local.sql_database_connection_free_unencrypted
   depends_on = [

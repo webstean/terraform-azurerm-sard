@@ -392,20 +392,16 @@ module "ai-services" {
       azurerm_user_assigned_identity.environment.id
     ]
   }
-
-  /*
-  diagnostic_settings = {
+  diagnostic_settings = var.logging_enabled == false ? null : {
     diag_setting_1 = {
-      name              = "Logs-Metrics-And-Audit to Azure Monitor ${module.log_analytics_workspace.resource.name}"
-      log_groups        = ["allLogs", "audit"]
-      metric_categories = ["AllMetrics"]
+      name       = "Optional Logging 1"
+      log_groups = ["allLogs"]
+      metric     = ["AllMetrics"]
       #metric_categories              = ["SLI", "Requests"]
       log_analytics_destination_type = null
       workspace_resource_id          = module.log_analytics_workspace.resource_id
     }
   }
-*/
-
   role_assignments = {
     role_assignment_sp1 = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Cognitive Services OpenAI User/${azurerm_user_assigned_identity.environment.principal_id}")

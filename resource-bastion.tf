@@ -295,6 +295,16 @@ module "avm-res-network-bastionhost" {
   session_recording_enabled = var.bastion_sku == "Premium" ? true : false
 
   virtual_network_id = module.virtual_network.resource_id
+  diagnostic_settings = var.logging_enabled == false ? null : {
+    diag_setting_1 = {
+      name       = "Optional Logging 1"
+      log_groups = ["allLogs"]
+      metric     = ["AllMetrics"]
+      #metric_categories              = ["SLI", "Requests"]
+      log_analytics_destination_type = null
+      workspace_resource_id          = module.log_analytics_workspace.resource_id
+    }
+  }
   depends_on = [
     module.environment_resource_group,
     module.virtual_network

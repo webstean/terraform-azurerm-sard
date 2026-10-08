@@ -44,6 +44,16 @@ module "virtual_network" {
     enabled     = true
     enforcement = "AllowUnencrypted"
   }
+  diagnostic_settings = var.logging_enabled == false ? null : {
+    diag_setting_1 = {
+      name       = "Optional Logging 1"
+      log_groups = ["allLogs"]
+      metric     = ["AllMetrics"]
+      #metric_categories              = ["SLI", "Requests"]
+      log_analytics_destination_type = null
+      workspace_resource_id          = module.log_analytics_workspace.resource_id
+    }
+  }
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 

@@ -7,54 +7,6 @@ locals {
   sql_port                 = "1433"
 }
 
-module "sqlserver_subnet" {
-  source  = "Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
-  version = "~> 0.22, < 1.0"
-
-  name             = "sqlserver"
-  parent_id        = module.virtual_network.resource_id
-  address_prefixes = [format("10.%s.55.0/24", local.regions[var.location].location_number)]
-
-  default_outbound_access_enabled               = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
-  service_endpoints                             = tobool(var.deploy_private_endpoints) ? [] : local.service_endpoints
-  private_link_service_network_policies_enabled = tobool(var.deploy_private_link_service) ? true : false
-  ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
-  ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
-  private_endpoint_network_policies = tobool(var.deploy_private_endpoints) ? "Enabled" : "Disabled"
-
-  route_table = {
-    id = azurerm_route_table.this.id
-  }
-  nat_gateway = var.deploy_nat_gateway ? { id = module.nat_gateway[0].resource_id } : null
-  network_security_group = {
-    id = (tobool(var.data_pii) || tobool(var.data_phi)) ? azurerm_network_security_group.secure.id : azurerm_network_security_group.any2any.id
-  }
-  depends_on = [
-    azurerm_route_table.this,
-    module.virtual_network,
-    azurerm_network_security_group.secure,
-    azurerm_network_security_group.any2any,
-    module.nat_gateway
-  ]
-}
-
-resource "azurerm_user_assigned_identity" "sqlserver" {
-  name = "id-${local.sql_server_location}-sqlserver-readwrite"
-
-  resource_group_name = module.environment_resource_group.resource.name
-  location            = module.environment_resource_group.resource.location
-  isolation_scope     = var.deploy_sql_failover ? null : "Regional"
-
-  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-resource "time_sleep" "sqlserver_identity_create_wait" {
-  create_duration = "1m"
-  depends_on      = [azurerm_user_assigned_identity.sqlserver]
-}
-
 resource "azurerm_network_security_group" "inbound_sqlserver" {
   count = tobool(var.deploy_private_endpoints) ? 1 : 0
 
@@ -147,6 +99,55 @@ resource "azurerm_network_security_group" "inbound_sqlserver" {
   }
 }
 
+module "sqlserver_subnet" {
+  source  = "Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
+  version = "~> 0.22, < 1.0"
+
+  name             = "sqlserver"
+  parent_id        = module.virtual_network.resource_id
+  address_prefixes = [format("10.%s.55.0/24", local.regions[var.location].location_number)]
+
+  default_outbound_access_enabled               = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
+  service_endpoints                             = tobool(var.deploy_private_endpoints) ? [] : local.service_endpoints
+  private_link_service_network_policies_enabled = tobool(var.deploy_private_link_service) ? true : false
+  ## Supported values: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled.
+  ## Keep this as Enabled so private endpoint network policies remain active on this subnet unless a workload explicitly requires policy exemptions.
+  private_endpoint_network_policies = tobool(var.deploy_private_endpoints) ? "Enabled" : "Disabled"
+
+  route_table = {
+    id = azurerm_route_table.this.id
+  }
+  nat_gateway = var.deploy_nat_gateway ? { id = module.nat_gateway[0].resource_id } : null
+  network_security_group = {
+    id = (tobool(var.data_pii) || tobool(var.data_phi)) ? azurerm_network_security_group.secure.id : azurerm_network_security_group.any2any.id
+  }
+  depends_on = [
+    azurerm_route_table.this,
+    module.virtual_network,
+    azurerm_network_security_group.secure,
+    azurerm_network_security_group.any2any,
+    module.nat_gateway
+  ]
+}
+
+resource "azurerm_user_assigned_identity" "sqlserver" {
+  name = "id-${local.sql_server_location}-sqlserver-readwrite"
+
+  resource_group_name = module.environment_resource_group.resource.name
+  location            = module.environment_resource_group.resource.location
+  isolation_scope     = var.deploy_sql_failover ? null : "Regional"
+
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+resource "time_sleep" "sqlserver_identity_create_wait" {
+  create_duration = "1m"
+  depends_on      = [azurerm_user_assigned_identity.sqlserver]
+}
+
+
 resource "azurerm_role_assignment" "sqlstorage1" {
   scope                = azurerm_storage_account.this.id
   role_definition_name = "Storage Blob Data Contributor"
@@ -173,28 +174,37 @@ resource "azurerm_role_assignment" "sql_db_contributor" {
   description          = local.iac_message
 }
 
-resource "azurerm_key_vault" "sql_kv" {
-  name                       = local.sql_server_hostname
-  resource_group_name        = module.environment_resource_group.resource.name
-  location                   = module.environment_resource_group.resource.location
-  sku_name                   = "standard"
-  tenant_id                  = data.azurerm_client_config.current.tenant_id
-  purge_protection_enabled   = false
-  rbac_authorization_enabled = true
-  soft_delete_retention_days = 7
-  tags                       = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+module "sql_keyvault" {
+  source           = "Azure/avm-res-keyvault-vault/azurerm"
+  version          = "~>0.7, < 1.0"
+  enable_telemetry = var.enable_telemetry
+
+  name                           = local.sql_server_hostname
+  resource_group_name            = module.environment_resource_group.resource.name
+  location                       = module.environment_resource_group.resource.location
+  tenant_id                      = data.azurerm_client_config.current.tenant_id
+  sku_name                       = "standard"
+  purge_protection_enabled       = false
+  soft_delete_retention_days     = 7
+  legacy_access_policies_enabled = false
+  tags                           = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+}
+
+moved {
+  from = azurerm_key_vault.sql_kv
+  to   = module.sql_keyvault.azurerm_key_vault.this
 }
 
 # Grant the deploying principal permissions to create the key
 resource "azurerm_role_assignment" "sql_kv_admin" {
   principal_id         = data.azurerm_client_config.current.object_id
-  scope                = azurerm_key_vault.sql_kv.id
+  scope                = module.sql_keyvault.resource_id
   role_definition_name = "Key Vault Administrator"
   description          = local.iac_message
 }
 resource "azurerm_role_assignment" "sql_kv_crypto" {
   principal_id         = azurerm_user_assigned_identity.sqlserver.principal_id
-  scope                = azurerm_key_vault.sql_kv.id
+  scope                = module.sql_keyvault.resource_id
   role_definition_name = "Key Vault Crypto Service Encryption User"
   description          = local.iac_message
 }
@@ -204,7 +214,7 @@ resource "azurerm_key_vault_key" "tde" {
     "wrapKey",
   ]
   key_type     = "RSA"
-  key_vault_id = azurerm_key_vault.sql_kv.id
+  key_vault_id = module.sql_keyvault.resource_id
   name         = "tde-key"
   key_size     = 2048
 
@@ -245,17 +255,16 @@ module "sql_server_this" {
     ]
   }
 
-  /*
-  diagnostic_settings = {
+   diagnostic_settings = var.logging_enabled == false ? null : {
     diag_setting_1 = {
-      name                           = "Logs to Azure Monitor ${local.sql_server_location}-p1"
-      log_groups                     = ["allLogs", "audit"]
-      metric_categories              = ["SLI", "Requests"]
+      name       = "Optional Logging 1"
+      log_groups = ["allLogs"]
+      metric     = ["AllMetrics"]
+      #metric_categories              = ["SLI", "Requests"]
       log_analytics_destination_type = null
       workspace_resource_id          = module.log_analytics_workspace.resource_id
     }
   }
-*/
 
 #private_endpoints = {
 #  primary = {

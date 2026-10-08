@@ -142,7 +142,6 @@ module "private_dns_zones" {
       tags                                   = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
     }
   }
-
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
     kind = "CanNotDelete"
