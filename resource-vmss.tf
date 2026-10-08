@@ -27,8 +27,7 @@ locals {
   nat_gateway_pips = {
     for i in range(local.nat_gateway_pip_count) :
     format("pip%02d", i + 1) => {
-      create_public_ip_address        = true
-      public_ip_address_resource_name = "pip-natgw-${format("%02d", i + 1)}-${var.location}"
+      name = "pip-natgw-${format("%02d", i + 1)}-${var.location}"
     }
   }
 }
