@@ -73,7 +73,8 @@ module "nat_gateway" {
 }
 
 locals {
-  vmss_external_load_balancer_pip_count = (tobool(var.data_pii) || tobool(var.data_phi)) ? 3 : 1
+  vmss_external_load_balancer_pip_count      = (tobool(var.data_pii) || tobool(var.data_phi)) ? 3 : 1
+  vmss_external_load_balancer_probe_protocol = "Tcp"
 }
 
 resource "azurerm_public_ip" "vmss_external" {
@@ -93,6 +94,7 @@ resource "azurerm_public_ip" "vmss_external" {
   zones                   = tobool(var.deploy_private_endpoints) ? local.regions[var.location].regions : null
   tags                    = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
+
 
 module "vmss_external_load_balancer" {
   count = var.deploy_vmss_external_load_balancer ? 1 : 0
@@ -124,15 +126,6 @@ module "vmss_external_load_balancer" {
     }
   }
 
-  lb_probes = {
-    vmss = {
-      name     = "vmss-health-probe"
-      protocol = "Tcp"
-      port     = var.vmss_port_tcp_internal_probe
-      #request_path = "/index.html" only for HTTP/HTTPS probes
-    }
-  }
-
   lb_rules = {
     for index in range(local.vmss_external_load_balancer_pip_count) :
     format("vmss_rule_%02d", index + 1) => {
@@ -146,6 +139,15 @@ module "vmss_external_load_balancer" {
       load_distribution                 = "SourceIPProtocol"
       enable_floating_ip                = true
       disable_outbound_snat             = var.deploy_nat_gateway ? false : true ## Allow NLB to provide outboud Internet if no NAT Gateway
+    }
+  }
+
+  lb_probes = {
+    vmss = {
+      name     = "vmss-health-probe"
+      protocol = local.vmss_external_load_balancer_probe_protocol
+      port     = var.vmss_port_tcp_internal_probe
+      #request_path = "/index.html" only for HTTP/HTTPS probes
     }
   }
 
