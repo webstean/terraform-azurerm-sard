@@ -20,6 +20,17 @@ locals {
   nat_name_location = lower("${local.nat_name}-${lower(var.location)}")
   nat_random_suffix = substr(random_string.environment.result, 0, 6)
   nat_name_hostname = lower(substr(replace("l${local.nat_random_suffix}${local.nat_name_location}", "-", ""), 0, 24))
+  nat_gateway_pip_count = var.nat_gateway_pip_count
+  nat_gateway_pip_keys = toset([
+    for i in range(local.nat_gateway_pip_count) : format("pip%02d", i + 1)
+  ])
+  nat_gateway_pips = {
+    for i in range(local.nat_gateway_pip_count) :
+    format("pip%02d", i + 1) => {
+      create_public_ip_address      = true
+      public_ip_address_resource_name = "pip-natgw-${format("%02d", i + 1)}-${var.location}"
+    }
+  }
 }
 
 module "nat_gateway" {
@@ -34,11 +45,7 @@ module "nat_gateway" {
   location  = module.environment_resource_group.resource.location
   sku_name  = "StandardV2"
 
-  public_ips = {
-    main = {
-      name = "pip-nat-${local.nat_name_location}"
-    }
-  }
+  public_ips = local.nat_gateway_pips
 
   public_ip_configuration = {
     main = {
