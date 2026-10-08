@@ -47,6 +47,18 @@ module "appgateway_subnet" {
     id = (tobool(var.data_pii) || tobool(var.data_phi)) ? azurerm_network_security_group.secure.id : azurerm_network_security_group.any2any.id
   }
   ## no delegations for this subnet, for the Application Gateway we are using the dedicated subnet only
+  /*
+  diagnostic_settings = var.logging_enabled == false ? null : {
+    diag_setting_1 = {
+      name       = "Optional Logging 1"
+      log_groups = ["allLogs"]
+      metric     = ["AllMetrics"]
+      #metric_categories              = ["SLI", "Requests"]
+      log_analytics_destination_type = null
+      workspace_resource_id          = module.log_analytics_workspace.resource.resource_id
+    }
+  }
+*/
   depends_on = [
     azurerm_route_table.this,
     module.virtual_network,
@@ -56,15 +68,19 @@ module "appgateway_subnet" {
   ]
 }
 
-resource "azurerm_public_ip" "app_gateway" {
-  count = var.inbound_access == "App-Gateway" ? 1 : 0
+module "appgateway_public_ip" {
+  source  = "Azure/avm-res-network-publicipaddress/azurerm"
+  version = "~> 0.0, < 1.0"
+  count   = var.inbound_access == "App-Gateway" ? 1 : 0
 
   name                = local.app_gateway_public_ip_name
   resource_group_name = module.environment_resource_group.resource.name
   location            = module.environment_resource_group.resource.location
   allocation_method   = "Static"
+  sku                 = "Standard"
 
-  tags       = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+
   depends_on = [azurerm_role_assignment.sql_kv_admin]
 }
 
@@ -72,8 +88,8 @@ resource "azurerm_public_ip" "app_gateway" {
 resource "azurerm_monitor_diagnostic_setting" "gateway_pip_metrics" {
   count = var.inbound_access == "App-Gateway" ? 1 : 0
 
-  name                       = "Metrics-${azurerm_public_ip.app_gateway[0].name}-to-Azure-Monitor"
-  target_resource_id         = azurerm_public_ip.app_gateway[0].id
+  name                       = "Metrics-${module.appgateway_public_ip[0].name}-to-Azure-Monitor"
+  target_resource_id         = module.appgateway_public_ip[0].resource_id
   log_analytics_workspace_id = module.log_analytics_workspace.resource_id
 
   enabled_metric {
@@ -83,8 +99,8 @@ resource "azurerm_monitor_diagnostic_setting" "gateway_pip_metrics" {
 resource "azurerm_monitor_diagnostic_setting" "gateway_pip_logs" {
   count = var.inbound_access == "App-Gateway" ? 1 : 0
 
-  name                       = "Logs-${azurerm_public_ip.app_gateway[0].name}-to-Azure-Monitor"
-  target_resource_id         = azurerm_public_ip.app_gateway[0].id
+  name                       = "Logs-${module.appgateway_public_ip[0].name}-to-Azure-Monitor"
+  target_resource_id         = module.appgateway_public_ip[0].resource_id
   log_analytics_workspace_id = module.log_analytics_workspace.resource_id
 
   enabled_log {
@@ -92,7 +108,6 @@ resource "azurerm_monitor_diagnostic_setting" "gateway_pip_logs" {
   }
 }
 */
-
 
 resource "azurerm_web_application_firewall_policy" "gateway" {
   count = var.inbound_access == "App-Gateway" ? 1 : 0
@@ -164,7 +179,7 @@ resource "azurerm_application_gateway" "this" {
 
   frontend_ip_configuration {
     name                 = local.app_gateway_frontend_ip_configuration_name
-    public_ip_address_id = azurerm_public_ip.app_gateway[0].id
+    public_ip_address_id = module.appgateway_public_ip[0].resource_id
   }
 
   dynamic "ssl_certificate" {

@@ -350,7 +350,7 @@ resource "azurerm_dns_cname_record" "ingress_frontdoor" {
   name                = each.value
   zone_name           = azurerm_dns_zone.environment.name
   resource_group_name = module.environment_resource_group.resource.name
-  record              = azurerm_cdn_frontdoor_endpoint.this[0].host_name
+  record              = module.frontdoor[0].frontdoor_endpoints["endpoint"].host_name
   ttl                 = 300
   tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
@@ -367,7 +367,7 @@ resource "azurerm_dns_srv_record" "ingress_frontdoor_tls1" {
   record {
     priority = 100
     weight   = 1
-    target   = azurerm_cdn_frontdoor_origin.this[0].host_name
+    target   = module.frontdoor[0].frontdoor_origins["origin"].host_name
     port     = (tobool(var.data_pii) || tobool(var.data_phi)) ? 443 : 8443
   }
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
@@ -396,37 +396,21 @@ resource "azurerm_dns_a_record" "ingress_app_gateway" {
   name                = each.value
   resource_group_name = module.environment_resource_group.resource.name
   zone_name           = azurerm_dns_zone.environment.name
-  records             = [azurerm_public_ip.app_gateway[0].ip_address]
+  records             = [module.appgateway_public_ip[0].public_ip_address]
   ttl                 = 300
   tags                = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-}
-
-resource "azurerm_cdn_frontdoor_custom_domain" "this" {
-  for_each = var.inbound_access == "FrontDoor" ? local.ingress_aliases_frontdoor : toset([])
-
-  name                     = "custom-domain-${each.key}"
-  host_name                = each.value
-  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.this[0].id
-
-  tls {
-    certificate_type = "ManagedCertificate"
-  }
-  depends_on = [
-    azurerm_cdn_frontdoor_profile.this,
-    azurerm_dns_txt_record.frontdoor_swa_verify,
-  ]
 }
 
 resource "azurerm_dns_txt_record" "frontdoor_validation" {
   for_each = var.inbound_access == "FrontDoor" ? local.ingress_aliases_frontdoor : toset([])
 
-  name                = "_dnsauth.app"
+  name                = "_dnsauth.${each.value}"
   zone_name           = azurerm_dns_zone.environment.name
   resource_group_name = module.environment_resource_group.resource.name
   ttl                 = 3600
 
   record {
-    value = azurerm_cdn_frontdoor_custom_domain.this[each.key].validation_token
+    value = module.frontdoor[0].frontdoor_custom_domains[each.key].validation_token
   }
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }

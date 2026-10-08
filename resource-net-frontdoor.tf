@@ -14,91 +14,94 @@ locals {
   frontdoor_custom_dns_zone_name = "cd-${substr(local.frontdoor_name_hostname, 0, 18)}"
 }
 
-resource "azurerm_cdn_frontdoor_profile" "this" {
-  count = local.frontdoor_enabled ? 1 : 0
+module "frontdoor" {
+  source  = "Azure/avm-res-cdn-profile/azurerm"
+  version = "0.1.9"
+  count   = local.frontdoor_enabled ? 1 : 0
 
-  name                = local.frontdoor_name_location
-  resource_group_name = module.environment_resource_group.resource.name
-  sku_name            = var.frontdoor_sku == "Standard" ? "Standard_AzureFrontDoor" : "Premium_AzureFrontDoor"
-
+  location                 = module.environment_resource_group.resource.location
+  name                     = local.frontdoor_name_location
+  resource_group_name      = module.environment_resource_group.resource.name
   response_timeout_seconds = 30
+  sku                      = var.frontdoor_sku == "Standard" ? "Standard_AzureFrontDoor" : "Premium_AzureFrontDoor"
   tags                     = module.environment_resource_group.resource.tags
-  lifecycle {
-    ignore_changes = [tags.created]
-  }
-}
+  enable_telemetry         = var.enable_telemetry
 
-resource "azurerm_cdn_frontdoor_endpoint" "this" {
-  count = local.frontdoor_enabled ? 1 : 0
-
-  name                     = local.frontdoor_endpoint_name
-  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.this[0].id
-  enabled                  = true
-}
-
-resource "azurerm_cdn_frontdoor_origin_group" "this" {
-  count = local.frontdoor_enabled ? 1 : 0
-
-  name                     = local.frontdoor_origin_group_name
-  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.this[0].id
-
-  load_balancing {
-    sample_size                 = 4
-    successful_samples_required = 3
+  front_door_endpoints = {
+    endpoint = {
+      name = local.frontdoor_endpoint_name
+    }
   }
 
-  health_probe {
-    path                = "/"
-    request_type        = "HEAD"
-    protocol            = "Https"
-    interval_in_seconds = 120
+  front_door_origin_groups = {
+    origin_group = {
+      name = local.frontdoor_origin_group_name
+      load_balancing = {
+        lb = {
+          sample_size                 = 4
+          successful_samples_required = 3
+        }
+      }
+      health_probe = {
+        hp = {
+          path                = "/"
+          request_type        = "HEAD"
+          protocol            = "Https"
+          interval_in_seconds = 120
+        }
+      }
+    }
   }
-}
 
-resource "azurerm_cdn_frontdoor_origin" "this" {
-  count = local.frontdoor_enabled ? 1 : 0
+  front_door_origins = {
+    origin = {
+      name                           = local.frontdoor_origin_name
+      origin_group_key               = "origin_group"
+      enabled                        = true
+      certificate_name_check_enabled = true
+      host_name                      = local.frontdoor_origin_host
+      host_header                    = local.frontdoor_origin_host
+      http_port                      = (tobool(var.data_pii) || tobool(var.data_phi)) ? 80 : 8080
+      https_port                     = (tobool(var.data_pii) || tobool(var.data_phi)) ? 443 : 8443
+      priority                       = 1
+      weight                         = 1000
+    }
+  }
 
-  name                          = local.frontdoor_origin_name
-  cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.this[0].id
+  front_door_custom_domains = {
+    for alias in local.ingress_aliases_frontdoor : alias => {
+      name      = "custom-domain-${alias}"
+      host_name = "${alias}.${azurerm_dns_zone.environment.name}"
+      tls = {
+        certificate_type = "ManagedCertificate"
+      }
+    }
+  }
 
-  enabled                        = true
-  certificate_name_check_enabled = true
-  host_name                      = local.frontdoor_origin_host
-  origin_host_header             = local.frontdoor_origin_host
-  ## Only supported  HTTP ports:  80, 8080
-  http_port = (tobool(var.data_pii) || tobool(var.data_phi)) ? 80 : 8080
-  ## Only supported  HTTPS ports:  443, 8443
-  https_port = (tobool(var.data_pii) || tobool(var.data_phi)) ? 443 : 8443
-  priority   = 1
-  weight     = 1000
-}
-
-resource "azurerm_cdn_frontdoor_route" "this" {
-  count = local.frontdoor_enabled ? 1 : 0
-
-  name                          = local.frontdoor_route_name
-  cdn_frontdoor_endpoint_id     = azurerm_cdn_frontdoor_endpoint.this[0].id
-  cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.this[0].id
-  cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.this[0].id]
-  ## certificate
-  cdn_frontdoor_custom_domain_ids = [
-    try(azurerm_cdn_frontdoor_custom_domain.this["fd"].id, null)
-  ]
-
-  enabled                = true
-  forwarding_protocol    = "HttpsOnly"
-  https_redirect_enabled = true
-  link_to_default_domain = true
-  patterns_to_match      = ["/*"]
-  supported_protocols    = ["Http", "Https"]
+  front_door_routes = {
+    route = {
+      name                   = local.frontdoor_route_name
+      endpoint_key           = "endpoint"
+      origin_group_key       = "origin_group"
+      origin_keys            = [local.frontdoor_origin_name]
+      custom_domain_keys     = [for alias in local.ingress_aliases_frontdoor : alias]
+      enabled                = true
+      forwarding_protocol    = "HttpsOnly"
+      https_redirect_enabled = true
+      link_to_default_domain = true
+      patterns_to_match      = ["/*"]
+      supported_protocols    = ["Http", "Https"]
+    }
+  }
+  depends_on = [azurerm_dns_txt_record.frontdoor_swa_verify]
 }
 
 /*
 resource "azurerm_monitor_diagnostic_setting" "frontdoor_logs" {
   count = local.frontdoor_enabled ? 1 : 0
 
-  name                       = "Audit-and-Logs-${azurerm_cdn_frontdoor_profile.this[0].name}-to-Azure-Monitor"
-  target_resource_id         = azurerm_cdn_frontdoor_profile.this[0].id
+  name                       = "Audit-and-Logs-${module.frontdoor[0].resource_name}-to-Azure-Monitor"
+  target_resource_id         = module.frontdoor[0].resource_id
   log_analytics_workspace_id = module.log_analytics_workspace.resource_id
 
   enabled_log {
@@ -111,8 +114,8 @@ resource "azurerm_monitor_diagnostic_setting" "frontdoor_logs" {
 resource "azurerm_monitor_diagnostic_setting" "frontdoor_metrics" {
   count = local.frontdoor_enabled ? 1 : 0
 
-  name                       = "Metrics-${azurerm_cdn_frontdoor_profile.this[0].name}-to-Azure-Monitor"
-  target_resource_id         = azurerm_cdn_frontdoor_profile.this[0].id
+  name                       = "Metrics-${module.frontdoor[0].resource_name}-to-Azure-Monitor"
+  target_resource_id         = module.frontdoor[0].resource_id
   log_analytics_workspace_id = module.log_analytics_workspace.resource_id
 
   enabled_metric {
@@ -124,12 +127,12 @@ resource "azurerm_monitor_diagnostic_setting" "frontdoor_metrics" {
 output "frontdoor_fqdn" {
   description = "The Front Door endpoint FQDN."
   sensitive   = false
-  value       = try(azurerm_cdn_frontdoor_endpoint.this[0].host_name, null)
+  value       = try(module.frontdoor[0].frontdoor_endpoints["endpoint"].host_name, null)
 }
 output "frontdoor_txt_validation_token" {
   description = "The Front Door custom domain TXT validation token."
   sensitive   = false
-  value       = try(azurerm_cdn_frontdoor_custom_domain.this["fd"].validation_token, null)
+  value       = try(module.frontdoor[0].frontdoor_custom_domains["fd"].validation_token, null)
 }
 */
 

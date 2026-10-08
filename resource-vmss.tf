@@ -273,16 +273,6 @@ module "vmss_keyvault" {
     ip_rules       = tobool(var.deploy_private_endpoints) ? [] : ["0.0.0.0/0"]
     #virtual_network_subnet_ids = tobool(var.deploy_private_endpoints) ? null : [for subnet in local.vnet_subnets : subnet.id if try(contains(subnet.service_endpoints, "Microsoft.KeyVault"), false)]
   }
-  diagnostic_settings = var.logging_enabled == false ? null : {
-    diag_setting_1 = {
-      name       = "Optional Logging 1"
-      log_groups = ["allLogs"]
-      metric     = ["AllMetrics"]
-      #metric_categories              = ["SLI", "Requests"]
-      log_analytics_destination_type = null
-      workspace_resource_id          = module.log_analytics_workspace.resource.resource_id
-    }
-  }
   role_assignments = {
     role_assignment_1 = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Key Vault Secrets User/${azurerm_user_assigned_identity.environment.principal_id}")
@@ -307,6 +297,16 @@ module "vmss_keyvault" {
       skip_service_principal_aad_check = true
       principal_type                   = "ServicePrincipal"
       description                      = local.iac_message
+    }
+  }
+  diagnostic_settings = var.logging_enabled == false ? null : {
+    diag_setting_1 = {
+      name       = "Optional Logging 1"
+      log_groups = ["allLogs"]
+      metric     = ["AllMetrics"]
+      #metric_categories              = ["SLI", "Requests"]
+      log_analytics_destination_type = null
+      workspace_resource_id          = module.log_analytics_workspace.resource.resource_id
     }
   }
   lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
@@ -624,6 +624,18 @@ module "virtualmachinescaleset" {
   }
   zone_balance = true
   zones        = local.regions[var.location].zones ## Note: Due to a limitation of the Azure API at this time only one Availability Zone can be defined.
+  /*
+  diagnostic_settings = var.logging_enabled == false ? null : {
+    diag_setting_1 = {
+      name       = "Optional Logging 1"
+      log_groups = ["allLogs"]
+      metric     = ["AllMetrics"]
+      #metric_categories              = ["SLI", "Requests"]
+      log_analytics_destination_type = null
+      workspace_resource_id          = module.log_analytics_workspace.resource.resource_id
+    }
+  }
+*/
   lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
     kind = "CanNotDelete"
   } : null
@@ -724,7 +736,18 @@ module "vmss_autoscale_setting" {
       }
     }
   }
-
+  /*
+  diagnostic_settings = var.logging_enabled == false ? null : {
+    diag_setting_1 = {
+      name       = "Optional Logging 1"
+      log_groups = ["allLogs"]
+      metric     = ["AllMetrics"]
+      #metric_categories              = ["SLI", "Requests"]
+      log_analytics_destination_type = null
+      workspace_resource_id          = module.log_analytics_workspace.resource.resource_id
+    }
+  }
+*/
   notification = {
     email = {
       send_to_subscription_administrator    = false
