@@ -136,6 +136,7 @@ Next steps here
 | [azurerm_network_security_group.secure](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
 | [azurerm_private_link_service.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_link_service) | resource |
 | [azurerm_public_ip.relay](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
+| [azurerm_public_ip.vmss_external](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_role_assignment.aspire_dotnet_dashboard_access](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.bastion_connect](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.compute_recommendations](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
@@ -271,7 +272,6 @@ Next steps here
 | <a name="input_logging_basic_only"></a> [logging\_basic\_only](#input\_logging\_basic\_only) | Use only basic tables for logging where applicable. | `bool` | `false` | no |
 | <a name="input_logging_enabled"></a> [logging\_enabled](#input\_logging\_enabled) | Enable or disable logging for the environment. | `bool` | `false` | no |
 | <a name="input_logging_retention"></a> [logging\_retention](#input\_logging\_retention) | The number of days to retain logging for the environment. Set to 0 to disable retention. | `number` | `0` | no |
-| <a name="input_nat_gateway_pip_count"></a> [nat\_gateway\_pip\_count](#input\_nat\_gateway\_pip\_count) | n/a | `number` | `1` | no |
 | <a name="input_outbound_access"></a> [outbound\_access](#input\_outbound\_access) | Specifies the type of outbound access to the environment via the Internet. Options are: 'Direct' (free), 'Nat-Gateway' ($$), 'Hub-and-Spoke-with-Nat-Gateway' ($$$).<br/>Note: that 'Direct' does not allowed Virtual Machine Scale Sets to have any OutBound Internet access, you need to use a Nat-Gateway or Hub-and-Spoke | `string` | `"Direct"` | no |
 | <a name="input_private_link_service_allowed_fqdns"></a> [private\_link\_service\_allowed\_fqdns](#input\_private\_link\_service\_allowed\_fqdns) | FQDNs allowed for the Private Link Service. | `list(string)` | <pre>[<br/>  "*"<br/>]</pre> | no |
 | <a name="input_private_link_service_auto_approval_subscription_ids"></a> [private\_link\_service\_auto\_approval\_subscription\_ids](#input\_private\_link\_service\_auto\_approval\_subscription\_ids) | The list of subscription IDs that are auto-approved for the Private Link Service. | `list(string)` | <pre>[<br/>  "fd72f9ff-96b6-4a20-a870-ceaa17d70bc8",<br/>  "8d894c2b-238f-490b-8dd1-d93898c5bf83"<br/>]</pre> | no |
