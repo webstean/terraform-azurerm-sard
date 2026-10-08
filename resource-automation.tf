@@ -1,4 +1,8 @@
 ## Automation Account, created at subscription (lgoal) level since we are not limited to 2 for the number of Automaiton account per subscription
+/*
+  name                = reverse(split("/", var.automation_account_id))[0]
+  resource_group_name = split("/", var.automation_account_id)[4]
+*/
 
 locals {
   automation_account_id_parts            = var.automation_account_id == null ? [] : split("/", trim(var.automation_account_id, "/"))

@@ -10,7 +10,6 @@ resource "azurerm_dns_a_record" "aca" { ## establish domain ownership
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 resource "azurerm_dns_txt_record" "aca" { ## establish domain ownership
-
   name                = "asuid"
   zone_name           = azurerm_dns_zone.aca.name
   resource_group_name = module.environment_resource_group.resource.name
@@ -47,8 +46,10 @@ resource "azurerm_container_app_environment_certificate" "this" {
   }
 }
 
+/*
 resource "azapi_update_resource" "aca_custom_domain_binding" {
   type        = "Microsoft.App/containerApps@2024-03-01"
+  #type        = "Microsoft.App/managedEnvironments@2022-03-01"
   resource_id = azurerm_container_app_environment.this.id
 
   body = {
@@ -75,6 +76,7 @@ resource "azapi_update_resource" "aca_custom_domain_binding" {
     azurerm_container_app_environment.this
   ]
 }
+*/
 
 output "aca_certificate_subject_name" {
   description = "The subject name of the Container App Environment."
