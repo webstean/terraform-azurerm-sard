@@ -77,12 +77,12 @@ module "vmss_external_load_balancer" {
   resource_group_name = module.environment_resource_group.resource.name
   location            = module.environment_resource_group.resource.location
   sku                 = "Standard"
-  sku_tier            = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
+  sku_tier            = tobool(var.deploy_private_endpoints) ? "Global" : "Regional" ## Regional is cheaper
 
   frontend_ip_configurations = {
     vmss_frontend = {
-      name                          = "vmss-external-frontend"
-      public_ip_address_resource_id = azurerm_public_ip.vmss_external[0].id
+      name = "vmss-external-frontend"
+      #public_ip_address_resource_id = azurerm_public_ip.vmss_external[0].id
       ## Azure rejects zones on a frontend config that references a public IP; zones come from the public IP itself.
       zones = ["None"]
     }
@@ -139,8 +139,6 @@ module "vmss_external_load_balancer" {
   }
 
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-
-  depends_on = [azapi_update_resource.vmss_external_reverse_fqdn]
 }
 
 /*
@@ -163,7 +161,8 @@ resource "azurerm_public_ip" "vmss_external" {
   sku_tier                = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
   zones                   = local.regions[var.location].zones
 
-  /*
+*/
+/*
   diagnostic_settings = var.logging_enabled == false ? null : {
     diag_setting_1 = {
       name       = "Optional Logging 1"
@@ -175,6 +174,7 @@ resource "azurerm_public_ip" "vmss_external" {
     }
   }
   */
+/*
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 
   lifecycle {
