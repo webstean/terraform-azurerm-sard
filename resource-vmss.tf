@@ -20,7 +20,7 @@ locals {
   nat_name_location     = lower("${local.nat_name}-${lower(var.location)}")
   nat_random_suffix     = substr(random_string.environment.result, 0, 6)
   nat_name_hostname     = lower(substr(replace("l${local.nat_random_suffix}${local.nat_name_location}", "-", ""), 0, 24))
-  nat_gateway_pip_count = 2 ## (tobool(var.data_pii) || tobool(var.data_phi)) ? 3 : 1
+  nat_gateway_pip_count = (tobool(var.data_pii) || tobool(var.data_phi)) ? 3 : 1
   nat_gateway_pip_keys = toset([
     for i in range(local.nat_gateway_pip_count) : format("pip%02d", i + 1)
   ])
@@ -73,7 +73,7 @@ module "nat_gateway" {
 }
 
 locals {
-  vmss_external_load_balancer_pip_count = 2 ## (tobool(var.data_pii) || tobool(var.data_phi)) ? 3 : 1
+  vmss_external_load_balancer_pip_count = (tobool(var.data_pii) || tobool(var.data_phi)) ? 3 : 1
 }
 
 resource "azurerm_public_ip" "vmss_external" {
