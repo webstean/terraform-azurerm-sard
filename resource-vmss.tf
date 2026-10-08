@@ -91,7 +91,7 @@ resource "azurerm_public_ip" "vmss_external" {
   reverse_fqdn            = local.external-nlb_name
   sku                     = "Standard"
   sku_tier                = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
-  zones                   = null
+  zones                   = tobool(var.deploy_private_endpoints) ? local.regions[var.location].regions : null
   tags                    = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
