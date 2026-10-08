@@ -93,8 +93,11 @@ resource "azurerm_public_ip" "vmss_external" {
   sku_tier                = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
   zones                   = tobool(var.deploy_private_endpoints) ? local.regions[var.location].regions : null
   tags                    = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-}
 
+  lifecycle {
+    create_before_destroy = true
+  }
+}
 
 module "vmss_external_load_balancer" {
   count = var.deploy_vmss_external_load_balancer ? 1 : 0
