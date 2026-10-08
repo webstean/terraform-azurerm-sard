@@ -85,7 +85,7 @@ resource "azurerm_public_ip" "vmss_external" {
   resource_group_name     = module.environment_resource_group.resource.name
   location                = module.environment_resource_group.resource.location
   allocation_method       = "Static"
-  domain_name_label       = local.vmss_external_load_balancer_pip_count == 1 ? "${local.vmss_name}${random_string.environment.result}" : null
+  domain_name_label       = local.vmss_external_load_balancer_pip_count == 1 ? "${local.vmss_name}${random_string.environment.result}" : "${local.vmss_name}${random_string.environment.result}-${format("%02d", each.value)}"
   idle_timeout_in_minutes = 30
   ip_version              = "IPv4"
   reverse_fqdn            = local.external-nlb_name
@@ -94,23 +94,6 @@ resource "azurerm_public_ip" "vmss_external" {
   zones                   = null
   tags                    = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
-
-/*
-moved {
-  from = module.vmss_external_load_balancer[0].azurerm_public_ip.this["vmss_frontend"]
-  to   = azurerm_public_ip.vmss_external["pip01"]
-}
-
-moved {
-  from = module.vmss_external_load_balancer[0].azurerm_public_ip.this["vmss_frontend_01"]
-  to   = azurerm_public_ip.vmss_external["pip01"]
-}
-
-moved {
-  from = module.vmss_external_load_balancer[0].azurerm_public_ip.this["vmss_frontend_02"]
-  to   = azurerm_public_ip.vmss_external["pip02"]
-}
-*/
 
 module "vmss_external_load_balancer" {
   count = var.deploy_vmss_external_load_balancer ? 1 : 0
@@ -179,114 +162,6 @@ module "vmss_external_load_balancer" {
 
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
-
-/*
-moved {
-  from = module.vmss_external_load_balancer[0].azurerm_public_ip.this["vmss_frontend"]
-  to   = azurerm_public_ip.vmss_external[0]
-}
-
-resource "azurerm_public_ip" "vmss_external" {
-  count = var.deploy_vmss_external_load_balancer ? 1 : 0
-
-  name                    = "pip-${local.vmss_name}-external"
-  resource_group_name     = module.environment_resource_group.resource.name
-  location                = module.environment_resource_group.resource.location
-  allocation_method       = "Static"
-  domain_name_label       = "${local.vmss_name}${random_string.environment.result}"
-  idle_timeout_in_minutes = 30
-  ip_version              = "IPv4"
-  sku                     = "Standard"
-  sku_tier                = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
-  zones                   = local.regions[var.location].zones
-
-*/
-/*
-  diagnostic_settings = var.logging_enabled == false ? null : {
-    diag_setting_1 = {
-      name       = "Optional Logging 1"
-      log_groups = ["allLogs"]
-      metric     = ["AllMetrics"]
-      #metric_categories              = ["SLI", "Requests"]
-      log_analytics_destination_type = null
-      workspace_resource_id          = module.log_analytics_workspace.resource.resource_id
-    }
-  }
-  */
-/*
-  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-
-  lifecycle {
-    ignore_changes = [reverse_fqdn]
-  }
-}
-*/
-
-/*
-resource "azapi_update_resource" "vmss_external_reverse_fqdn" {
-  count = var.deploy_vmss_external_load_balancer ? 1 : 0
-
-  type        = "Microsoft.Network/publicIPAddresses@2024-05-01"
-  resource_id = azurerm_public_ip.vmss_external[0].id
-  body = {
-    properties = {
-      reverseFqdn = "${local.vmss_name}${random_string.environment.result}.${azurerm_dns_zone.environment.name}"
-    }
-  }
-
-  depends_on = [azurerm_dns_a_record.vmss_external_reverse_fqdn]
-}
-*/
-
-/*
-resource "azurerm_monitor_diagnostic_setting" "pip-metrics" {
-  count = var.vmss_number_of_instances == 0 || var.vmss_autoscale_enabled == false ? 0 : 1
-
-  name                       = "Metrics-${azurerm_public_ip.nat[0].name}-to-Azure-Monitor"
-  target_resource_id         = azurerm_public_ip.nat[0].id
-  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
-
-  enabled_metric {
-    category = "AllMetrics"
-  }
-}
-resource "azurerm_monitor_diagnostic_setting" "pip_logs" {
-  count = var.vmss_number_of_instances == 0 || var.vmss_autoscale_enabled == false ? 0 : 1
-
-  name                       = "Logs-${azurerm_public_ip.nat[0].name}-to-Azure-Monitor"
-  target_resource_id         = azurerm_public_ip.nat[0].id
-  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
-
-  enabled_log {
-    category_group = "allLogs"
-  }
-}
-*/
-
-/*
-resource "azurerm_monitor_diagnostic_setting" "nat_gateway_metrics" {
-  count = var.vmss_number_of_instances == 0 || var.vmss_autoscale_enabled == false ? 0 : 1
-
-  name                       = "Metrics-${azurerm_nat_gateway.this[0].name}-to-Azure-Monitor"
-  target_resource_id         = azurerm_nat_gateway.this[0].id
-  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
-
-  enabled_metric {
-    category = "AllMetrics"
-  }
-}
-resource "azurerm_monitor_diagnostic_setting" "nat_gateway_logs" {
-  count = var.vmss_number_of_instances == 0 || var.vmss_autoscale_enabled == false ? 0 : 1
-
-  name                       = "Logs-${azurerm_nat_gateway.this[0].name}-to-Azure-Monitor"
-  target_resource_id         = azurerm_nat_gateway.this[0].id
-  log_analytics_workspace_id = module.log_analytics_workspace.resource_id
-
-  enabled_log {
-    category_group = "allLogs"
-  }
-}
-*/
 
 module "vmss_keyvault" {
   source           = "Azure/avm-res-keyvault-vault/azurerm"
