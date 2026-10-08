@@ -36,7 +36,7 @@ module "nat_gateway" {
 
   public_ips = {
     main = {
-      name = "pip-${local.nat_name_location}"
+      name = "pip-nat-${local.nat_name_location}"
     }
   }
 
