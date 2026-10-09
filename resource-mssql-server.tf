@@ -187,27 +187,46 @@ module "sql_keyvault" {
   purge_protection_enabled       = false
   soft_delete_retention_days     = 7
   legacy_access_policies_enabled = false
-  tags                           = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-}
-
-moved {
-  from = azurerm_key_vault.sql_kv
-  to   = module.sql_keyvault.azurerm_key_vault.this
+  role_assignments = {
+    "sp_roleassignment1" = {
+      principal_id                     = data.azurerm_client_config.current.object_id
+      role_definition_id_or_name       = "Key Vault Administrator"
+      skip_service_principal_aad_check = true
+      principal_type                   = "ServicePrincipal"
+      description                      = local.iac_message
+    },
+    "sp_roleassignment2" = {
+      principal_id                     = azurerm_user_assigned_identity.sqlserver.principal_id
+      role_definition_id_or_name       = "Key Vault Crypto Service Encryption User"
+      skip_service_principal_aad_check = true
+      principal_type                   = "ServicePrincipal"
+      description                      = local.iac_message
+    },
+    "sp_roleassignment3" = {
+      principal_id                     = azurerm_user_assigned_identity.environment.principal_id
+      role_definition_id_or_name       = "Key Vault Secrets User"
+      skip_service_principal_aad_check = true
+      principal_type                   = "ServicePrincipal"
+      description                      = local.iac_message
+    }
+  }
+  diagnostic_settings = var.logging_enabled == false ? null : {
+    diag_setting_1 = {
+      name       = "Optional Logging 1"
+      log_groups = ["allLogs"]
+      metric     = ["AllMetrics"]
+      #metric_categories              = ["SLI", "Requests"]
+      log_analytics_destination_type = null
+      workspace_resource_id          = module.log_analytics_workspace.resource_id
+    }
+  }
+  lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
+    kind = "CanNotDelete"
+  } : null
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 
 # Grant the deploying principal permissions to create the key
-resource "azurerm_role_assignment" "sql_kv_admin" {
-  principal_id         = data.azurerm_client_config.current.object_id
-  scope                = module.sql_keyvault.resource_id
-  role_definition_name = "Key Vault Administrator"
-  description          = local.iac_message
-}
-resource "azurerm_role_assignment" "sql_kv_crypto" {
-  principal_id         = azurerm_user_assigned_identity.sqlserver.principal_id
-  scope                = module.sql_keyvault.resource_id
-  role_definition_name = "Key Vault Crypto Service Encryption User"
-  description          = local.iac_message
-}
 resource "azurerm_key_vault_key" "tde" {
   key_opts = [
     "unwrapKey",
@@ -226,8 +245,10 @@ resource "azurerm_key_vault_key" "tde" {
       time_before_expiry = "P30D"
     }
   }
-  tags       = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-  depends_on = [azurerm_role_assignment.sql_kv_admin]
+  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  depends_on = [
+    module.sql_keyvault,
+  ]
 }
 
 /*
@@ -312,7 +333,8 @@ resource "azurerm_mssql_server" "this" {
 
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [
-    module.environment_resource_group.resource
+    module.environment_resource_group.resource,
+    module.sql_keyvault,
   ]
 }
 
@@ -334,6 +356,10 @@ module "private_endpoint_sqlserver" {
     kind = "CanNotDelete"
   } : null
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  depends_on = [
+    module.environment_resource_group.resource,
+    module.sql_keyvault,
+  ]
 }
 
 
@@ -373,6 +399,10 @@ resource "azurerm_mssql_server" "this-failover" {
   ## Possible values are Default, Proxy, and Redirect.
   connection_policy = "Default"
 
+  depends_on = [
+    module.environment_resource_group.resource,
+    module.sql_keyvault,
+  ]
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
 /*

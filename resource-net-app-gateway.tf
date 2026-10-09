@@ -90,8 +90,6 @@ module "appgateway_public_ip" {
     }
   }
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
-
-  depends_on = [azurerm_role_assignment.sql_kv_admin]
 }
 
 resource "azurerm_web_application_firewall_policy" "gateway" {
