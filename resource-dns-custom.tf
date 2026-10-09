@@ -12,7 +12,7 @@ locals {
   ingress_aliases_pubsub = toset(["pubsub"])
   ## FrontDoor
   ingress_aliases_frontdoor = toset(["fd"])
-  external-nlb_name         = "external-nlb.${var.custom_dns_zone_name}"
+  external-nlb_name         = "external-nlb"
 }
 
 data "azurerm_dns_zone" "specified" {
