@@ -187,22 +187,35 @@ module "sql_keyvault" {
   purge_protection_enabled       = false
   soft_delete_retention_days     = 7
   legacy_access_policies_enabled = false
+  network_acls = {
+    default_action = tobool(var.deploy_private_endpoints) ? "Deny" : "Allow"
+    bypass         = "AzureServices"
+    ip_rules       = tobool(var.deploy_private_endpoints) ? [] : ["0.0.0.0/0"]
+    #virtual_network_subnet_ids = tobool(var.deploy_private_endpoints) ? null : [for subnet in local.vnet_subnets : subnet.id if try(contains(subnet.service_endpoints, "Microsoft.KeyVault"), false)]
+  }
   role_assignments = {
-    "sp_roleassignment1" = {
+    "sp_roleassignment1a" = {
       principal_id                     = data.azurerm_client_config.current.object_id
       role_definition_id_or_name       = "Key Vault Administrator"
       skip_service_principal_aad_check = true
       principal_type                   = "ServicePrincipal"
       description                      = local.iac_message
     },
-    "sp_roleassignment2" = {
+    "sp_roleassignment2a" = {
+      principal_id                     = data.azurerm_client_config.current.object_id
+      role_definition_id_or_name       = "Key Vault Secrets Officer"
+      skip_service_principal_aad_check = true
+      principal_type                   = "ServicePrincipal"
+      description                      = local.iac_message
+    },
+    "sp_roleassignment3a" = {
       principal_id                     = azurerm_user_assigned_identity.sqlserver.principal_id
       role_definition_id_or_name       = "Key Vault Crypto Service Encryption User"
       skip_service_principal_aad_check = true
       principal_type                   = "ServicePrincipal"
       description                      = local.iac_message
     },
-    "sp_roleassignment3" = {
+    "sp_roleassignment4a" = {
       principal_id                     = azurerm_user_assigned_identity.environment.principal_id
       role_definition_id_or_name       = "Key Vault Secrets User"
       skip_service_principal_aad_check = true
