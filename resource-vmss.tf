@@ -124,8 +124,7 @@ module "vmss_external_load_balancer" {
 
   backend_address_pools = {
     vmss = {
-      name                        = "vmss-backend-pool"
-      virtual_network_resource_id = module.virtual_network.resource.id
+      name = "vmss-backend-pool"
     }
   }
 
