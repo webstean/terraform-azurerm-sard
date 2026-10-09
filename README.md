@@ -55,7 +55,6 @@ Next steps here
 | [azapi_resource.embedding_gpt4o](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource.embedding_small](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource.foundry](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
-| [azapi_resource.free_sql_database](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource_action.sql_server_automatic_tuning](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource_action) | resource |
 | [azapi_update_resource.aca_env_otel](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/update_resource) | resource |
 | [azapi_update_resource.configurationStore_telemetry](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/update_resource) | resource |
@@ -111,8 +110,6 @@ Next steps here
 | [azurerm_key_vault_certificate.letsencrypt-aca](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_certificate) | resource |
 | [azurerm_key_vault_certificate.letsencrypt-pubsub](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_certificate) | resource |
 | [azurerm_key_vault_key.tde](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_key) | resource |
-| [azurerm_key_vault_secret.sql_database_connection_free_encrypted](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
-| [azurerm_key_vault_secret.sql_database_connection_free_unencrypted](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
 | [azurerm_key_vault_secret.vmss_admin_password](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
 | [azurerm_lb.relay](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb) | resource |
 | [azurerm_lb_backend_address_pool.relay](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_backend_address_pool) | resource |
@@ -125,7 +122,6 @@ Next steps here
 | [azurerm_monitor_diagnostic_setting.foundry_project_audit](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_monitor_diagnostic_setting.foundry_project_metrics](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_monitor_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_workspace) | resource |
-| [azurerm_mssql_database_extended_auditing_policy.free_sql_database](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database_extended_auditing_policy) | resource |
 | [azurerm_mssql_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) | resource |
 | [azurerm_mssql_server.this-failover](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) | resource |
 | [azurerm_mssql_server_dns_alias.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server_dns_alias) | resource |
@@ -183,7 +179,6 @@ Next steps here
 | [azurerm_subnet.pls_nat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.private_endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_user_assigned_identity.environment](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
-| [azurerm_user_assigned_identity.free_sql_database](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_user_assigned_identity.sqlserver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_virtual_hub.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_hub) | resource |
 | [azurerm_virtual_hub_connection.vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_hub_connection) | resource |
@@ -200,7 +195,6 @@ Next steps here
 | [terraform_data.dab_build_apply_trigger](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) | resource |
 | [terraform_data.deploy_site](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) | resource |
 | [time_sleep.environment_identity_create_wait](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
-| [time_sleep.free_sql_database_identity_create_wait](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 | [time_sleep.resource_group_create_wait](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 | [time_sleep.sqlserver_identity_create_wait](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 | [time_sleep.wait_10_seconds_for_network_watcher_creation](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
@@ -361,10 +355,6 @@ Next steps here
 | <a name="output_relay_mssql_public_ip"></a> [relay\_mssql\_public\_ip](#output\_relay\_mssql\_public\_ip) | The public IP address of the relay load balancer. |
 | <a name="output_security_perimeter_inbound_public_ips"></a> [security\_perimeter\_inbound\_public\_ips](#output\_security\_perimeter\_inbound\_public\_ips) | List of public IPs allowed for inbound traffic to the security perimeter |
 | <a name="output_security_perimeter_outbound_fqdns"></a> [security\_perimeter\_outbound\_fqdns](#output\_security\_perimeter\_outbound\_fqdns) | List of FQDNs allowed for outbound traffic from the security perimeter |
-| <a name="output_sql_database_connection_free_encrypted"></a> [sql\_database\_connection\_free\_encrypted](#output\_sql\_database\_connection\_free\_encrypted) | Connection string for the SQL database using Entra ID authentication with encryption enabled. Ensure that your client supports Azure AD authentication and has the necessary permissions to connect. |
-| <a name="output_sql_database_connection_free_odbc_alias"></a> [sql\_database\_connection\_free\_odbc\_alias](#output\_sql\_database\_connection\_free\_odbc\_alias) | Registry alias for the SQL database connection. |
-| <a name="output_sql_database_connection_free_unencrypted"></a> [sql\_database\_connection\_free\_unencrypted](#output\_sql\_database\_connection\_free\_unencrypted) | Connection string for the SQL database using Entra ID authentication with encryption disabled. Ensure that your client supports Azure AD authentication and has the necessary permissions to connect. |
-| <a name="output_sql_free_database_name"></a> [sql\_free\_database\_name](#output\_sql\_free\_database\_name) | Name of the free SQL database. |
 | <a name="output_sql_server_dns_alias"></a> [sql\_server\_dns\_alias](#output\_sql\_server\_dns\_alias) | The fully qualified domain name (FQDN) alias of the SQL Server instance. |
 | <a name="output_sql_server_failover_dns_alias"></a> [sql\_server\_failover\_dns\_alias](#output\_sql\_server\_failover\_dns\_alias) | The fully qualified domain name (FQDN) alias of the SQL Server failover instance. |
 | <a name="output_sql_server_failover_hostname"></a> [sql\_server\_failover\_hostname](#output\_sql\_server\_failover\_hostname) | The fully qualified domain name of the SQL Server failover instance. |
