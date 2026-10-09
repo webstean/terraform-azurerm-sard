@@ -303,7 +303,7 @@ resource "azurerm_monitor_data_collection_rule" "windows_vm" {
     type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.environment.id]
   }
-  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  tags       = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [azurerm_log_analytics_solution.change_tracking]
 }
 
@@ -421,7 +421,7 @@ resource "azurerm_monitor_data_collection_rule" "windows_change_tracking" {
     identity_ids = [azurerm_user_assigned_identity.environment.id]
   }
 
-  tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
+  tags       = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [azurerm_log_analytics_solution.change_tracking]
 }
 
