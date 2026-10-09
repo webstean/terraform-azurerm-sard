@@ -71,7 +71,6 @@ Next steps here
 | [azurerm_container_app_environment_storage.shared](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_storage) | resource |
 | [azurerm_container_registry_task.dab_build](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry_task) | resource |
 | [azurerm_container_registry_task_schedule_run_now.dab_build_now](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry_task_schedule_run_now) | resource |
-| [azurerm_databox_edge_device.gateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/databox_edge_device) | resource |
 | [azurerm_dns_a_record.aca](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
 | [azurerm_dns_a_record.acatest](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
 | [azurerm_dns_a_record.apex_alias](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
@@ -109,7 +108,6 @@ Next steps here
 | [azurerm_dns_txt_record.msrdc](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_txt_record) | resource |
 | [azurerm_dns_zone.aca](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_zone) | resource |
 | [azurerm_dns_zone.environment](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_zone) | resource |
-| [azurerm_key_vault.sql_kv](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault) | resource |
 | [azurerm_key_vault_certificate.letsencrypt-aca](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_certificate) | resource |
 | [azurerm_key_vault_certificate.letsencrypt-pubsub](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_certificate) | resource |
 | [azurerm_key_vault_key.tde](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_key) | resource |
@@ -123,6 +121,9 @@ Next steps here
 | [azurerm_lb_rule.relay](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_rule) | resource |
 | [azurerm_log_analytics_query_pack.platform](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_query_pack) | resource |
 | [azurerm_monitor_data_collection_endpoint.otel](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_data_collection_endpoint) | resource |
+| [azurerm_monitor_diagnostic_setting.foundry_logging](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
+| [azurerm_monitor_diagnostic_setting.foundry_project_audit](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
+| [azurerm_monitor_diagnostic_setting.foundry_project_metrics](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_monitor_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_workspace) | resource |
 | [azurerm_mssql_database_extended_auditing_policy.free_sql_database](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database_extended_auditing_policy) | resource |
 | [azurerm_mssql_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) | resource |
@@ -335,8 +336,6 @@ Next steps here
 | <a name="output_bastion_command_wac_tunnel_pwsh"></a> [bastion\_command\_wac\_tunnel\_pwsh](#output\_bastion\_command\_wac\_tunnel\_pwsh) | Bastion Tunnel command to access Windows Admin Center - only works with Standard or Premium Bastion SKUs |
 | <a name="output_bastion_id"></a> [bastion\_id](#output\_bastion\_id) | Bastion Host ID |
 | <a name="output_container_registry_dab_broker_image"></a> [container\_registry\_dab\_broker\_image](#output\_container\_registry\_dab\_broker\_image) | The DAB broker image reference for Docker or Podman.<br/>Run the DAB broker image using Podman<br/>podman run "$(terraform output -raw container\_registry\_dab\_broker\_image)" |
-| <a name="output_databox_gateway_id"></a> [databox\_gateway\_id](#output\_databox\_gateway\_id) | The ID of the Databox Edge Gateway device. |
-| <a name="output_databox_gateway_properties"></a> [databox\_gateway\_properties](#output\_databox\_gateway\_properties) | The properties of the Databox Edge Gateway device. |
 | <a name="output_environment_diag_storage_account_name"></a> [environment\_diag\_storage\_account\_name](#output\_environment\_diag\_storage\_account\_name) | The name of the main storage account for this environment. |
 | <a name="output_environment_home_page"></a> [environment\_home\_page](#output\_environment\_home\_page) | The SARD Environment home page |
 | <a name="output_environment_name"></a> [environment\_name](#output\_environment\_name) | The SARD Environment name |
@@ -418,6 +417,7 @@ Next steps here
 | <a name="module_private_dns_zones"></a> [private\_dns\_zones](#module\_private\_dns\_zones) | Azure/avm-res-network-privatednszone/azurerm | ~>0.0, < 1.0 |
 | <a name="module_private_endpoint_sqlserver"></a> [private\_endpoint\_sqlserver](#module\_private\_endpoint\_sqlserver) | Azure/avm-res-network-privateendpoint/azurerm | ~>0.0, < 1.0 |
 | <a name="module_sandbox_subnet"></a> [sandbox\_subnet](#module\_sandbox\_subnet) | Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet | ~> 0.22, < 1.0 |
+| <a name="module_sql_keyvault"></a> [sql\_keyvault](#module\_sql\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
 | <a name="module_sql_private_dns_zones"></a> [sql\_private\_dns\_zones](#module\_sql\_private\_dns\_zones) | Azure/avm-res-network-privatednszone/azurerm | ~>0.0, < 1.0 |
 | <a name="module_sqlserver_subnet"></a> [sqlserver\_subnet](#module\_sqlserver\_subnet) | Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet | ~> 0.22, < 1.0 |
 | <a name="module_subnet_mlhub"></a> [subnet\_mlhub](#module\_subnet\_mlhub) | Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet | ~> 0.22, < 1.0 |
