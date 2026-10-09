@@ -51,11 +51,13 @@ module "appconfiguration" {
 */
 
   key_values = {
+    /*
     SQL_DATABASE_CONNECTION_STRING = {
       key   = "SQL_DATABASE_CONNECTION_STRING"
       label = "basic"
       value = local.sql_database_connection_free_encrypted
     }
+*/
     CUSTOMER = {
       key   = upper("customer")
       label = "basic"

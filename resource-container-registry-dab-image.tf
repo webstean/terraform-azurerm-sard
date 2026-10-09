@@ -31,10 +31,10 @@ fi
 BASH
 
   #COPY ${var.prefix}.json /App/dab-config.json
+  ## ENV DATABASE_CONNECTION_STRING=${jsonencode(local.sql_database_connection_free_encrypted)}
   dab_dockerfile = <<-DOCKERFILE
 ARG BASE_IMAGE=mcr.microsoft.com/azure-databases/data-api-builder:latest
 FROM $${BASE_IMAGE}
-ENV DATABASE_CONNECTION_STRING=${jsonencode(local.sql_database_connection_free_encrypted)}
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod 0755 /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
