@@ -188,9 +188,9 @@ module "sql_keyvault" {
   soft_delete_retention_days     = 7
   legacy_access_policies_enabled = false
   network_acls = {
-    default_action = tobool(var.deploy_private_endpoints) ? "Deny" : "Allow"
+    default_action = tobool(var.deploy_sql_private_endpoints) ? "Deny" : "Allow"
     bypass         = "AzureServices"
-    ip_rules       = tobool(var.deploy_private_endpoints) ? [] : ["0.0.0.0/0"]
+    ip_rules       = tobool(var.deploy_sql_private_endpoints) ? [] : ["0.0.0.0/0"]
     #virtual_network_subnet_ids = tobool(var.deploy_private_endpoints) ? null : [for subnet in local.vnet_subnets : subnet.id if try(contains(subnet.service_endpoints, "Microsoft.KeyVault"), false)]
   }
   role_assignments = {
@@ -346,7 +346,6 @@ resource "azurerm_mssql_server" "this" {
 
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [
-    module.environment_resource_group.resource,
     module.sql_keyvault,
   ]
 }
@@ -370,7 +369,6 @@ module "private_endpoint_sqlserver" {
   } : null
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
   depends_on = [
-    module.environment_resource_group.resource,
     module.sql_keyvault,
   ]
 }

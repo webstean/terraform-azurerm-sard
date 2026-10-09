@@ -26,6 +26,7 @@ module "foundry_keyvault" {
   network_acls = {
     default_action = tobool(var.deploy_private_endpoints) ? "Deny" : "Allow"
     bypass         = "AzureServices"
+    ip_rules       = tobool(var.deploy_private_endpoints) ? [] : ["0.0.0.0/0"]
     #virtual_network_subnet_ids = tobool(var.deploy_private_endpoints) ? null : [for subnet in local.vnet_subnets : subnet.id if try(contains(subnet.service_endpoints, "Microsoft.KeyVault"), false)]
   }
   diagnostic_settings = var.logging_enabled == false ? null : {

@@ -29,19 +29,16 @@ module "cert_keyvault" {
     bypass         = "AzureServices"
     #virtual_network_subnet_ids = tobool(var.deploy_private_endpoints) ? null : [for subnet in local.vnet_subnets : subnet.id if try(contains(subnet.service_endpoints, "Microsoft.KeyVault"), false)]
   }
-
-  /*
-  diagnostic_settings = {
+  diagnostic_settings = var.logging_enabled == false ? null : {
     diag_setting_1 = {
-      name                           = "Logs-Metrics-And-Audit to Azure Monitor ${module.log_analytics_workspace.resource.name}"
-      log_groups                     = ["allLogs", "audit"]
-      metric_categories              = ["AllMetrics"]
+      name       = "Optional Logging 1"
+      log_groups = ["allLogs"]
+      metric     = ["AllMetrics"]
+      #metric_categories              = ["SLI", "Requests"]
       log_analytics_destination_type = null
-      workspace_resource_id          = module.log_analytics_workspace.resource.workspace_id
+      workspace_resource_id          = module.log_analytics_workspace.resource_id
     }
-}
-*/
-
+  }
   role_assignments = {
     role_assignment_1 = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Key Vault Secrets User/${azurerm_user_assigned_identity.environment.principal_id}")
