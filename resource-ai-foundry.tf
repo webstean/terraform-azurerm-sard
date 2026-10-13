@@ -269,6 +269,19 @@ resource "azapi_resource" "embedding_gpt4o" {
   }
 }
 
+/*
+## Manages a Cognitive Services (Microsoft Foundry) Account Connection with Entra ID authentication.
+resource "azurerm_cognitive_account_connection_entra_id" "this" {
+  name                 = "storage-connection"
+  cognitive_account_id = azapi_resource.foundry.id
+  category             = "AzureStorageAccount" ## Possible values are AIServices, ApiManagement, AppConfig, AzureOpenAI, AzureStorageAccount, CognitiveSearch, CognitiveService, CosmosDb, Databricks, ManagedOnlineEndpoint, MicrosoftFabric, and Sharepoint.
+  target               = azurerm_storage_account.this.primary_blob_endpoint
+  metadata = {
+    ResourceId = azurerm_storage_account.this.id
+  }
+}
+*/
+
 output "foundry_name" {
   description = "The name of the Foundry resource."
   sensitive   = false
