@@ -358,7 +358,7 @@ module "private_endpoint_sqlserver" {
   enable_telemetry = var.enable_telemetry
 
   name                           = "${local.pep_name_location}-${azurerm_mssql_server.this.name}"
-  resource_group_name            = module.environment_resource_group.resource.name
+  parent_id                      = module.environment_resource_group.resource.resource_id
   location                       = module.environment_resource_group.resource.location
   network_interface_name         = "pep-${azurerm_mssql_server.this.name}"
   private_connection_resource_id = azurerm_mssql_server.this.id
