@@ -154,6 +154,12 @@ resource "azuread_service_principal" "microsoft_edge" {
 }
 ## azuread_service_principal.microsoft_edge.client_id
 
+resource "azuread_service_principal" "microsoft_edge_authentication" {
+  client_id    = "f2d19332-a09d-48c8-a53b-c49ae5502dfc" ## Microsoft Edge Authentication
+  use_existing = true
+}
+## azuread_service_principal.microsoft_edge_authentication.client_id
+
 resource "azuread_service_principal" "azure_portal" {
   client_id    = "c44b4083-3bb0-49c1-b47d-974e53cbdf3c" ## Azure Portal
   use_existing = true
