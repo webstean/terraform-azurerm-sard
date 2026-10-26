@@ -56,7 +56,7 @@ module "nat_gateway" {
       zones                   = local.regions[var.location].zones
     }
   }
-/*
+  /*
   diagnostic_settings = var.logging_enabled == false ? null : {
     diag_setting_1 = {
       name       = "Optional Logging 1"
