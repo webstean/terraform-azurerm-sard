@@ -75,7 +75,7 @@ module "application_insights" {
   enable_telemetry = var.enable_telemetry
 
   name                          = "insights-${local.law_name}"
-  resource_group_name           = module.environment_resource_group.resource.name
+  parent_id                     = module.environment_resource_group.resource.resource_id
   location                      = module.environment_resource_group.resource.location
   workspace_id                  = module.log_analytics_workspace.resource_id
   retention_in_days             = 30
