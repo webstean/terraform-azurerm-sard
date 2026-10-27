@@ -126,6 +126,7 @@ module "environment_resource_group" {
 */
 
     ## ==========================================================================================
+/*
     "up_roleassignment1" = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Contributor/${var.owner_entra_object_id}")
       role_definition_id_or_name       = "Contributor"
@@ -134,6 +135,7 @@ module "environment_resource_group" {
       principal_type                   = "User"
       description                      = local.iac_message
     }
+*/
     "up_roleassignment2" = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Reader and Data Access/${var.owner_entra_object_id}")
       role_definition_id_or_name       = "Reader and Data Access" ## Storage Only
