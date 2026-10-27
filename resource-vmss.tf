@@ -218,7 +218,7 @@ module "vmss_keyvault" {
   }
   diagnostic_settings = var.logging_enabled == false ? null : {
     diag_setting_1 = {
-      name       = "VMSS Optional Logging 1"
+      name       = "VMSS KeyVault Optional Logging 1"
       log_groups = ["allLogs"]
       metric     = ["AllMetrics"]
       #metric_categories              = ["SLI", "Requests"]
@@ -543,7 +543,7 @@ module "virtualmachinescaleset" {
   zones        = local.regions[var.location].zones ## Note: Due to a limitation of the Azure API at this time only one Availability Zone can be defined.
   diagnostic_settings = var.logging_enabled == false ? null : {
     diag_setting_1 = {
-      name       = "Optional Logging 1"
+      name       = "VMSS Optional Logging 1"
       log_groups = ["allLogs"]
       metric     = ["AllMetrics"]
       #metric_categories              = ["SLI", "Requests"]
