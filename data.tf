@@ -11,7 +11,7 @@ data "azurerm_location" "current" {
 
 locals {
   ## Unisys policy
-  public_access_allowed = data.azurerm_subscription.current.tags["hasPublicIP"] == "Yes" ? true : false
+  public_access_allowed = try(data.azurerm_subscription.current.tags["hasPublicIP"], null) == "Yes" ? true : false
 }
 
 /*
