@@ -218,7 +218,7 @@ module "vmss_keyvault" {
   }
   diagnostic_settings = var.logging_enabled == false ? null : {
     diag_setting_1 = {
-      name       = "Optional Logging 1"
+      name       = "VMSS Optional Logging 1"
       log_groups = ["allLogs"]
       metric     = ["AllMetrics"]
       #metric_categories              = ["SLI", "Requests"]
@@ -541,7 +541,6 @@ module "virtualmachinescaleset" {
   }
   zone_balance = true
   zones        = local.regions[var.location].zones ## Note: Due to a limitation of the Azure API at this time only one Availability Zone can be defined.
-  /*
   diagnostic_settings = var.logging_enabled == false ? null : {
     diag_setting_1 = {
       name       = "Optional Logging 1"
@@ -552,7 +551,6 @@ module "virtualmachinescaleset" {
       workspace_resource_id          = module.log_analytics_workspace.resource_id
     }
   }
-*/
   lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
     kind = "CanNotDelete"
   } : null
@@ -669,7 +667,7 @@ module "vmss_autoscale_setting" {
     email = {
       send_to_subscription_administrator    = false
       send_to_subscription_co_administrator = false
-      #custom_emails                         = [var.alert_email, var.owner_email]
+      custom_emails                         = [var.owner_email]
     }
   }
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
