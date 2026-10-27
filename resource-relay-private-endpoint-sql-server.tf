@@ -49,7 +49,7 @@ resource "azurerm_lb_backend_address_pool_address" "target" {
   virtual_network_id      = module.virtual_network.resource_id
 
   # the private IP you're relaying to
-  ip_address = module.private_endpoint_sqlserver[0].resource.private_service_connection[0].private_ip_address
+  ip_address = module.private_endpoint_sqlserver[0].private_ip_addresses[0]
 }
 
 resource "azurerm_lb_probe" "tcp" {
@@ -79,4 +79,3 @@ output "relay_mssql_public_ip" {
   sensitive   = false
   value       = try(azurerm_public_ip.relay[0].ip_address, null)
 }
-
