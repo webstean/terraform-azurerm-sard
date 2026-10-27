@@ -56,17 +56,15 @@ module "nat_gateway" {
       zones                   = local.regions[var.location].zones
     }
   }
-  /*
   diagnostic_settings = var.logging_enabled == false ? null : {
     diag_setting_1 = {
-      name       = "Optional Logging 1"
-      log_groups = ["allLogs"]
-      metric     = ["AllMetrics"]
+      name                           = "Optional NAT Gateway Logging 1"
+      log_groups                     = ["allLogs"]
+      metric                         = ["AllMetrics"]
       log_analytics_destination_type = null
       workspace_resource_id          = module.log_analytics_workspace.resource_id
     }
   }
-*/
   lock = (tobool(var.data_pii) || tobool(var.data_phi)) ? {
     kind = "CanNotDelete"
   } : null
@@ -156,7 +154,7 @@ module "vmss_external_load_balancer" {
 
   diagnostic_settings = var.logging_enabled == false ? null : {
     diag_setting_1 = {
-      name                           = "Optional Logging 1"
+      name                           = "Optional NLB Logging 1"
       log_groups                     = ["allLogs"]
       metric_categories              = ["AllMetrics"]
       log_analytics_destination_type = null
