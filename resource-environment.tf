@@ -126,7 +126,7 @@ module "environment_resource_group" {
 */
 
     ## ==========================================================================================
-/*
+    /*
     "up_roleassignment1" = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Contributor/${var.owner_entra_object_id}")
       role_definition_id_or_name       = "Contributor"
