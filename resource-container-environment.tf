@@ -195,7 +195,7 @@ resource "azapi_update_resource" "aca_env_otel" {
   body = {
     properties = {
       appInsightsConfiguration = {
-        connectionString = module.application_insights.resource.connection_string
+        connectionString = module.application_insights.connection_string
       }
 
       # This is normal ACA stdout/stderr logging.
