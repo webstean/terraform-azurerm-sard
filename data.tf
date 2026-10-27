@@ -243,7 +243,13 @@ resource "azuread_service_principal" "microsoft_graph_cli" {
   client_id    = "14d82eec-204b-4c2f-b7e8-296a70dab67e" // Microsoft Graph Command Line Tools
   use_existing = true
 }
-## azuread_service_principal.microsoft_graph_client_id
+## azuread_service_principal.microsoft_graph_cli.client_id
+
+resource "azuread_service_principal" "microsoft_tunnel" {
+  client_id    = "eb539595-3fe1-474e-9c1d-feb3625d1be5" // Microsoft Tunnel
+  use_existing = true
+}
+## azuread_service_principal.microsoft_tunnel.client_id
 
 resource "azuread_service_principal" "azure_resource_manager" {
   client_id    = "797f4846-ba00-4fd7-ba43-dac1f8f63013" // Microsoft Azure Management
