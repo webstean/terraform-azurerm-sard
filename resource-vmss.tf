@@ -91,8 +91,8 @@ resource "azurerm_public_ip" "vmss_external" {
   idle_timeout_in_minutes = 30
   ip_version              = "IPv4"
   sku                     = "Standard"
-  sku_tier                = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
-  zones                   = tobool(var.deploy_private_endpoints) ? local.regions[var.location].regions : null
+  sku_tier                = "Regional"
+  zones                   = contains(local.regions[var.location].zones, "None") ? null : local.regions[var.location].zones
   tags                    = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 
   lifecycle {
@@ -111,7 +111,7 @@ module "vmss_external_load_balancer" {
   resource_group_name = module.environment_resource_group.resource.name
   location            = module.environment_resource_group.resource.location
   sku                 = "Standard"
-  sku_tier            = tobool(var.deploy_private_endpoints) ? "Global" : "Regional" ## Regional is cheaper
+  sku_tier            = "Regional" # Global-tier backends must be regional load balancers, not VMSS NICs.
 
   frontend_ip_configurations = {
     for index in range(local.vmss_external_load_balancer_pip_count) :
@@ -141,8 +141,8 @@ module "vmss_external_load_balancer" {
       backend_address_pool_object_names = ["vmss"]
       probe_object_name                 = "vmss"
       load_distribution                 = "SourceIPProtocol"
-      enable_floating_ip                = true
-      disable_outbound_snat             = var.deploy_nat_gateway ? false : true ## Allow NLB to provide outboud Internet if no NAT Gateway
+      enable_floating_ip                = true # Required for backend-port reuse; guest loopback configuration is documented in README.md.
+      disable_outbound_snat             = var.deploy_nat_gateway
     }
   }
 
@@ -157,10 +157,9 @@ module "vmss_external_load_balancer" {
 
   diagnostic_settings = var.logging_enabled == false ? null : {
     diag_setting_1 = {
-      name       = "Optional Logging 1"
-      log_groups = ["allLogs"]
-      metric     = ["AllMetrics"]
-      #metric_categories              = ["SLI", "Requests"]
+      name                           = "Optional Logging 1"
+      log_groups                     = ["allLogs"]
+      metric_categories              = ["AllMetrics"]
       log_analytics_destination_type = null
       workspace_resource_id          = module.log_analytics_workspace.resource_id
     }
