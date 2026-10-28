@@ -243,20 +243,6 @@ output "environment_resource_group_location" {
   value       = var.location
 }
 
-output "security_perimeter_inbound_public_ips" {
-  type        = list(string)
-  description = "List of public IPs allowed for inbound traffic to the security perimeter"
-  sensitive   = false
-  value       = var.security_perimeter_inbound_public_ips
-}
-
-output "security_perimeter_outbound_fqdns" {
-  type        = list(string)
-  description = "List of FQDNs allowed for outbound traffic from the security perimeter"
-  sensitive   = false
-  value       = var.security_perimeter_outbound_fqdns
-}
-
 output "subscription_display_name" {
   description = "The subscription display name of the current Azure subscription."
   sensitive   = false
