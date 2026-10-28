@@ -185,7 +185,6 @@ module "environment_resource_group" {
       principal_type                   = "User"
       description                      = local.iac_message
     }
-    /*
     "up_roleassignment9" = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Container Apps SandboxGroup Data Owner/${var.owner_entra_object_id}")
       role_definition_id_or_name       = "Container Apps SandboxGroup Data Owner"
@@ -194,7 +193,6 @@ module "environment_resource_group" {
       principal_type                   = "User"
       description                      = local.iac_message
     }
-*/
     /*
     "up_roleassignment10" = {
       role_definition_id_or_name       = "Storage Blob Data Reader"
