@@ -94,7 +94,7 @@ module "frontdoor" {
     }
   }
   diagnostic_settings = var.logging_enabled == false ? null : {
-    diag_setting_1 = {
+    diagsettings = {
       name       = "Optional Logging 1"
       log_groups = ["allLogs"]
       metric     = ["AllMetrics"]

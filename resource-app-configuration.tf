@@ -40,7 +40,7 @@ module "appconfiguration" {
 
   /*
   diagnostic_settings = {
-    diag_setting_1 = {
+    diagsettings = {
       name                           = "Logs-Metrics-And-Audit-to-Azure-Monitor-${module.log_analytics_workspace.resource.name}"
       log_groups                     = ["allLogs", "audit"]
       metric_categories              = ["AllMetrics"]
@@ -127,7 +127,7 @@ module "appconfiguration" {
     }
   } : null
   diagnostic_settings = var.logging_enabled == false ? null : {
-    diag_setting_1 = {
+    diagsettings = {
       name       = "Optional Logging 1"
       log_groups = ["allLogs"]
       metric     = ["AllMetrics"]

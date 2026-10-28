@@ -59,7 +59,7 @@ module "nat_gateway" {
   /*
   ## doesn't work - timesout after 30mins trying to create
   diagnostic_settings = var.logging_enabled == false ? null : {
-    diag_setting_1 = {
+    diagsettings = {
       name                           = "Optional NAT Gateway Logging 1"
       log_groups                     = ["allLogs"]
       metric                         = ["AllMetrics"]
@@ -156,7 +156,7 @@ module "vmss_external_load_balancer" {
   }
 
   diagnostic_settings = var.logging_enabled == false ? null : {
-    diag_setting_1 = {
+    diagsettings = {
       name                           = "Optional NLB Logging 1"
       log_groups                     = ["allLogs"]
       metric_categories              = ["AllMetrics"]
@@ -218,7 +218,7 @@ module "vmss_keyvault" {
     }
   }
   diagnostic_settings = var.logging_enabled == false ? null : {
-    diag_setting_1 = {
+    diagsettings = {
       name       = "VMSS KeyVault Optional Logging 1"
       log_groups = ["allLogs"]
       metric     = ["AllMetrics"]
@@ -644,7 +644,7 @@ module "vmss_autoscale_setting" {
   }
   /*
   diagnostic_settings = var.logging_enabled == false ? null : {
-    diag_setting_1 = {
+    diagsettings = {
       name       = "Optional VMSS Scaling Logging 1"
       log_groups = ["allLogs"]
       metric     = ["AllMetrics"]

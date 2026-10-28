@@ -49,7 +49,7 @@ module "appgateway_subnet" {
   ## no delegations for this subnet, for the Application Gateway we are using the dedicated subnet only
   /*
   diagnostic_settings = var.logging_enabled == false ? null : {
-    diag_setting_1 = {
+    diagsettings = {
       name       = "Optional Logging 1"
       log_groups = ["allLogs"]
       metric     = ["AllMetrics"]
@@ -80,7 +80,7 @@ module "appgateway_public_ip" {
   sku                 = "Standard"
 
   diagnostic_settings = var.logging_enabled == false ? null : {
-    diag_setting_1 = {
+    diagsettings = {
       name       = "Optional Logging 1"
       log_groups = ["allLogs"]
       metric     = ["AllMetrics"]

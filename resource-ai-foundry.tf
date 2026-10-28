@@ -30,8 +30,8 @@ module "foundry_keyvault" {
     #virtual_network_subnet_ids = tobool(var.deploy_private_endpoints) ? null : [for subnet in local.vnet_subnets : subnet.id if try(contains(subnet.service_endpoints, "Microsoft.KeyVault"), false)]
   }
   diagnostic_settings = var.logging_enabled == false ? null : {
-    diag_setting_1 = {
-      name       = "Optional Logging 1"
+    diag_settings = {
+      name       = "AI Foundry Logging 1"
       log_groups = ["allLogs"]
       metric     = ["AllMetrics"]
       #metric_categories              = ["SLI", "Requests"]

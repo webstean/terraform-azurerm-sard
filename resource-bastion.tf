@@ -296,7 +296,7 @@ module "avm-res-network-bastionhost" {
 
   virtual_network_id = module.virtual_network.resource_id
   diagnostic_settings = var.logging_enabled == false ? null : {
-    diag_setting_1 = {
+    diagsettings = {
       name       = "Optional Logging 1"
       log_groups = ["allLogs"]
       metric     = ["AllMetrics"]

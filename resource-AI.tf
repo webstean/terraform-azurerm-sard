@@ -30,7 +30,7 @@ module "ai_keyvault" {
     #virtual_network_subnet_ids = tobool(var.deploy_private_endpoints) ? null : [for subnet in local.vnet_subnets : subnet.id if try(contains(subnet.service_endpoints, "Microsoft.KeyVault"), false)]
   }
   diagnostic_settings = var.logging_enabled == false ? null : {
-    diag_setting_1 = {
+    diagsettings = {
       name       = "Optional AI KeyVault Logging 1"
       log_groups = ["allLogs"]
       metric     = ["AllMetrics"]
@@ -393,7 +393,7 @@ module "ai-services" {
     ]
   }
   diagnostic_settings = var.logging_enabled == false ? null : {
-    diag_setting_1 = {
+    diagsettings = {
       name       = "Optional ${each.value.sku_name} Logging 1"
       log_groups = ["allLogs", "Audit"]
       metric     = ["AllMetrics"]
