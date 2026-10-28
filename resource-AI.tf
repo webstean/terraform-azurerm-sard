@@ -395,7 +395,7 @@ module "ai-services" {
   diagnostic_settings = var.logging_enabled == false ? null : {
     diag_setting_1 = {
       name       = "Optional ${each.value.sku_name} Logging 1"
-      log_groups = ["allLogs"]
+      log_groups = ["allLogs", "Audit"]
       metric     = ["AllMetrics"]
       #metric_categories              = ["SLI", "Requests"]
       log_analytics_destination_type = null
