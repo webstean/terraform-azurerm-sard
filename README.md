@@ -126,7 +126,7 @@ Next steps here
 ## Requirements
 
 | Name | Version |
-| ------ | --------- |
+|------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~>1.0, < 2.0 |
 | <a name="requirement_acme"></a> [acme](#requirement\_acme) | ~>3.0, < 4.0 |
 | <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | ~>2.0, < 3.0 |
@@ -138,7 +138,7 @@ Next steps here
 ## Resources
 
 | Name | Type |
-| ------ | ------ |
+|------|------|
 | [acme_certificate.aca_wildcard](https://registry.terraform.io/providers/vancluever/acme/latest/docs/resources/certificate) | resource |
 | [acme_certificate.pubsub](https://registry.terraform.io/providers/vancluever/acme/latest/docs/resources/certificate) | resource |
 | [acme_registration.this](https://registry.terraform.io/providers/vancluever/acme/latest/docs/resources/registration) | resource |
@@ -312,7 +312,7 @@ Next steps here
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-| ------ | ------------- | ------ | --------- | :--------: |
+|------|-------------|------|---------|:--------:|
 | <a name="input_administrator_group_display_name"></a> [administrator\_group\_display\_name](#input\_administrator\_group\_display\_name) | Entra ID display name for the user or group that will have administrator permissions.<br/>Note, can be a Entra ID user or a group. | `string` | n/a | yes |
 | <a name="input_administrator_group_object_id"></a> [administrator\_group\_object\_id](#input\_administrator\_group\_object\_id) | The Entra ID object ID for the administrator group<br/>Note, can be a Entra ID user or a group. | `string` | n/a | yes |
 | <a name="input_customer"></a> [customer](#input\_customer) | The name of the customer (free-text) | `string` | n/a | yes |
@@ -330,7 +330,7 @@ Next steps here
 | <a name="input_ai_free_search_principal_id"></a> [ai\_free\_search\_principal\_id](#input\_ai\_free\_search\_principal\_id) | The principal ID of the AI Free Search resource to be used. | `string` | `null` | no |
 | <a name="input_automation_account_id"></a> [automation\_account\_id](#input\_automation\_account\_id) | The ID of the Azure Automation Account to be used. | `string` | `null` | no |
 | <a name="input_bastion_premium_private_deployment"></a> [bastion\_premium\_private\_deployment](#input\_bastion\_premium\_private\_deployment) | If true, deploys a Premium Bastion with private deployment (no public IP). If false, deploys a Premium Bastion with public deployment. | `bool` | `false` | no |
-| <a name="input_bastion_sku"></a> [bastion\_sku](#input\_bastion\_sku) | Azure Bastion SKU tier that determines features and pricing. See <https://learn.microsoft.com/en-us/azure/bastion/bastion-sku-comparison> | `string` | `"Developer"` | no |
+| <a name="input_bastion_sku"></a> [bastion\_sku](#input\_bastion\_sku) | Azure Bastion SKU tier that determines features and pricing. See https://learn.microsoft.com/en-us/azure/bastion/bastion-sku-comparison | `string` | `"Developer"` | no |
 | <a name="input_container_registry_id"></a> [container\_registry\_id](#input\_container\_registry\_id) | The ID of the Azure Container Registry to be used. | `string` | `null` | no |
 | <a name="input_container_registry_login_server"></a> [container\_registry\_login\_server](#input\_container\_registry\_login\_server) | The login server of the Azure Container Registry to be used. | `string` | `null` | no |
 | <a name="input_container_registry_name"></a> [container\_registry\_name](#input\_container\_registry\_name) | The name of the Azure Container Registry to be used. | `string` | `null` | no |
@@ -405,7 +405,7 @@ Next steps here
 ## Outputs
 
 | Name | Description |
-| ------ | ------------- |
+|------|-------------|
 | <a name="output_aca_certificate_subject_name"></a> [aca\_certificate\_subject\_name](#output\_aca\_certificate\_subject\_name) | The subject name of the Container App Environment. |
 | <a name="output_aca_env_custom_domain_verification_id"></a> [aca\_env\_custom\_domain\_verification\_id](#output\_aca\_env\_custom\_domain\_verification\_id) | The custom domain verification ID of the Container App Environment. |
 | <a name="output_aca_env_default_domain"></a> [aca\_env\_default\_domain](#output\_aca\_env\_default\_domain) | The default domain of the Container App Environment. |
@@ -481,7 +481,7 @@ Next steps here
 ## Modules
 
 | Name | Source | Version |
-| ------ | -------- | --------- |
+|------|--------|---------|
 | <a name="module_ai-services"></a> [ai-services](#module\_ai-services) | Azure/avm-res-cognitiveservices-account/azurerm | ~>0.0, < 1.0 |
 | <a name="module_ai_keyvault"></a> [ai\_keyvault](#module\_ai\_keyvault) | Azure/avm-res-keyvault-vault/azurerm | ~>0.7, < 1.0 |
 | <a name="module_aihub"></a> [aihub](#module\_aihub) | Azure/avm-res-machinelearningservices-workspace/azurerm | ~>0.0, < 1.0 |
