@@ -660,11 +660,35 @@ DESC
   default     = null
 }
 
+variable "security_perimeter_enabled" {
+  type        = bool
+  sensitive   = false
+  description = <<DESC
+Network Security Perimeter (NSP) Enabled or Disabled. Cannot be enabled if Private Endpoints are enabled.
+Service Endpoints are not support for resources, protected by NSP, so service endpoints will be disabled, if NSP is enabled for a particular PaaS resource.
+Note: NSPs are applied in a separate step, a dependent GitHub Action than runs after the initial plan/apply.
+There is one NSP per environment.
+Log Analytics Workspaces configrued with Sentinel (SIEM) are not suppoted with NSP. 
+Note: NSP (Network Security Perimeter) are free.
+Refer to https://learn.microsoft.com/en-us/azure/private-link/network-security-perimeter-concepts 
+DESC
+  default     = false
+}
+
 variable "security_perimeter_inbound_public_ips" {
   type        = list(string)
   sensitive   = false
   description = <<DESC
-Allowed inbound addresses for the Azure Security Perimeter.
+Allowed inbound IP addresses for this Network Security Perimeter (NSP) applied to this environment.
+DESC
+  default     = ["0.0.0.0/0"]
+}
+
+variable "security_perimeter_inbound_service_tags" {
+  type        = list(string)
+  sensitive   = false
+  description = <<DESC
+Allowed inbound service tags for this Network Security Perimeter (NSP) applied to this environment.
 DESC
   default     = ["0.0.0.0/0"]
 }
@@ -673,7 +697,7 @@ variable "security_perimeter_outbound_fqdns" {
   type        = list(string)
   sensitive   = false
   description = <<DESC
-Allowed outbound FQDNs for the Azure Security Perimeter.
+Allowed outbound FQDNs for Network Security Perimeter (NSP) applied to this environment.
 DESC
   default     = ["*"]
 }
