@@ -176,8 +176,9 @@ locals {
       rai_policy                 = false
     }
     Emotion = {
-      kind                       = "Emotion"
+      enable                     = false
       classic                    = false
+      kind                       = "Emotion"
       storage                    = true
       sku_name                   = "S0"
       dynamic_throttling_enabled = true
