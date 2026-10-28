@@ -56,7 +56,7 @@ module "nat_gateway" {
       zones                   = local.regions[var.location].zones
     }
   }
-/*
+  /*
   ## doesn't work - timesout after 30mins trying to create
   diagnostic_settings = var.logging_enabled == false ? null : {
     diag_setting_1 = {
