@@ -691,7 +691,12 @@ variable "security_perimeter_inbound_service_tags" {
   description = <<DESC
 Allowed inbound service tags for this Network Security Perimeter (NSP) applied to this environment.
 DESC
-  default     = ["AzureCloud"]
+  default     = [
+    "AzureCloud",
+    "PowerPlatform",
+    "AzureMonitor",
+    "MicrosoftDiscoveryService",
+    "Storage",
 }
 
 variable "security_perimeter_outbound_fqdns" {
