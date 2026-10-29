@@ -95,7 +95,7 @@ variable "ai_free_search_id" {
   description = <<DESC
 The ID of the AI Free Search resource to be used.
 DESC
-  default     = null
+  default     = true
 }
 
 variable "ai_free_search_principal_id" {
@@ -104,7 +104,7 @@ variable "ai_free_search_principal_id" {
   description = <<DESC
 The principal ID of the AI Free Search resource to be used.
 DESC
-  default     = null
+  default     = false
 }
 
 variable "aca_consumption_gpu_enabled" {
