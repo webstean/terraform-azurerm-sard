@@ -69,6 +69,29 @@ module "log_analytics_workspace" {
   ]
 }
 
+/*
+resource "azurerm_monitor_metric_alert" "ingestion" {
+  name                = "law-ingestion-high"
+  resource_group_name = module.environment_resource_group.resource.name
+  scopes              = [module.log_analytics_workspace.resource_id]
+  severity            = 2
+  frequency           = "PT1H"
+  window_size         = "PT6H"
+
+  criteria {
+    metric_namespace = "Microsoft.OperationalInsights/workspaces"
+    metric_name      = "Average_Billable_Data_Ingestion"
+    aggregation      = "Total"
+    operator         = "GreaterThan"
+    threshold        = 800000000 # ~0.8 GB over 6h
+  }
+
+  #action {
+  #  action_group_id = azurerm_monitor_action_group.ops.id
+  #}
+}
+*/
+
 module "application_insights" {
   source           = "Azure/avm-res-insights-component/azurerm"
   version          = "~>0.0, < 1.0"
