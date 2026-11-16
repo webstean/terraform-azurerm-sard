@@ -85,7 +85,7 @@ resource "azurerm_public_ip" "vmss_external" {
   } : {}
 
   name                    = "pip-vmss-external-${format("%02d", each.value)}"
-  parent_id               = module.environment_resource_group.resource.name ## module.global_resource_group.id
+  parent_id               = module.environment_resource_group.resource.id
   # resource_group_name     = module.environment_resource_group.resource.name
   location                = module.environment_resource_group.resource.location
   allocation_method       = "Static"
@@ -110,7 +110,8 @@ module "vmss_external_load_balancer" {
   enable_telemetry = var.enable_telemetry
 
   name                = "lb-external-${local.vmss_name}"
-  resource_group_name = module.environment_resource_group.resource.name
+  parent_id           = module.environment_resource_group.resource.id
+  ## resource_group_name = module.environment_resource_group.resource.name
   location            = module.environment_resource_group.resource.location
   sku                 = "Standard"
   sku_tier            = "Regional" # Global-tier backends must be regional load balancers, not VMSS NICs.
@@ -175,7 +176,7 @@ module "vmss_keyvault" {
   enable_telemetry = var.enable_telemetry
 
   name                            = local.vmss_name_hostname
-  resource_group_name             = module.environment_resource_group.resource.name
+  parent_id                       = module.environment_resource_group.resource.id
   location                        = module.environment_resource_group.resource.location
   tenant_id                       = data.azurerm_client_config.current.tenant_id
   sku_name                        = "standard"
