@@ -180,7 +180,7 @@ module "sql_keyvault" {
   enable_telemetry = var.enable_telemetry
 
   name                           = local.sql_server_hostname
-  parent_id                       = module.global_resource_group.id
+  parent_id                      = module.environment_resource_group.resource.id
   # resource_group_name            = module.environment_resource_group.resource.name
   location                       = module.environment_resource_group.resource.location
   tenant_id                      = data.azurerm_client_config.current.tenant_id
@@ -273,7 +273,7 @@ module "sql_server_this" {
 
   name                = "${local.sql_server_location}-p1"
   location            = module.environment_resource_group.resource.location
-  parent_id                       = module.global_resource_group.id
+  parent_id                      = module.environment_resource_group.resource.id
   server_version      = "12.0"
   azuread_administrator = {
     login_username              = var.owner_entra_display_name
