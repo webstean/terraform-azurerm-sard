@@ -39,20 +39,10 @@ resource "azurerm_storage_account" "this" {
     directory_type = "AADKERB"
     #default_share_level_permission = "StorageFileDataSmbShareElevatedContributor"
   }
-
-  ## share_properties {
-  ##  smb {
-  ## versions - (Optional) A set of SMB protocol versions. Possible values are SMB2.1, SMB3.0, and SMB3.1.1.
-  ##versions                        = ["SMB2.1", "SMB3.0"]
-  ##kerberos_ticket_encryption_type = ["AES-256"]     ## AES-256, RC4-HMAC
-  ## channel_encryption_type         = ["AES-256-GCM"] ## "AES-128-CCM" "AES-128-GCM" "AES-256-GCM"
-  ## authentication_types - (Optional) A set of SMB authentication methods. Possible values are NTLMv2, and Kerberos.
-  ## authentication_types = ["Kerberos", "NTLMv2"] ## NTLMv2 is needed for ACA
-  ## }
-  ##  }
+  ## azurerm v5:   smb_oauth_enabled = true
 
   share_properties {
-    smb { ## compatible with Azure Container Apps (ACA)
+    smb { ## needs to be compatible with Azure Container Apps (ACA)
       versions                        = ["SMB2.1", "SMB3.0", "SMB3.1.1"]
       kerberos_ticket_encryption_type = ["AES-256"] ## AES-256, RC4-HMAC
       channel_encryption_type         = ["AES-128-CCM", "AES-128-GCM", "AES-256-GCM"]
