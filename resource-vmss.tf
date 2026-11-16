@@ -85,7 +85,8 @@ resource "azurerm_public_ip" "vmss_external" {
   } : {}
 
   name                    = "pip-vmss-external-${format("%02d", each.value)}"
-  resource_group_name     = module.environment_resource_group.resource.name
+  parent_id               = module.environment_resource_group.resource.name ## module.global_resource_group.id
+  # resource_group_name     = module.environment_resource_group.resource.name
   location                = module.environment_resource_group.resource.location
   allocation_method       = "Static"
   domain_name_label       = local.vmss_external_load_balancer_pip_count == 1 ? "${local.vmss_name}${random_string.environment.result}" : "${local.vmss_name}${random_string.environment.result}-${format("%02d", each.value)}"
