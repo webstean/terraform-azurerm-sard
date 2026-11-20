@@ -14,8 +14,9 @@ module "log_analytics_workspace" {
   version          = "~>0.0, < 1.0"
   enable_telemetry = var.enable_telemetry
 
-  name                                      = local.law_name_location
-  resource_group_name                       = module.environment_resource_group.resource.name
+  name      = local.law_name_location
+  parent_id = module.environment_resource_group.resource.id
+  ## resource_group_name                       = module.environment_resource_group.resource.name
   location                                  = module.environment_resource_group.resource.location
   log_analytics_workspace_sku               = "PerGB2018"
   log_analytics_workspace_daily_quota_gb    = 5

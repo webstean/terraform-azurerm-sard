@@ -11,9 +11,8 @@ module "foundry_keyvault" {
   version          = "~>0.7, < 1.0"
   enable_telemetry = var.enable_telemetry
 
-  name      = local.foundry_name_hostname
-  parent_id = module.global_resource_group.id
-  # resource_group_name             = module.environment_resource_group.resource.name
+  name                            = local.foundry_name_hostname
+  parent_id                       = module.environment_resource_group.resource.id
   location                        = module.environment_resource_group.resource.location
   tenant_id                       = data.azurerm_client_config.current.tenant_id
   sku_name                        = "standard"

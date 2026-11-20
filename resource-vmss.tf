@@ -84,9 +84,9 @@ resource "azurerm_public_ip" "vmss_external" {
     for index in range(local.vmss_external_load_balancer_pip_count) : format("pip%02d", index + 1) => index + 1
   } : {}
 
-  name      = "pip-vmss-external-${format("%02d", each.value)}"
-  parent_id = module.environment_resource_group.resource.id
-  # resource_group_name     = module.environment_resource_group.resource.name
+  name = "pip-vmss-external-${format("%02d", each.value)}"
+  ## parent_id = module.environment_resource_group.resource.id
+  resource_group_name     = module.environment_resource_group.resource.name
   location                = module.environment_resource_group.resource.location
   allocation_method       = "Static"
   domain_name_label       = local.vmss_external_load_balancer_pip_count == 1 ? "${local.vmss_name}${random_string.environment.result}" : "${local.vmss_name}${random_string.environment.result}-${format("%02d", each.value)}"
@@ -175,7 +175,8 @@ module "vmss_keyvault" {
   version          = "~>0.7, < 1.0"
   enable_telemetry = var.enable_telemetry
 
-  name                            = local.vmss_name_hostname
+  name = local.vmss_name_hostname
+  ## resource_group_name = module.environment_resource_group.resource.name
   parent_id                       = module.environment_resource_group.resource.id
   location                        = module.environment_resource_group.resource.location
   tenant_id                       = data.azurerm_client_config.current.tenant_id

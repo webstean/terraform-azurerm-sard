@@ -181,7 +181,7 @@ module "sql_keyvault" {
 
   name      = local.sql_server_hostname
   parent_id = module.environment_resource_group.resource.id
-  # resource_group_name            = module.environment_resource_group.resource.name
+  ## resource_group_name            = module.environment_resource_group.resource.name
   location                       = module.environment_resource_group.resource.location
   tenant_id                      = data.azurerm_client_config.current.tenant_id
   sku_name                       = "standard"

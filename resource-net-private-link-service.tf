@@ -34,8 +34,8 @@ module "pls_internal_load_balancer" {
   enable_telemetry = var.enable_telemetry
 
   name      = "lb-local.${local.pls_name}"
-  parent_id = module.global_resource_group.id
-  # resource_group_name = module.environment_resource_group.resource.name
+  parent_id = module.environment_resource_group.resource.id
+  ## resource_group_name = module.environment_resource_group.resource.name
   location = module.environment_resource_group.resource.location
   sku      = "Standard"
   sku_tier = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
@@ -93,7 +93,7 @@ resource "azurerm_private_link_service" "this" {
   location            = module.environment_resource_group.resource.location
 
   load_balancer_frontend_ip_configuration_ids = [
-    module.pls_internal_load_balancer[0].resource.frontend_ip_configuration[0].id,
+    module.pls_internal_load_balancer[0].frontend_ip_configuration_resource_ids["pls_frontend"],
   ]
 
   dynamic "nat_ip_configuration" {

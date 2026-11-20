@@ -1,5 +1,5 @@
 output "security_perimeter_enabled" {
-  type        = list(string)
+  type        = bool
   description = "Is the NSP (Network Servucirty Perimeter) enabled or not"
   sensitive   = false
   value       = var.security_perimeter_enabled
