@@ -73,12 +73,12 @@ module "appgateway_public_ip" {
   version = "~> 0.0, < 1.0"
   count   = var.inbound_access == "App-Gateway" ? 1 : 0
 
-  name                = local.app_gateway_public_ip_name
-  parent_id           = module.global_resource_group.id
+  name      = local.app_gateway_public_ip_name
+  parent_id = module.global_resource_group.id
   # resource_group_name = module.environment_resource_group.resource.name
-  location            = module.environment_resource_group.resource.location
-  allocation_method   = "Static"
-  sku                 = "Standard"
+  location          = module.environment_resource_group.resource.location
+  allocation_method = "Static"
+  sku               = "Standard"
 
   diagnostic_settings = var.logging_enabled == false ? null : {
     diagsettings = {

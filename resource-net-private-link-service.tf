@@ -33,12 +33,12 @@ module "pls_internal_load_balancer" {
   version          = "~>0.5, < 1.0"
   enable_telemetry = var.enable_telemetry
 
-  name                = "lb-local.${local.pls_name}"
-  parent_id           = module.global_resource_group.id
+  name      = "lb-local.${local.pls_name}"
+  parent_id = module.global_resource_group.id
   # resource_group_name = module.environment_resource_group.resource.name
-  location            = module.environment_resource_group.resource.location
-  sku                 = "Standard"
-  sku_tier            = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
+  location = module.environment_resource_group.resource.location
+  sku      = "Standard"
+  sku_tier = tobool(var.deploy_private_endpoints) ? "Global" : "Regional"
 
   frontend_ip_configurations = {
     pls_frontend = {
