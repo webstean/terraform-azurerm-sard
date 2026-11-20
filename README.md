@@ -402,7 +402,7 @@ Next steps here
 | <a name="input_vmss_port_tcp_internal_probe"></a> [vmss\_port\_tcp\_internal\_probe](#input\_vmss\_port\_tcp\_internal\_probe) | The port on which the internal service's probe will listen. | `number` | `80` | no |
 | <a name="input_vmss_sku_name"></a> [vmss\_sku\_name](#input\_vmss\_sku\_name) | Azure Virtual Machine SKU for the scale set (e.g., Standard\_D2s\_v5). Determines vCPU, memory, and pricing.<br/>Set to null, for a SKU to be randomly selected by the system. | `string` | `"Standard_D2s_v5"` | no |
 | <a name="input_vpn_access_group_display_name"></a> [vpn\_access\_group\_display\_name](#input\_vpn\_access\_group\_display\_name) | Entra ID display name for the user or group that will have VPN access. | `string` | `null` | no |
-| <a name="input_vpn_access_group_object_id"></a> [vpn\_access\_group\_object\_id](#input\_vpn\_access\_group\_object\_id) | The Entra ID object ID for the VPN access group (can be a user or a group) | `string` | `null` | no |
+| <a name="input_vpn_access_group_object_id"></a> [vpn\_access\_group\_object\_id](#input\_vpn\_access\_group\_object\_id) | The Entra ID object ID for the VPN access group (can be a user or a group) | `string` | `""` | no |
 
 ## Outputs
 
