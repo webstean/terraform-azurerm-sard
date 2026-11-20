@@ -38,8 +38,8 @@ The Entra ID object ID for the owner of this environment
 DESC
 
   validation {
-    condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.owner_entra_object_id)))
-    error_message = "The variable 'owner_entra_object_id' must be a valid GUID."
+    condition     = var.owner_entra_object_id == null || can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.owner_entra_object_id)))
+    error_message = "The variable 'owner_entra_object_id' must be null or a valid GUID."
   }
 }
 
@@ -68,8 +68,8 @@ The Entra ID object ID for the administrator group
 Note, can be a Entra ID user or a group.
 DESC
   validation {
-    condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.administrator_group_object_id)))
-    error_message = "The variable 'administrator_group_object_id' must be a valid GUID."
+    condition     = var.administrator_group_object_id == null || can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.administrator_group_object_id)))
+    error_message = "The variable 'administrator_group_object_id' must be null or a valid GUID."
   }
 }
 
@@ -81,8 +81,8 @@ The single Azure subscription ID in which the resources will be deployed.
 DESC
 
   validation {
-    condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.subscription_id)))
-    error_message = "subscription_id must be a valid GUID."
+    condition     = var.subscription_id == null || can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.subscription_id)))
+    error_message = "subscription_id must be null or a valid GUID."
   }
 }
 
@@ -998,9 +998,9 @@ variable "vpn_access_group_object_id" {
 The Entra ID object ID for the VPN access group (can be a user or a group)
 DESC
   validation {
-    condition     = can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.vpn_access_group_object_id)))
-    error_message = "The variable 'vpn_access_group_object_id' must be a valid GUID."
+    condition     = var.vpn_access_group_object_id == null ? true : trimspace(var.vpn_access_group_object_id) == "" || can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", trimspace(var.vpn_access_group_object_id)))
+    error_message = "The variable 'vpn_access_group_object_id' must be null, empty, or a valid GUID."
   }
-  default = null
+  default = ""
 }
 
