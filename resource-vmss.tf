@@ -379,6 +379,42 @@ module "virtualmachinescaleset" {
     },
     */
     {
+      name                                      = "Microsoft.Azure.Monitoring.DependencyAgent"
+      publisher                                 = "Microsoft.Azure.Monitoring.DependencyAgent"
+      type                                      = "DependencyAgentWindows"
+      type_handler_version                      = "9.10"
+      auto_upgrade_minor_version_enabled        = true
+      failure_suppression_enabled               = false
+      extensions_to_provision_after_vm_creation = []
+      provision_after_extensions                = ["AdminCenter", "Execute.CustomData.bin"]
+      settings                                  = "{\"enableAMA\":true,}"
+    },
+/*
+{
+  "type": "extensions",
+  "name": "VMSnapshot",
+  "location":"<myLocation>",
+  "properties": {
+    "publisher": "Microsoft.Azure.RecoveryServices",
+    "type": "VMSnapshot",
+    "typeHandlerVersion": "1.9",
+    "autoUpgradeMinorVersion": true,
+    "settings": {
+      "locale":"<location>",
+      "taskId":"<taskId used by Azure Backup service to communicate with extension>",
+      "commandToExecute": "snapshot",
+      "commandStartTimeUTCTicks": "<scheduled start time of the snapshot task>",
+      "vmType": "microsoft.compute/virtualmachines"
+    },
+    "protectedSettings": {
+      "objectStr": "<blob SAS uri representation of VM sent by Azure Backup service to extension>",
+      "logsBlobUri": "<blob uri where logs of command execution by extension are written to>",
+      "statusBlobUri": "<blob uri where status of the command executed by extension is written>"
+    }
+  }
+}
+*/
+    {
       name                                      = "HealthExtension"
       publisher                                 = "Microsoft.ManagedServices"
       type                                      = "ApplicationHealthWindows"
