@@ -776,7 +776,7 @@ variable "vmss_autoscale_business_hours_start" {
   description = <<DESC
 Virtual Machine Scale Set: hour (0-23) each weekday when the CPU-based business-hours autoscale profile activates.
 DESC
-  default     = 16 ## 4pm
+  default     = 9 ## 9am
 }
 
 variable "vmss_autoscale_cooldown" {
