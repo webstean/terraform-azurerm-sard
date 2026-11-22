@@ -640,7 +640,7 @@ module "vmss_autoscale_setting" {
       recurrence = {
         timezone = local.regions[module.environment_resource_group.resource.location].timezone
         days     = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-        hours    = [17]
+        hours    = [11]
         minutes  = [10]
       }
     }
