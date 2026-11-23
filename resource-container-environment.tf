@@ -117,7 +117,7 @@ resource "acme_certificate" "aca_wildcard" {
 
 ## write/update certificate in KeyVault so you can use it in other services
 resource "azurerm_key_vault_certificate" "letsencrypt-aca" {
-  name         = "cert-wildcard-${lower(replace(acme_certificate.aca_wildcard.certificate_domain, ".", "-"))}"
+  name         = "cert-wildcard-${replace(lower(acme_certificate.aca_wildcard.certificate_domain), "/[^a-z0-9-]/", "-")}"
   key_vault_id = module.cert_keyvault.resource_id
 
   certificate {
