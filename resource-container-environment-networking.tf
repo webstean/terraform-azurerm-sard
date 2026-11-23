@@ -49,8 +49,8 @@ module "containerappenv_subnet" {
 module "sandbox_subnet" {
   count = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? 0 : 1
 
-  source  = "Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
-  version = "~> 0.22, < 1.0"
+  source           = "Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
+  version          = "~> 0.22, < 1.0"
   enable_telemetry = var.enable_telemetry
   location         = module.virtual_network.resource.location
 
