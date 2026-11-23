@@ -582,6 +582,7 @@ data "azurerm_network_watcher" "this" {
 module "outbound_subnet" {
   source  = "Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
   version = "~> 0.22, < 1.0"
+  enable_telemetry = var.enable_telemetry
 
   name             = "outbound"
   parent_id        = module.virtual_network.resource_id
