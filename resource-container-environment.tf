@@ -39,7 +39,9 @@ resource "azurerm_container_app_environment_certificate" "this" {
     azurerm_dns_a_record.aca,
     azurerm_dns_txt_record.aca,
     azurerm_dns_ns_record.aca,
-    azurerm_container_app_environment.this
+    azurerm_container_app_environment.this,
+    # The telemetry update reprovisions the environment, blocking certificate creation.
+    azapi_update_resource.aca_env_otel
   ]
   lifecycle {
     create_before_destroy = true
