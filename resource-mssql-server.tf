@@ -100,8 +100,8 @@ resource "azurerm_network_security_group" "inbound_sqlserver" {
 }
 
 module "sqlserver_subnet" {
-  source  = "Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
-  version = "~> 0.22, < 1.0"
+  source           = "Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
+  version          = "~> 0.22, < 1.0"
   enable_telemetry = var.enable_telemetry
   location         = module.virtual_network.resource.location
 
