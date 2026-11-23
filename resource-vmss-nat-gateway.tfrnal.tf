@@ -141,15 +141,17 @@ module "vmss_external_load_balancer" {
     }
   }
 
-  diagnostic_settings = var.logging_enabled == false ? null : {
+  /*
+diagnostic_settings = var.logging_enabled == false ? null : {
     diagsettings = {
       name                           = "Optional NLB Logging 1"
       log_groups                     = ["allLogs"]
       metric_categories              = ["AllMetrics"]
-      log_analytics_destination_type = null
+      # log_analytics_destination_type = null
       workspace_resource_id          = module.log_analytics_workspace.resource_id
     }
   }
+*/
 
   tags = { for key, value in module.environment_resource_group.resource.tags : key => value if lower(key) != "created" }
 }
