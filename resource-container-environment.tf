@@ -195,6 +195,13 @@ resource "azapi_update_resource" "aca_env_otel" {
   parent_id = module.environment_resource_group.resource_id
 
   body = {
+    identity = {
+      type = "UserAssigned"
+      userAssignedIdentities = {
+        (azurerm_user_assigned_identity.environment.id) = {}
+      }
+    }
+
     properties = {
       appInsightsConfiguration = {
         connectionString = module.application_insights.connection_string
