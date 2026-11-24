@@ -158,7 +158,6 @@ Next steps here
 | [azurerm_automation_runbook.demo_powershell_script1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_runbook) | resource |
 | [azurerm_automation_variable_string.user_assigned_identity_client_id](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_string) | resource |
 | [azurerm_container_app_environment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment) | resource |
-| [azurerm_container_app_environment_certificate.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_certificate) | resource |
 | [azurerm_container_app_environment_storage.logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_storage) | resource |
 | [azurerm_container_app_environment_storage.shared](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment_storage) | resource |
 | [azurerm_container_registry_task.dab_build](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry_task) | resource |
@@ -409,7 +408,6 @@ Next steps here
 
 | Name | Description |
 |------|-------------|
-| <a name="output_aca_certificate_subject_name"></a> [aca\_certificate\_subject\_name](#output\_aca\_certificate\_subject\_name) | The subject name of the Container App Environment. |
 | <a name="output_aca_env_custom_domain_verification_id"></a> [aca\_env\_custom\_domain\_verification\_id](#output\_aca\_env\_custom\_domain\_verification\_id) | The custom domain verification ID of the Container App Environment. |
 | <a name="output_aca_env_default_domain"></a> [aca\_env\_default\_domain](#output\_aca\_env\_default\_domain) | The default domain of the Container App Environment. |
 | <a name="output_aca_env_id"></a> [aca\_env\_id](#output\_aca\_env\_id) | The ID of the Container App Environment. |
