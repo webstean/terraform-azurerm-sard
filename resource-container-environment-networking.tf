@@ -10,10 +10,10 @@ module "containerappenv_subnet" {
   source           = "Azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
   version          = "~> 0.22, < 1.0"
   enable_telemetry = var.enable_telemetry
-  location         = module.virtual_network.resource.location
 
   name             = "containerappenv-${var.prefix}"
   parent_id        = module.virtual_network.resource_id
+  location         = module.virtual_network.resource.location
   address_prefixes = [format("10.%s.12.0/23", local.regions[var.location].location_number)]
 
   default_outbound_access_enabled               = (tobool(var.data_pii) || tobool(var.data_phi) || tobool(var.deploy_private_endpoints)) ? false : true
