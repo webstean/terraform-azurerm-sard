@@ -78,15 +78,16 @@ resource "azapi_update_resource" "aca_custom_domain_binding" {
     azurerm_dns_txt_record.aca,
     azurerm_dns_ns_record.aca,
     azurerm_container_app_environment.this
+    azurerm_container_app_environment_certificate.this,
   ]
 }
-*/
 
 output "aca_certificate_subject_name" {
   description = "The subject name of the Container App Environment."
   sensitive   = false
   value       = azurerm_container_app_environment_certificate.this.subject_name
 }
+*/
 
 ## create wildcard certificate for aca
 resource "acme_certificate" "aca_wildcard" {
