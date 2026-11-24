@@ -5,6 +5,7 @@ module "helloworld_container_app" {
 
   name                                  = "helloworld"
   resource_group_name                   = module.environment_resource_group.resource.name
+  location                              = module.environment_resource_group.resource.location
   container_app_environment_resource_id = azurerm_container_app_environment.this.id
   revision_mode                         = "Single"
 

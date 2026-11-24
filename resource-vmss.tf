@@ -218,7 +218,7 @@ module "virtualmachinescaleset" {
       provision_after_extensions                = ["AdminCenter", "Execute.CustomData.bin"]
       settings                                  = "{\"enableAMA\":true,}"
     },
-/*
+    /*
 {
   "type": "extensions",
   "name": "VMSnapshot",
