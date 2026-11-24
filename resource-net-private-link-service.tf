@@ -62,7 +62,7 @@ module "pls_internal_load_balancer" {
   lb_rules = {
     pls = {
       name                              = "pls-rule"
-      frontend_ip_configuration_name    = "pls-frontend"
+      frontend_ip_configuration_name    = "pls-internal-frontend"
       protocol                          = "Tcp"
       frontend_port                     = var.private_link_service_port
       backend_port                      = var.private_link_service_port
