@@ -25,6 +25,7 @@ resource "azurerm_dns_txt_record" "aca" { ## establish domain ownership
     azurerm_dns_caa_record.aca_allowed_certs,
   ]
 }
+/*
 resource "azurerm_container_app_environment_certificate" "this" {
   name                         = "${lower(local.ingress_custom_aca)}-certificate"
   container_app_environment_id = azurerm_container_app_environment.this.id
@@ -47,6 +48,7 @@ resource "azurerm_container_app_environment_certificate" "this" {
     create_before_destroy = true
   }
 }
+*/
 
 /*
 resource "azapi_update_resource" "aca_custom_domain_binding" {
@@ -195,13 +197,6 @@ resource "azapi_update_resource" "aca_env_otel" {
   parent_id = module.environment_resource_group.resource_id
 
   body = {
-    identity = {
-      type = "UserAssigned"
-      userAssignedIdentities = {
-        (azurerm_user_assigned_identity.environment.id) = {}
-      }
-    }
-
     properties = {
       appInsightsConfiguration = {
         connectionString = module.application_insights.connection_string

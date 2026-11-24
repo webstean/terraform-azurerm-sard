@@ -114,7 +114,6 @@ module "environment_resource_group" {
       principal_type                   = "ServicePrincipal"
       description                      = local.iac_message
     }
-    /*
     "sp_roleassignment10" = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Container Apps SandboxGroup Data Owner/${var.owner_entra_object_id}")
       role_definition_id_or_name       = "Container Apps SandboxGroup Data Owner"
@@ -123,8 +122,6 @@ module "environment_resource_group" {
       principal_type                   = "ServicePrincipal"
       description                      = local.iac_message
     }
-*/
-
     ## ==========================================================================================
     /*
     "up_roleassignment1" = {
