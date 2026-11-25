@@ -952,7 +952,7 @@ variable "vmss_sku_name" {
 Azure Virtual Machine SKU for the scale set (e.g., Standard_D2s_v5). Determines vCPU, memory, and pricing.
 Set to null, for a SKU to be randomly selected by the system.
 DESC
-  default     = "Standard_D2s_v5" ## Standard_D2s_v5
+  default     = null ## "Standard_D2s_v5" ## Standard_D2s_v5
 }
 
 variable "vmss_port_tcp_external" {
