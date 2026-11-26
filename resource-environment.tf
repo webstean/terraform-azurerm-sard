@@ -166,9 +166,25 @@ module "environment_resource_group" {
       principal_type                   = "User"
       description                      = local.iac_message
     }
-    "up_roleassignment8" = {
+    "up_roleassignment8a" = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Key Vault Secrets User/${var.owner_entra_object_id}")
+      role_definition_id_or_name       = "Key Vault Reader"
+      principal_id                     = var.owner_entra_object_id
+      skip_service_principal_aad_check = false
+      principal_type                   = "User"
+      description                      = local.iac_message
+    }
+    "up_roleassignment8b" = {
       name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Key Vault Secrets User/${var.owner_entra_object_id}")
       role_definition_id_or_name       = "Key Vault Secrets User"
+      principal_id                     = var.owner_entra_object_id
+      skip_service_principal_aad_check = false
+      principal_type                   = "User"
+      description                      = local.iac_message
+    }
+    "up_roleassignment9a" = {
+      name                             = uuidv5("url", "${module.environment_resource_group.resource.id}/Key Vault Secrets User/${var.owner_entra_object_id}")
+      role_definition_id_or_name       = "Key Vault Certificate User"
       principal_id                     = var.owner_entra_object_id
       skip_service_principal_aad_check = false
       principal_type                   = "User"
@@ -284,4 +300,27 @@ The SARD Azure Portal url
 DESC
   sensitive   = false
   value       = try(local.portal_link, null)
+}
+
+data "azapi_resource_list" "policy_assignments" {
+  type      = "Microsoft.Authorization/policyAssignments@2022-06-01"
+  parent_id = module.environment_resource_group.resource.id
+
+  query_parameters = {
+    "$filter" = ["atScopeAndAbove()"]          # includes subscription and management group assignments
+  }
+
+  response_export_values = ["*"]
+}
+
+output "policy_assignments" {
+  value = [
+    for a in data.azapi_resource_list.policy_assignments.output.value : {
+      name        = a.name
+      scope       = a.properties.scope
+      displayName = try(a.properties.displayName, null)
+      definition  = a.properties.policyDefinitionId
+      enforcement = a.properties.enforcementMode
+    }
+  ]
 }
